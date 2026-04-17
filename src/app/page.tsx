@@ -1,21 +1,20 @@
 "use client"
 
-import { useMemo, useRef, useState } from "react"
+import Link from "next/link"
+import { type ReactNode, useMemo, useRef, useState } from "react"
 import {
-  Globe,
-  ChevronDown,
   ArrowRightLeft,
-  X,
-  Volume2,
+  Check,
   Copy,
-  Share2,
+  Globe,
+  Loader2,
   Mic,
-  Languages,
-  MessageCircleMore,
-  Bot,
-  History,
+  Clipboard,
+  Send,
+  Share2,
+  Volume2,
 } from "lucide-react"
-import { LoginLinkButton } from "@/components/auth/LoginLinkButton"
+import { cn } from "@/components/ui/Button"
 
 const MAX_CHARS = 5000
 const languages = [
@@ -29,14 +28,82 @@ const languages = [
   "Japanese",
 ]
 
+function TranslationPanel({
+  title,
+  body,
+  accentColor,
+  borderClassName,
+  cardClassName,
+  align = "left",
+  actions,
+  children,
+}: {
+  title: string
+  body: string
+  accentColor: string
+  borderClassName: string
+  cardClassName: string
+  align?: "left" | "right"
+  actions?: ReactNode
+  children?: ReactNode
+}) {
+  const isRightAligned = align === "right"
+
+  return (
+    <section className={cn("relative flex-1 rounded-[2rem] border px-5 pb-8 pt-6 shadow-[0_24px_60px_rgba(0,0,0,0.32)]", borderClassName)}>
+      <div className="flex h-full flex-col justify-between">
+        <div className={cn("flex items-center justify-between", isRightAligned && "flex-row-reverse")}>
+          <div className={cn("flex items-center gap-3", isRightAligned && "flex-row-reverse")}>
+            <div className="flex h-12 w-12 items-center justify-center rounded-2xl text-lg" style={{ backgroundColor: `${accentColor}24` }}>
+              {isRightAligned ? "🌍" : "✍️"}
+            </div>
+            <div className={cn(isRightAligned && "text-right")}>
+              <p className="text-sm font-semibold text-[#eef1ff]">{title}</p>
+              <p className="text-xs uppercase tracking-[0.18em] text-[#8ea0c9]">
+                {isRightAligned ? "Output" : "Input"}
+              </p>
+            </div>
+          </div>
+
+          {actions ? <div className={cn("flex items-center gap-2", isRightAligned && "flex-row-reverse")}>{actions}</div> : null}
+        </div>
+
+        <div className={cn("mt-8 rounded-[1.75rem] border p-5", cardClassName, isRightAligned && "text-right")}>
+          <p className="text-sm uppercase tracking-[0.2em] text-[#7f91be]">
+            {isRightAligned ? "Translation" : "Original"}
+          </p>
+          {children ? (
+            <div className="mt-3">{children}</div>
+          ) : (
+            <p className="mt-3 min-h-[6rem] text-[1.45rem] leading-tight text-[#eef1ff] sm:text-[1.7rem]">
+              {body}
+            </p>
+          )}
+          <div className={cn("mt-6 flex items-end gap-2", isRightAligned ? "justify-end" : "justify-start")}>
+            <div className="h-14 w-2 origin-bottom rounded-full bg-[#79b3ff] scale-y-[0.42]" />
+            <div className="h-14 w-2 origin-bottom rounded-full bg-[#d0bcff] scale-y-[0.78]" />
+            <div className="h-14 w-2 origin-bottom rounded-full bg-[#79b3ff] scale-y-[0.56]" />
+            <div className="h-14 w-2 origin-bottom rounded-full bg-[#d0bcff] scale-y-100" />
+            <div className="h-14 w-2 origin-bottom rounded-full bg-[#79b3ff] scale-y-[0.64]" />
+          </div>
+        </div>
+      </div>
+    </section>
+  )
+}
+
 export default function Home() {
   const inputRef = useRef<HTMLTextAreaElement>(null)
+  const audioRef = useRef<HTMLAudioElement | null>(null)
   const [sourceLanguage, setSourceLanguage] = useState("English")
   const [targetLanguage, setTargetLanguage] = useState("Spanish")
   const [text, setText] = useState("")
-  const [translatedText, setTranslatedText] = useState("Introduce el texto a traducir...")
+  const [translatedText, setTranslatedText] = useState("Your translated text will appear here.")
   const [loading, setLoading] = useState(false)
+  const [audioLoading, setAudioLoading] = useState(false)
   const [error, setError] = useState("")
+  const [copied, setCopied] = useState(false)
+  const [pastePending, setPastePending] = useState(false)
 
   const canTranslate = text.trim().length > 0 && !loading
 
@@ -82,19 +149,21 @@ export default function Home() {
   const swapLanguages = () => {
     setSourceLanguage(targetLanguage)
     setTargetLanguage(sourceLanguage)
-    if (translatedText && translatedText !== "Introduce el texto a traducir...") {
+    if (translatedText && translatedText !== "Your translated text will appear here.") {
       setText(translatedText)
-      setTranslatedText(text || "Introduce el texto a traducir...")
+      setTranslatedText(text || "Your translated text will appear here.")
     }
   }
 
   const copyTranslation = async () => {
-    if (!translatedText || translatedText === "Introduce el texto a traducir...") return
+    if (!translatedText || translatedText === "Your translated text will appear here.") return
     await navigator.clipboard.writeText(translatedText)
+    setCopied(true)
+    window.setTimeout(() => setCopied(false), 1200)
   }
 
   const shareTranslation = async () => {
-    if (!translatedText || translatedText === "Introduce el texto a traducir...") return
+    if (!translatedText || translatedText === "Your translated text will appear here.") return
 
     if (navigator.share) {
       await navigator.share({
@@ -107,139 +176,204 @@ export default function Home() {
     await navigator.clipboard.writeText(translatedText)
   }
 
-  const clearInput = () => {
-    setText("")
-    setError("")
-    inputRef.current?.focus()
+  const pasteIntoInput = async () => {
+    try {
+      setPastePending(true)
+      const clipboardText = await navigator.clipboard.readText()
+      setText(clipboardText.slice(0, MAX_CHARS))
+      setError("")
+      inputRef.current?.focus()
+    } catch (pasteError) {
+      setError(pasteError instanceof Error ? pasteError.message : "Unable to paste from clipboard.")
+    } finally {
+      setPastePending(false)
+    }
   }
 
-  const focusInputCard = (event: React.MouseEvent<HTMLElement>) => {
-    const target = event.target as HTMLElement
-    if (target.closest("button") || target.closest("select")) return
-    inputRef.current?.focus()
+  const playTranslation = async () => {
+    if (!translatedText || translatedText === "Your translated text will appear here.") return
+
+    try {
+      setAudioLoading(true)
+      setError("")
+
+      const response = await fetch("/api/synthesize", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          text: translatedText,
+        }),
+      })
+
+      if (!response.ok) {
+        const payload = await response.json().catch(() => ({}))
+        throw new Error(payload?.error || "Unable to synthesize speech right now.")
+      }
+
+      const audioBlob = await response.blob()
+      const audioUrl = URL.createObjectURL(audioBlob)
+
+      if (audioRef.current) {
+        audioRef.current.pause()
+        URL.revokeObjectURL(audioRef.current.src)
+      }
+
+      const audio = new Audio(audioUrl)
+      audioRef.current = audio
+      audio.onended = () => {
+        URL.revokeObjectURL(audioUrl)
+        if (audioRef.current === audio) {
+          audioRef.current = null
+        }
+      }
+
+      await audio.play()
+    } catch (playError) {
+      setError(playError instanceof Error ? playError.message : "Unable to play translated audio.")
+    } finally {
+      setAudioLoading(false)
+    }
   }
 
   return (
-    <main className="min-h-screen bg-[#000f3d] text-white">
-      <div className="mx-auto flex min-h-screen w-full max-w-md flex-col px-4 pb-6 pt-8">
-        <header className="flex items-center justify-between gap-4">
-          <div className="flex items-center gap-3">
-            <div className="flex h-10 w-10 items-center justify-center rounded-full">
-              <Globe className="h-9 w-9 text-[#c7afff]" strokeWidth={2.2} />
-            </div>
-            <div>
-              <h1 className="text-[28px] font-semibold tracking-tight text-[#c7afff]">EchoLingo</h1>
-              <p className="text-xs text-[#9ea8c7]">Translate now, save later</p>
+    <main className="min-h-[calc(100dvh-5rem)] bg-[#020b23] text-white">
+      <div className="relative min-h-[calc(100dvh-5rem)] w-full overflow-hidden bg-[radial-gradient(circle_at_top,rgba(124,92,255,0.22),transparent_28%),linear-gradient(180deg,#09142f_0%,#050c1f_48%,#09142f_100%)]">
+        <div className="flex items-center justify-between px-4 pt-6 sm:px-6 sm:pt-8">
+          <div className="flex items-center gap-2 text-[#c8aefc]">
+            <Globe size={26} />
+            <h1 className="text-xl font-semibold">EchoLingo</h1>
+          </div>
+
+          <Link
+            href="/login"
+            className="inline-flex w-auto shrink-0 items-center justify-center rounded-full border border-[#44607b] bg-[#214461] px-5 py-3 text-sm font-medium text-[#e6e8f5] transition-all hover:bg-[#2a4e6f] active:scale-95"
+          >
+            Log In
+          </Link>
+        </div>
+
+        <div className="relative flex min-h-[calc(100dvh-11rem)] flex-col px-4 pb-[max(2rem,env(safe-area-inset-bottom))] pt-6 sm:px-6 sm:pt-8">
+          <TranslationPanel
+            title={sourceLanguage}
+            body=""
+            accentColor="#d0bcff"
+            borderClassName="border-[#d0bcff]/10 bg-[linear-gradient(180deg,rgba(27,38,73,0.96),rgba(14,22,46,0.92))]"
+            cardClassName="border-[#d0bcff]/10 bg-[#0e1731]/80"
+            actions={
+              <>
+                <select
+                  className="rounded-full border border-[#d0bcff]/20 bg-[#101936] px-4 py-3 text-sm text-[#eef1ff] outline-none"
+                  value={sourceLanguage}
+                  onChange={(event) => setSourceLanguage(event.target.value)}
+                  aria-label="Source language"
+                >
+                  {languages.map((lang) => (
+                    <option key={`src-${lang}`} value={lang} className="bg-[#132041] text-white">
+                      {lang}
+                    </option>
+                  ))}
+                </select>
+                <button
+                  type="button"
+                  onClick={pasteIntoInput}
+                  className="flex h-11 w-11 items-center justify-center rounded-full bg-[#101936] text-[#d8def6]"
+                  aria-label="Paste into translation input"
+                >
+                  {pastePending ? <Loader2 size={18} className="animate-spin" /> : <Clipboard size={18} />}
+                </button>
+              </>
+            }
+          >
+            <textarea
+              ref={inputRef}
+              value={text}
+              onChange={(event) => setText(event.target.value.slice(0, MAX_CHARS))}
+              placeholder="Enter text to translate..."
+              className="min-h-[8rem] w-full resize-none bg-transparent text-[1.45rem] leading-tight text-[#eef1ff] outline-none placeholder:text-[#69789e] sm:text-[1.7rem]"
+            />
+          </TranslationPanel>
+
+          <div className="pointer-events-none relative z-20 -my-10 flex justify-center sm:-my-14">
+            <div className="relative mx-auto flex h-28 w-28 items-center justify-center sm:h-36 sm:w-36">
+              <div className="absolute inset-0 rounded-full bg-[radial-gradient(circle,rgba(181,137,255,0.28)_0%,rgba(181,137,255,0.08)_48%,transparent_72%)]" />
+              <div className="absolute inset-[14px] rounded-full border border-[#f0d5ff]/20 bg-[#120f2d]/90 shadow-[0_16px_40px_rgba(107,63,201,0.38)] sm:inset-[18px]" />
+              <button
+                type="button"
+                onClick={swapLanguages}
+                className="pointer-events-auto relative z-10 flex h-16 w-16 items-center justify-center rounded-full bg-[linear-gradient(180deg,#d8b6ff_0%,#a45cff_100%)] text-[#2e0b5a] shadow-[0_12px_30px_rgba(164,92,255,0.45)] sm:h-20 sm:w-20"
+                aria-label="Swap languages"
+              >
+                <ArrowRightLeft size={28} className="sm:h-9 sm:w-9" strokeWidth={2.6} />
+              </button>
             </div>
           </div>
 
-          <LoginLinkButton
-            label="Log In"
-            className="w-auto shrink-0 border-[#44607b] bg-[#214461] px-5 py-3 text-sm font-medium text-[#e6e8f5] hover:bg-[#2a4e6f]"
-          />
-        </header>
-
-        <section className="mt-12 rounded-[800px] bg-[#222d52] px-5 py-5 shadow-[0_12px_30px_rgba(0,0,0,0.22)]">
-          <div className="grid grid-cols-[1fr_auto_1fr] items-center">
-            <label className="flex items-center justify-center gap-2 text-[#e6e8f5]">
-              <span className="sr-only">Source language</span>
-              <select
-                className="w-full bg-transparent text-center text-[20px] font-medium outline-none"
-                value={sourceLanguage}
-                onChange={(e) => setSourceLanguage(e.target.value)}
-              >
-                {languages.map((lang) => (
-                  <option key={`src-${lang}`} value={lang} className="bg-[#222d52] text-white">
-                    {lang}
-                  </option>
-                ))}
-              </select>
-              <ChevronDown className="h-5 w-5" />
-            </label>
-
-            <button
-              onClick={swapLanguages}
-              className="mx-3 flex h-[74px] w-[74px] items-center justify-center rounded-full bg-[#283458] shadow-inner"
-              aria-label="Swap languages"
-            >
-              <ArrowRightLeft className="h-9 w-9 text-[#c7afff]" strokeWidth={2.2} />
-            </button>
-
-            <label className="flex items-center justify-center gap-2 text-[#e6e8f5]">
-              <span className="sr-only">Target language</span>
-              <select
-                className="w-full bg-transparent text-center text-[20px] font-medium outline-none"
-                value={targetLanguage}
-                onChange={(e) => setTargetLanguage(e.target.value)}
-              >
-                {languages.map((lang) => (
-                  <option key={`tgt-${lang}`} value={lang} className="bg-[#222d52] text-white">
-                    {lang}
-                  </option>
-                ))}
-              </select>
-              <ChevronDown className="h-5 w-5" />
-            </label>
-          </div>
-        </section>
-
-        <section
-          className="mt-10 cursor-text rounded-[34px] bg-[#0f1c49] px-8 pb-8 pt-10 shadow-[0_18px_35px_rgba(0,0,0,0.22)]"
-          onClick={focusInputCard}
-        >
-          <textarea
-            ref={inputRef}
-            value={text}
-            onChange={(e) => setText(e.target.value.slice(0, MAX_CHARS))}
-            placeholder="Enter text to translate..."
-            className="pointer-events-auto relative z-10 h-52 w-52 resize-none bg-transparent text-[24px] leading-snug text-[#dae2fd] placeholder:text-[#737598] outline-none"
+          <TranslationPanel
+            title={targetLanguage}
+            body={translatedText}
+            accentColor="#8bd6b4"
+            borderClassName="border-[#8bd6b4]/10 bg-[linear-gradient(180deg,rgba(13,24,45,0.92),rgba(20,40,53,0.96))]"
+            cardClassName="border-[#8bd6b4]/10 bg-[#0d1c2c]/80"
+            align="right"
+            actions={
+              <>
+                <button
+                  type="button"
+                  onClick={playTranslation}
+                  disabled={audioLoading}
+                  className="flex h-11 w-11 items-center justify-center rounded-full bg-[#101936] text-[#d8def6]"
+                  aria-label="Play translated audio"
+                >
+                  {audioLoading ? <Loader2 size={18} className="animate-spin" /> : <Volume2 size={18} />}
+                </button>
+                <button
+                  type="button"
+                  onClick={copyTranslation}
+                  className="flex h-11 w-11 items-center justify-center rounded-full bg-[#101936] text-[#d8def6]"
+                  aria-label="Copy translated text"
+                >
+                  {copied ? <Check size={18} /> : <Copy size={18} />}
+                </button>
+                <button
+                  type="button"
+                  onClick={shareTranslation}
+                  className="flex h-11 w-11 items-center justify-center rounded-full bg-[#101936] text-[#d8def6]"
+                  aria-label="Share translated text"
+                >
+                  <Share2 size={18} />
+                </button>
+                <select
+                  className="rounded-full border border-[#8bd6b4]/20 bg-[#101936] px-4 py-3 text-sm text-[#eef1ff] outline-none"
+                  value={targetLanguage}
+                  onChange={(event) => setTargetLanguage(event.target.value)}
+                  aria-label="Target language"
+                >
+                  {languages.map((lang) => (
+                    <option key={`tgt-${lang}`} value={lang} className="bg-[#132041] text-white">
+                      {lang}
+                    </option>
+                  ))}
+                </select>
+              </>
+            }
           />
 
-          <div className="mt-6 flex items-center justify-between">
-            <button onClick={clearInput} className="text-[#c7c3de]" aria-label="Clear text">
-              <X className="h-10 w-10" strokeWidth={2.2} />
-            </button>
-
+          <div className="mt-5 flex items-center justify-between gap-3 rounded-[2rem] border border-[#b9c7df]/10 bg-[#0d1734]/85 p-4 shadow-[0_20px_40px_rgba(0,0,0,0.24)]">
+            <span className={cn("text-sm", error ? "text-red-300" : "text-[#9fb0d4]")}>{helperText}</span>
             <button
+              type="button"
               onClick={translate}
               disabled={!canTranslate}
-              className="rounded-full bg-gradient-to-br from-[#d0bcff] to-[#7a5ac9] px-6 py-2 text-sm font-semibold text-[#3c0091] disabled:cursor-not-allowed disabled:opacity-40"
+              className="inline-flex items-center justify-center gap-2 rounded-full bg-[linear-gradient(180deg,#d8b6ff_0%,#a45cff_100%)] px-5 py-3 text-sm font-semibold text-[#2e0b5a] disabled:opacity-40"
+              aria-label="Translate text"
             >
-              {loading ? "Translating" : "Translate"}
-            </button>
-
-            <span className={`text-[15px] ${error ? "text-red-300" : "text-[#777995]"}`}>{helperText}</span>
-          </div>
-        </section>
-
-        <section className="mt-8 rounded-[34px] bg-[#232d52] px-8 pb-12 pt-10 shadow-[0_18px_35px_rgba(0,0,0,0.22)]">
-          <p className="max-w-[270px] text-[28px] leading-[1.15] text-[#c7afff]">{translatedText}</p>
-
-          <div className="mt-24 border-t border-[#2e395f]" />
-
-          <div className="mt-8 flex items-center justify-between">
-            <button className="flex h-[92px] w-[92px] items-center justify-center rounded-full bg-[#313b61]" aria-label="Play translation audio">
-              <Volume2 className="h-11 w-11 text-[#c7afff]" strokeWidth={2.2} />
-            </button>
-
-            <div className="flex items-center gap-8 text-[#d1c9e2]">
-              <button onClick={copyTranslation} aria-label="Copy translation">
-                <Copy className="h-8 w-8" strokeWidth={2.2} />
-              </button>
-              <button onClick={shareTranslation} aria-label="Share translation">
-                <Share2 className="h-8 w-8" strokeWidth={2.2} />
-              </button>
-            </div>
-          </div>
-        </section>
-
-        <section className="relative mt-8 flex flex-1 items-center justify-center pb-24 md:pb-8">
-          <div className="flex h-[100px] w-[100px] items-center justify-center rounded-full bg-[radial-gradient(circle,rgba(8,16,50,0.75)_0%,rgba(6,14,47,0.95)_65%,rgba(4,12,45,1)_100%)]">
-            <button className="flex h-[60px] w-[60px] items-center justify-center rounded-full bg-[#b997ff] shadow-[0_10px_30px_rgba(185,151,255,0.18)]" aria-label="Voice input">
-              <Mic className="h-8 w-8 text-[#3f00a8]" strokeWidth={2.4} />
+              {loading ? <Loader2 size={18} className="animate-spin" /> : <Send size={18} />}
+              <span>Translate</span>
             </button>
           </div>
-        </section>
+        </div>
       </div>
     </main>
   )
