@@ -1,6 +1,6 @@
 "use client"
 
-import { useMemo, useState } from "react"
+import { useMemo, useRef, useState } from "react"
 import {
   Globe,
   ChevronDown,
@@ -29,6 +29,7 @@ const languages = [
 ]
 
 export default function Home() {
+  const inputRef = useRef<HTMLTextAreaElement>(null)
   const [sourceLanguage, setSourceLanguage] = useState("English")
   const [targetLanguage, setTargetLanguage] = useState("Spanish")
   const [text, setText] = useState("")
@@ -108,6 +109,13 @@ export default function Home() {
   const clearInput = () => {
     setText("")
     setError("")
+    inputRef.current?.focus()
+  }
+
+  const focusInputCard = (event: React.MouseEvent<HTMLElement>) => {
+    const target = event.target as HTMLElement
+    if (target.closest("button") || target.closest("select")) return
+    inputRef.current?.focus()
   }
 
   return (
@@ -170,12 +178,16 @@ export default function Home() {
           </div>
         </section>
 
-        <section className="mt-10 rounded-[34px] bg-[#0f1c49] px-8 pb-8 pt-10 shadow-[0_18px_35px_rgba(0,0,0,0.22)]">
+        <section
+          className="mt-10 cursor-text rounded-[34px] bg-[#0f1c49] px-8 pb-8 pt-10 shadow-[0_18px_35px_rgba(0,0,0,0.22)]"
+          onClick={focusInputCard}
+        >
           <textarea
+            ref={inputRef}
             value={text}
             onChange={(e) => setText(e.target.value.slice(0, MAX_CHARS))}
             placeholder="Enter text to translate..."
-            className="h-52 w-full resize-none bg-transparent text-[24px] leading-snug text-[#dae2fd] placeholder:text-[#737598] outline-none"
+            className="pointer-events-auto relative z-10 h-52 w-full resize-none bg-transparent text-[24px] leading-snug text-[#dae2fd] placeholder:text-[#737598] outline-none"
           />
 
           <div className="mt-6 flex items-center justify-between">
