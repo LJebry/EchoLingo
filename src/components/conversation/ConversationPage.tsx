@@ -4,12 +4,9 @@ import { useMemo, useState } from "react"
 import Link from "next/link"
 import {
   ArrowRightLeft,
-  AudioLines,
   Check,
-  Clock3,
   Globe,
   Keyboard,
-  Languages,
   Loader2,
   Mic,
   Send,
@@ -368,9 +365,9 @@ export function ConversationPage() {
   }
 
   return (
-    <main className="flex min-h-screen justify-center bg-[#020b23] text-white">
-      <div className="relative min-h-screen w-full max-w-sm overflow-hidden bg-[radial-gradient(circle_at_top,rgba(124,92,255,0.22),transparent_28%),linear-gradient(180deg,#09142f_0%,#050c1f_48%,#09142f_100%)]">
-        <div className="flex items-center justify-between px-6 pt-10">
+    <main className="flex min-h-[calc(100dvh-5rem)] justify-center bg-[#020b23] text-white">
+      <div className="relative min-h-[calc(100dvh-5rem)] w-full max-w-md overflow-hidden bg-[radial-gradient(circle_at_top,rgba(124,92,255,0.22),transparent_28%),linear-gradient(180deg,#09142f_0%,#050c1f_48%,#09142f_100%)]">
+        <div className="flex items-center justify-between px-4 pt-6 sm:px-6 sm:pt-8">
           <div className="flex items-center gap-2 text-[#c8aefc]">
             <Globe size={26} />
             <h1 className="text-xl font-semibold">EchoLingo</h1>
@@ -382,7 +379,7 @@ export function ConversationPage() {
           </div>
         </div>
 
-        <div className="relative flex min-h-screen flex-col px-5 pb-44 pt-8">
+        <div className="relative flex min-h-[calc(100dvh-11rem)] flex-col px-4 pb-8 pt-6 sm:px-5 sm:pt-8">
           <SpeakerPanel
             speaker={speakers[0]}
             content={panelCopy.person1}
@@ -399,10 +396,10 @@ export function ConversationPage() {
             onRecordingComplete={(audioBlob) => submitTurn({ audioBlob })}
           >
             {({ isSupported, startRecording, stopRecording }) => (
-              <div className="pointer-events-none relative z-20 -my-14 flex justify-center">
-                <div className="relative mx-auto flex h-36 w-36 items-center justify-center">
+              <div className="pointer-events-none relative z-20 -my-10 flex justify-center sm:-my-14">
+                <div className="relative mx-auto flex h-28 w-28 items-center justify-center sm:h-36 sm:w-36">
                   <div className="absolute inset-0 rounded-full bg-[radial-gradient(circle,rgba(181,137,255,0.28)_0%,rgba(181,137,255,0.08)_48%,transparent_72%)]" />
-                  <div className="absolute inset-[18px] rounded-full border border-[#f0d5ff]/20 bg-[#120f2d]/90 shadow-[0_16px_40px_rgba(107,63,201,0.38)]" />
+                  <div className="absolute inset-[14px] rounded-full border border-[#f0d5ff]/20 bg-[#120f2d]/90 shadow-[0_16px_40px_rgba(107,63,201,0.38)] sm:inset-[18px]" />
                   <button
                     type="button"
                     onClick={() => {
@@ -413,13 +410,13 @@ export function ConversationPage() {
                       }
                     }}
                     disabled={isSubmitting || !isSupported}
-                    className="pointer-events-auto relative z-10 flex h-20 w-20 items-center justify-center rounded-full bg-[linear-gradient(180deg,#d8b6ff_0%,#a45cff_100%)] text-[#2e0b5a] shadow-[0_12px_30px_rgba(164,92,255,0.45)] disabled:opacity-50"
+                    className="pointer-events-auto relative z-10 flex h-16 w-16 items-center justify-center rounded-full bg-[linear-gradient(180deg,#d8b6ff_0%,#a45cff_100%)] text-[#2e0b5a] shadow-[0_12px_30px_rgba(164,92,255,0.45)] disabled:opacity-50 sm:h-20 sm:w-20"
                     aria-label={isRecording ? "Stop recording" : "Start recording"}
                   >
                     {isSubmitting ? (
-                      <Loader2 size={36} className="animate-spin" strokeWidth={2.6} />
+                      <Loader2 size={28} className="animate-spin sm:h-9 sm:w-9" strokeWidth={2.6} />
                     ) : (
-                      <Mic size={36} strokeWidth={2.6} />
+                      <Mic size={28} className="sm:h-9 sm:w-9" strokeWidth={2.6} />
                     )}
                   </button>
                 </div>
@@ -437,9 +434,9 @@ export function ConversationPage() {
           />
 
           <div className="mt-5 rounded-[2rem] border border-[#b9c7df]/10 bg-[#0d1734]/85 p-4 shadow-[0_20px_40px_rgba(0,0,0,0.24)]">
-            <div className="flex items-center justify-between text-xs uppercase tracking-[0.18em] text-[#8ea0c9]">
+            <div className="flex items-center justify-between gap-3 text-[10px] uppercase tracking-[0.18em] text-[#8ea0c9] sm:text-xs">
               <span>{activeSpeaker.name}</span>
-              <span>{activeSpeaker.sourceLanguage} to {activeSpeaker.targetLanguage}</span>
+              <span className="text-right">{activeSpeaker.sourceLanguage} to {activeSpeaker.targetLanguage}</span>
             </div>
 
             <div className="mt-3 flex gap-3">
@@ -447,13 +444,13 @@ export function ConversationPage() {
                 value={draftText}
                 onChange={(event) => setDraftText(event.target.value)}
                 placeholder={`Type what ${activeSpeaker.name.toLowerCase()} wants to say...`}
-                className="min-h-[90px] flex-1 resize-none rounded-[1.4rem] border border-[#d0bcff]/10 bg-[#091127] px-4 py-3 text-sm text-[#eef1ff] outline-none placeholder:text-[#69789e]"
+                className="min-h-[84px] flex-1 resize-none rounded-[1.4rem] border border-[#d0bcff]/10 bg-[#091127] px-4 py-3 text-sm text-[#eef1ff] outline-none placeholder:text-[#69789e] sm:min-h-[90px]"
               />
               <button
                 type="button"
                 onClick={() => submitTurn({ transcriptText: draftText })}
                 disabled={isSubmitting || !draftText.trim()}
-                className="flex h-auto min-h-[90px] w-14 items-center justify-center rounded-[1.4rem] bg-[#1d2b55] text-[#d0bcff] disabled:opacity-40"
+                className="flex h-auto min-h-[84px] w-12 items-center justify-center rounded-[1.4rem] bg-[#1d2b55] text-[#d0bcff] disabled:opacity-40 sm:min-h-[90px] sm:w-14"
                 aria-label="Send typed turn"
               >
                 <Send size={20} />
@@ -478,28 +475,6 @@ export function ConversationPage() {
             </div>
 
             {error && <p className="mt-3 text-sm text-red-300">{error}</p>}
-          </div>
-        </div>
-
-        <div className="absolute bottom-0 flex w-full justify-around bg-[#07112b] px-4 py-6 text-sm">
-          <div className="flex flex-col items-center">
-            <Languages />
-            <span>Translate</span>
-          </div>
-
-          <div className="flex flex-col items-center text-purple-300">
-            <Mic />
-            <span>Convo</span>
-          </div>
-
-          <div className="flex flex-col items-center">
-            <AudioLines />
-            <span>Voices</span>
-          </div>
-
-          <div className="flex flex-col items-center">
-            <Clock3 />
-            <span>History</span>
           </div>
         </div>
       </div>
