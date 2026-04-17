@@ -130,16 +130,12 @@ export default async function VoicesPage() {
           </div>
 
           <div className="mt-8 grid grid-cols-2 gap-5">
-            {profiles.map((profile, index) => (
+            {profiles.map((profile: SpeakerProfileItem, index: number) => (
               <Link
                 key={profile.id}
                 href={`/voices/${profile.id}`}
-                className="relative rounded-[30px] bg-[#0a1744] px-6 py-7 transition-transform hover:-translate-y-0.5"
+                className="relative rounded-[30px] bg-[#0a1744] px-6 py-7 transition-all duration-200 hover:-translate-y-0.5 hover:shadow-[0_0_0_1px_rgba(167,124,255,0.32),0_0_28px_rgba(167,124,255,0.22)] focus-visible:outline-none focus-visible:shadow-[0_0_0_1px_rgba(167,124,255,0.42),0_0_34px_rgba(167,124,255,0.28)] active:shadow-[0_0_0_1px_rgba(167,124,255,0.42),0_0_34px_rgba(167,124,255,0.28)]"
               >
-                {index === 0 && (
-                  <span className="absolute right-5 top-4 h-10 w-10 rounded-full bg-[#caaaff] shadow-[0_0_12px_3px_rgba(202,170,255,0.7)]" />
-                )}
-
                 <div className="flex flex-col items-center text-center">
                   <div className="flex h-[82px] w-[82px] items-center justify-center rounded-full bg-[#111f50] text-[42px]">
                     <span>{profileEmojis[index % profileEmojis.length]}</span>
@@ -158,7 +154,7 @@ export default async function VoicesPage() {
 
             <Link
               href="/voices/new"
-              className="rounded-[30px] border border-dashed border-[#25345e] bg-[#0a1744] px-6 py-7 transition-transform hover:-translate-y-0.5"
+              className="rounded-[30px] border border-dashed border-[#25345e] bg-[#0a1744] px-6 py-7 transition-all duration-200 hover:-translate-y-0.5 hover:shadow-[0_0_0_1px_rgba(167,124,255,0.32),0_0_28px_rgba(167,124,255,0.22)] focus-visible:outline-none focus-visible:shadow-[0_0_0_1px_rgba(167,124,255,0.42),0_0_34px_rgba(167,124,255,0.28)] active:shadow-[0_0_0_1px_rgba(167,124,255,0.42),0_0_34px_rgba(167,124,255,0.28)]"
             >
               <div className="flex flex-col items-center text-center">
                 <div className="flex h-[82px] w-[82px] items-center justify-center rounded-full bg-[#111f50] text-[42px]">

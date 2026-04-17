@@ -26,8 +26,8 @@ export function BottomNav() {
             key={item.href}
             href={item.href}
             className={cn(
-              "flex flex-col items-center justify-center gap-1 rounded-[1.25rem] px-4 py-2 transition-all active:scale-95",
-              isActive ? "bg-surface-high/60 text-pulse" : "text-support hover:text-pulse"
+              "flex flex-col items-center justify-center gap-1 rounded-[1rem] px-3 py-1.5 transition-all active:scale-95",
+              isActive ? "text-pulse" : "text-support hover:text-pulse"
             )}
           >
             <span
