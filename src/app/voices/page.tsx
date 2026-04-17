@@ -30,16 +30,18 @@ export default async function VoicesPage() {
               <div className="w-12 h-12 rounded-full bg-[#8bd6b4]/10 flex items-center justify-center text-[#8bd6b4]">
                 <Mic2 size={24} />
               </div>
-              <div>
-                <h4 className="font-bold text-lg text-[#dae2fd]">{profile.displayName}</h4>
-                <div className="flex items-center gap-2">
-                  <span className="text-[10px] font-bold uppercase tracking-widest text-[#b9c7df]/40">{profile.sourceLanguage}</span>
-                  <span className="text-[10px] text-[#b9c7df]/20">→</span>
-                  <span className="text-[10px] font-bold uppercase tracking-widest text-[#d0bcff]/60">{profile.targetLanguage}</span>
+                <div>
+                  <h4 className="font-bold text-lg text-[#dae2fd]">{profile.displayName}</h4>
+                  <div className="flex items-center gap-2">
+                    <span className="text-[10px] font-bold uppercase tracking-widest text-[#b9c7df]/40">{profile.sourceLanguage}</span>
+                    <span className="text-[10px] text-[#b9c7df]/20">→</span>
+                    <span className="text-[10px] font-bold uppercase tracking-widest text-[#d0bcff]/60">{profile.targetLanguage}</span>
+                  </div>
                 </div>
               </div>
-            </div>
-            <Button variant="ghost" size="sm">Edit</Button>
+            <Link href={`/voices/${profile.id}`}>
+              <Button variant="ghost" size="sm">Edit</Button>
+            </Link>
           </div>
         ))}
 

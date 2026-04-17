@@ -7,6 +7,12 @@ export async function getUserSpeakerProfiles(userId: string) {
   })
 }
 
+export async function getUserSpeakerProfileById(id: string, userId: string) {
+  return await prisma.speakerProfile.findFirst({
+    where: { id, userId },
+  })
+}
+
 export async function createSpeakerProfile(data: {
   userId: string
   displayName: string
@@ -16,5 +22,21 @@ export async function createSpeakerProfile(data: {
 }) {
   return await prisma.speakerProfile.create({
     data
+  })
+}
+
+export async function updateSpeakerProfile(
+  id: string,
+  userId: string,
+  data: {
+    displayName: string
+    sourceLanguage: string
+    targetLanguage: string
+    elevenLabsVoiceId?: string
+  }
+) {
+  return await prisma.speakerProfile.update({
+    where: { id, userId },
+    data,
   })
 }
