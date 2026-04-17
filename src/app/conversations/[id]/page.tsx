@@ -4,9 +4,14 @@ import { MobileHeader } from "@/components/layout/MobileHeader"
 import { getConversationWithTurns } from "@/lib/services/conversations"
 import { Volume2 } from "lucide-react"
 
-type ConversationTurn = NonNullable<
-  Awaited<ReturnType<typeof getConversationWithTurns>>
->["turns"][number]
+type ConversationTurnItem = {
+  id: string
+  sourceLanguage: string
+  targetLanguage: string
+  transcript: string
+  translatedText: string | null
+  audioUrl: string | null
+}
 
 export default async function ConversationDetailPage({ params }: { params: { id: string } }) {
   const session = await auth()
@@ -20,7 +25,7 @@ export default async function ConversationDetailPage({ params }: { params: { id:
       <MobileHeader title={conversation.title} />
 
       <div className="space-y-8 pb-32">
-        {conversation.turns.map((turn: ConversationTurn) => (
+        {conversation.turns.map((turn: ConversationTurnItem) => (
           <div key={turn.id} className="space-y-3">
             {/* Source */}
             <div className="flex justify-start">

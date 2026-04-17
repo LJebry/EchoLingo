@@ -15,6 +15,7 @@ import {
   Bot,
   History,
 } from "lucide-react"
+import { LoginLinkButton } from "@/components/auth/LoginLinkButton"
 
 const MAX_CHARS = 5000
 const languages = [
@@ -121,17 +122,21 @@ export default function Home() {
   return (
     <main className="min-h-screen bg-[#000f3d] text-white">
       <div className="mx-auto flex min-h-screen w-full max-w-md flex-col px-4 pb-6 pt-8">
-        <header className="flex items-center justify-between">
+        <header className="flex items-center justify-between gap-4">
           <div className="flex items-center gap-3">
             <div className="flex h-10 w-10 items-center justify-center rounded-full">
               <Globe className="h-9 w-9 text-[#c7afff]" strokeWidth={2.2} />
             </div>
-            <h1 className="text-[28px] font-semibold tracking-tight text-[#c7afff]">EchoLingo</h1>
+            <div>
+              <h1 className="text-[28px] font-semibold tracking-tight text-[#c7afff]">EchoLingo</h1>
+              <p className="text-xs text-[#9ea8c7]">Translate now, save later</p>
+            </div>
           </div>
 
-          <div className="flex h-14 w-14 items-center justify-center rounded-full border border-[#44607b] bg-[#214461]">
-            <span className="text-[26px]">👩🏻</span>
-          </div>
+          <LoginLinkButton
+            label="Log In"
+            className="w-auto shrink-0 border-[#44607b] bg-[#214461] px-5 py-3 text-sm font-medium text-[#e6e8f5] hover:bg-[#2a4e6f]"
+          />
         </header>
 
         <section className="mt-12 rounded-[800px] bg-[#222d52] px-5 py-5 shadow-[0_12px_30px_rgba(0,0,0,0.22)]">

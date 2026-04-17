@@ -3,12 +3,12 @@ node_modules
 .env
 .env.local
 .env.local.example
-.env.example
 
 /src/generated/prisma
 
 # Next.js
 .next/
+tsconfig.tsbuildinfo
 
 # IDE
 .vscode/

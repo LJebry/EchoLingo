@@ -1,21 +1,21 @@
-import { PrismaClient } from "@prisma/client"
 import { PrismaPg } from "@prisma/adapter-pg"
-import { Pool } from "pg"
+import { PrismaClient } from '@prisma/client'
 
-const connectionString =
-  process.env.DATABASE_URL ??
-  process.env.POSTGRES_PRISMA_URL ??
-  "postgresql://user:pass@localhost:5432/echolingo"
-
-const adapter = new PrismaPg(
-  new Pool({
-    connectionString,
-  })
-)
+const databaseUrl = process.env.DATABASE_URL
 
 const prismaClientSingleton = () => {
+  if (!databaseUrl) {
+    throw new Error("DATABASE_URL is not set")
+  }
+
+  if (databaseUrl.startsWith("prisma://") || databaseUrl.startsWith("prisma+postgres://")) {
+    return new PrismaClient({
+      accelerateUrl: databaseUrl,
+    })
+  }
+
   return new PrismaClient({
-    adapter,
+    adapter: new PrismaPg(databaseUrl),
   })
 }
 
@@ -27,4 +27,4 @@ const prisma = globalThis.prisma ?? prismaClientSingleton()
 
 export default prisma
 
-if (process.env.NODE_ENV !== "production") globalThis.prisma = prisma
+if (process.env.NODE_ENV !== 'production') globalThis.prisma = prisma
