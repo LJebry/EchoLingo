@@ -18,7 +18,7 @@ export default async function ConversationDetailPage({ params }: { params: { id:
   if (!session?.user?.id) redirect("/login")
 
   const conversation = await getConversationWithTurns(params.id, session.user.id)
-  if (!conversation) redirect("/conversations")
+  if (!conversation) redirect("/history")
 
   return (
     <div className="space-y-6">

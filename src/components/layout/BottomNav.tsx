@@ -10,7 +10,7 @@ export function BottomNav() {
 
   const navItems = [
     { href: '/', icon: Home, label: 'Home' },
-    { href: '/conversations', icon: MessageSquare, label: 'History' },
+    { href: '/history', icon: MessageSquare, label: 'History' },
     { href: '/voices', icon: UserCircle, label: 'Voices' },
     { href: '/settings', icon: Settings, label: 'Settings' },
   ]

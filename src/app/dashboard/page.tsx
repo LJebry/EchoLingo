@@ -37,7 +37,7 @@ export default async function DashboardPage() {
       <section className="space-y-4">
         <div className="flex items-center justify-between">
           <h3 className="text-xl font-bold text-[#dae2fd]">Recent Sessions</h3>
-          <Link href="/conversations">
+          <Link href="/history">
             <span className="text-sm text-[#d0bcff]">View All</span>
           </Link>
         </div>
