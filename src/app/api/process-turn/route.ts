@@ -8,6 +8,7 @@ const turnSchema = z.object({
   speakerProfileId: z.string().optional(),
   sourceLang: z.string(),
   targetLang: z.string(),
+  transcriptText: z.string().trim().min(1).optional(),
 })
 
 export async function POST(req: NextRequest) {
@@ -20,21 +21,28 @@ export async function POST(req: NextRequest) {
     const speakerProfileId = formData.get('speakerProfileId') as string | undefined
     const sourceLang = formData.get('sourceLang') as string
     const targetLang = formData.get('targetLang') as string
+    const transcriptText = (formData.get('transcriptText') as string | null)?.trim() || undefined
 
     // Validate metadata
     const validation = turnSchema.safeParse({
       conversationId,
       speakerProfileId,
       sourceLang,
-      targetLang
+      targetLang,
+      transcriptText,
     })
 
     if (!validation.success) {
       return NextResponse.json({ error: "Invalid metadata", details: validation.error.format() }, { status: 400 })
     }
 
+    if (!audioBlob && !transcriptText) {
+      return NextResponse.json({ error: "Audio or transcript text is required" }, { status: 400 })
+    }
+
     const result = await processTurn({
       audioBlob: audioBlob || undefined,
+      transcriptText,
       conversationId,
       speakerProfileId,
       sourceLang,

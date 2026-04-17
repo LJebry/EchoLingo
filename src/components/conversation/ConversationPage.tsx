@@ -1,17 +1,372 @@
 "use client"
 
+import { useMemo, useState } from "react"
+import Link from "next/link"
 import {
+  ArrowRightLeft,
+  AudioLines,
+  Check,
+  Clock3,
   Globe,
   Keyboard,
-  Mic,
   Languages,
-  Clock3,
-  AudioLines,
-  ArrowRightLeft,
+  Loader2,
+  Mic,
+  Send,
   Volume2,
 } from "lucide-react"
+import AudioRecorder from "@/components/AudioRecorder"
+import { cn } from "@/components/ui/Button"
+
+type SpeakerKey = "person1" | "person2"
+
+type SpeakerConfig = {
+  key: SpeakerKey
+  name: string
+  sourceLanguage: string
+  targetLanguage: string
+  accentColor: string
+  borderColor: string
+  panelClassName: string
+  cardClassName: string
+  wavePrimary: string
+  waveSecondary: string
+  align: "left" | "right"
+  upsideDown?: boolean
+}
+
+type ConversationTurn = {
+  id: string
+  speakerKey: SpeakerKey
+  transcript: string
+  translatedText: string
+  audioUrl?: string | null
+  saved: boolean
+}
+
+type PanelCopy = {
+  heading: string
+  body: string
+  status: string
+  audioUrl?: string | null
+  statusVariant: "saved" | "audio" | "waiting"
+}
+
+const speakers: SpeakerConfig[] = [
+  {
+    key: "person1",
+    name: "Person 1",
+    sourceLanguage: "English (US)",
+    targetLanguage: "Spanish",
+    accentColor: "#d0bcff",
+    borderColor: "border-[#d0bcff]/10",
+    panelClassName:
+      "bg-[linear-gradient(180deg,rgba(27,38,73,0.96),rgba(14,22,46,0.92))]",
+    cardClassName: "border-[#d0bcff]/10 bg-[#0e1731]/80",
+    wavePrimary: "bg-[#79b3ff]",
+    waveSecondary: "bg-[#d0bcff]",
+    align: "left",
+    upsideDown: true,
+  },
+  {
+    key: "person2",
+    name: "Person 2",
+    sourceLanguage: "Spanish",
+    targetLanguage: "English (US)",
+    accentColor: "#8bd6b4",
+    borderColor: "border-[#8bd6b4]/10",
+    panelClassName:
+      "bg-[linear-gradient(180deg,rgba(13,24,45,0.92),rgba(20,40,53,0.96))]",
+    cardClassName: "border-[#8bd6b4]/10 bg-[#0d1c2c]/80",
+    wavePrimary: "bg-[#8bd6b4]",
+    waveSecondary: "bg-[#d0bcff]",
+    align: "right",
+  },
+]
+
+function buildConversationTitle() {
+  return `Conversation ${new Date().toLocaleString()}`
+}
+
+function playAudio(url?: string | null) {
+  if (!url) return
+
+  const audio = new Audio(url)
+  void audio.play()
+}
+
+function getPanelCopy(turns: ConversationTurn[], speaker: SpeakerConfig): PanelCopy {
+  const ownTurn = [...turns].reverse().find((turn) => turn.speakerKey === speaker.key)
+  const heardTurn = [...turns].reverse().find((turn) => turn.speakerKey !== speaker.key)
+
+  if (ownTurn) {
+    return {
+      heading: "Original",
+      body: ownTurn.transcript,
+      status: ownTurn.saved ? "Saved to history" : "Guest mode",
+      audioUrl: ownTurn.audioUrl,
+      statusVariant: ownTurn.saved ? "saved" : "audio",
+    }
+  }
+
+  if (heardTurn) {
+    return {
+      heading: "Translation",
+      body: heardTurn.translatedText,
+      status: "Latest reply",
+      audioUrl: heardTurn.audioUrl,
+      statusVariant: "audio",
+    }
+  }
+
+  return {
+    heading: speaker.key === "person1" ? "Original" : "Translation",
+    body: speaker.key === "person1" ? "Tap the mic or type a line to start." : "The translated reply appears here.",
+    status: "Waiting",
+    audioUrl: null,
+    statusVariant: "waiting",
+  }
+}
+
+function SpeakerPanel({
+  speaker,
+  content,
+  isActive,
+  isRecording,
+  isSubmitting,
+  onActivate,
+}: {
+  speaker: SpeakerConfig
+  content: PanelCopy
+  isActive: boolean
+  isRecording: boolean
+  isSubmitting: boolean
+  onActivate: () => void
+}) {
+  const wrapperClassName = speaker.upsideDown ? "flex h-full flex-col justify-between rotate-180" : "flex h-full flex-col justify-between"
+  const textAlignClassName = speaker.align === "right" ? "text-right" : "text-left"
+  const justifyClassName = speaker.align === "right" ? "justify-end" : "justify-start"
+  const pillTextClassName = speaker.align === "right" ? "justify-start" : "justify-end"
+
+  const isLive = isActive && isRecording
+
+  return (
+    <section className={cn("relative flex-1 rounded-[2rem] border px-5 pb-10 pt-6 shadow-[0_24px_60px_rgba(0,0,0,0.32)]", speaker.borderColor, speaker.panelClassName)}>
+      <div className={wrapperClassName}>
+        <div className={cn("flex items-center justify-between", speaker.align === "right" && "flex-row-reverse")}>
+          <button
+            type="button"
+            onClick={onActivate}
+            className={cn(
+              "flex h-11 w-11 items-center justify-center rounded-full bg-[#101936] text-[#d8def6] transition-colors",
+              isActive && "ring-2 ring-offset-2 ring-offset-transparent",
+            )}
+            style={isActive ? { boxShadow: `0 0 0 2px ${speaker.accentColor}` } : undefined}
+            aria-label={`Use ${speaker.name}`}
+          >
+            <Keyboard size={18} />
+          </button>
+
+          <div className={cn("flex items-center gap-3", speaker.align === "right" && "flex-row-reverse")}>
+            <div className="flex h-12 w-12 items-center justify-center rounded-2xl text-lg" style={{ backgroundColor: `${speaker.accentColor}24` }}>
+              👤
+            </div>
+            <div className={textAlignClassName}>
+              <p className="text-sm font-semibold text-[#eef1ff]">{speaker.name}</p>
+              <p className="text-xs uppercase tracking-[0.18em] text-[#8ea0c9]">{speaker.sourceLanguage}</p>
+            </div>
+          </div>
+        </div>
+
+        <div className={cn("mt-10 rounded-[1.75rem] border p-5", speaker.cardClassName, textAlignClassName)}>
+          <p className="text-sm uppercase tracking-[0.2em] text-[#7f91be]">{content.heading}</p>
+          <p className="mt-3 min-h-[5.5rem] text-[1.55rem] leading-tight text-[#eef1ff]">{content.body}</p>
+          <div className={cn("mt-6 flex items-end gap-2", justifyClassName)}>
+            <div
+              className={cn(
+                "h-14 w-2 origin-bottom rounded-full",
+                speaker.wavePrimary,
+                isLive ? "animate-[voiceBarA_0.85s_ease-in-out_infinite]" : "scale-y-[0.42]"
+              )}
+            />
+            <div
+              className={cn(
+                "h-14 w-2 origin-bottom rounded-full",
+                speaker.waveSecondary,
+                isLive ? "animate-[voiceBarB_1s_ease-in-out_infinite]" : "scale-y-[0.78]"
+              )}
+            />
+            <div
+              className={cn(
+                "h-14 w-2 origin-bottom rounded-full",
+                speaker.wavePrimary,
+                isLive ? "animate-[voiceBarC_0.9s_ease-in-out_infinite]" : "scale-y-[0.56]"
+              )}
+            />
+            <div
+              className={cn(
+                "h-14 w-2 origin-bottom rounded-full",
+                speaker.waveSecondary,
+                isLive ? "animate-[voiceBarD_1.1s_ease-in-out_infinite]" : "scale-y-100"
+              )}
+            />
+            <div
+              className={cn(
+                "h-14 w-2 origin-bottom rounded-full",
+                speaker.wavePrimary,
+                isLive ? "animate-[voiceBarE_0.8s_ease-in-out_infinite]" : "scale-y-[0.64]"
+              )}
+            />
+          </div>
+        </div>
+
+        <div className={cn("mt-4 flex", pillTextClassName)}>
+          <button
+            type="button"
+            onClick={() => playAudio(content.audioUrl)}
+            disabled={!content.audioUrl}
+            className="inline-flex items-center gap-2 rounded-full px-4 py-2 text-sm text-[#d7def7] disabled:cursor-default disabled:opacity-70"
+            style={{
+              backgroundColor: speaker.key === "person1" ? "#202d54" : "#173343",
+              color: speaker.key === "person1" ? "#d7def7" : "#d6fff0",
+            }}
+          >
+            {isSubmitting && isActive ? (
+              <Loader2 size={14} className="animate-spin" />
+            ) : content.statusVariant === "saved" ? (
+              <Check size={14} />
+            ) : content.statusVariant === "audio" ? (
+              <Volume2 size={14} style={{ color: speaker.accentColor }} />
+            ) : (
+              <Mic size={14} style={{ color: speaker.accentColor }} />
+            )}
+            {content.status}
+          </button>
+        </div>
+      </div>
+    </section>
+  )
+}
 
 export function ConversationPage() {
+  const [activeSpeakerKey, setActiveSpeakerKey] = useState<SpeakerKey>("person1")
+  const [draftText, setDraftText] = useState("")
+  const [turns, setTurns] = useState<ConversationTurn[]>([])
+  const [conversationId, setConversationId] = useState<string | null>(null)
+  const [isSubmitting, setIsSubmitting] = useState(false)
+  const [isRecording, setIsRecording] = useState(false)
+  const [error, setError] = useState("")
+  const [persistenceState, setPersistenceState] = useState<"unknown" | "saved" | "guest">("unknown")
+
+  const activeSpeaker = useMemo(
+    () => speakers.find((speaker) => speaker.key === activeSpeakerKey) || speakers[0],
+    [activeSpeakerKey]
+  )
+
+  const panelCopy = useMemo(
+    () =>
+      Object.fromEntries(
+        speakers.map((speaker) => [speaker.key, getPanelCopy(turns, speaker)])
+      ) as Record<SpeakerKey, PanelCopy>,
+    [turns]
+  )
+
+  const ensureConversation = async () => {
+    if (conversationId) {
+      return conversationId
+    }
+
+    const response = await fetch("/api/conversations", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ title: buildConversationTitle() }),
+    })
+
+    if (response.status === 401) {
+      setPersistenceState("guest")
+      return undefined
+    }
+
+    if (!response.ok) {
+      throw new Error("Unable to create a saved conversation right now.")
+    }
+
+    const conversation = await response.json()
+    setConversationId(conversation.id)
+    setPersistenceState("saved")
+    return conversation.id as string
+  }
+
+  const submitTurn = async ({
+    audioBlob,
+    transcriptText,
+  }: {
+    audioBlob?: Blob
+    transcriptText?: string
+  }) => {
+    if (!audioBlob && !transcriptText?.trim()) {
+      return
+    }
+
+    setIsSubmitting(true)
+    setError("")
+
+    try {
+      const currentConversationId = await ensureConversation().catch((saveError) => {
+        console.error(saveError)
+        setPersistenceState("guest")
+        return undefined
+      })
+
+      const formData = new FormData()
+      formData.append("sourceLang", activeSpeaker.sourceLanguage)
+      formData.append("targetLang", activeSpeaker.targetLanguage)
+
+      if (audioBlob) {
+        formData.append("audio", audioBlob, "turn.webm")
+      }
+
+      if (transcriptText?.trim()) {
+        formData.append("transcriptText", transcriptText.trim())
+      }
+
+      if (currentConversationId) {
+        formData.append("conversationId", currentConversationId)
+      }
+
+      const response = await fetch("/api/process-turn", {
+        method: "POST",
+        body: formData,
+      })
+
+      const payload = await response.json()
+
+      if (!response.ok) {
+        throw new Error(payload?.error || "Unable to process this turn.")
+      }
+
+      setTurns((currentTurns) => [
+        ...currentTurns,
+        {
+          id: payload.id || crypto.randomUUID(),
+          speakerKey: activeSpeaker.key,
+          transcript: payload.transcript,
+          translatedText: payload.translatedText,
+          audioUrl: payload.audioUrl,
+          saved: Boolean(currentConversationId),
+        },
+      ])
+      setDraftText("")
+      setActiveSpeakerKey(activeSpeaker.key === "person1" ? "person2" : "person1")
+    } catch (submitError) {
+      setError(submitError instanceof Error ? submitError.message : "Something went wrong.")
+    } finally {
+      setIsSubmitting(false)
+    }
+  }
+
   return (
     <main className="flex min-h-screen justify-center bg-[#020b23] text-white">
       <div className="relative min-h-screen w-full max-w-sm overflow-hidden bg-[radial-gradient(circle_at_top,rgba(124,92,255,0.22),transparent_28%),linear-gradient(180deg,#09142f_0%,#050c1f_48%,#09142f_100%)]">
@@ -23,94 +378,107 @@ export function ConversationPage() {
 
           <div className="flex items-center gap-2 rounded-full border border-[#c8aefc]/15 bg-[#12203f]/80 px-3 py-2 text-sm text-[#d8def6]">
             <ArrowRightLeft size={14} className="text-[#c8aefc]" />
-            Live
+            {persistenceState === "saved" ? "Synced" : "Live"}
           </div>
         </div>
 
-        <div className="relative flex min-h-screen flex-col px-5 pb-36 pt-8">
-          <section className="relative flex-1 rounded-[2rem] border border-[#d0bcff]/10 bg-[linear-gradient(180deg,rgba(27,38,73,0.96),rgba(14,22,46,0.92))] px-5 pb-10 pt-6 shadow-[0_24px_60px_rgba(0,0,0,0.32)]">
-            <div className="flex h-full flex-col justify-between rotate-180">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-3">
-                  <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-[#d0bcff]/14 text-lg">
-                    👤
-                  </div>
-                  <div>
-                    <p className="text-sm font-semibold text-[#eef1ff]">Person 1</p>
-                    <p className="text-xs uppercase tracking-[0.18em] text-[#8ea0c9]">English (US)</p>
-                  </div>
-                </div>
-                <button className="flex h-11 w-11 items-center justify-center rounded-full bg-[#101936] text-[#d8def6]">
-                  <Keyboard size={18} />
-                </button>
-              </div>
+        <div className="relative flex min-h-screen flex-col px-5 pb-44 pt-8">
+          <SpeakerPanel
+            speaker={speakers[0]}
+            content={panelCopy.person1}
+            isActive={activeSpeakerKey === "person1"}
+            isRecording={isRecording}
+            isSubmitting={isSubmitting}
+            onActivate={() => setActiveSpeakerKey("person1")}
+          />
 
-              <div className="mt-10 rounded-[1.75rem] border border-[#d0bcff]/10 bg-[#0e1731]/80 p-5">
-                <p className="text-sm uppercase tracking-[0.2em] text-[#7f91be]">Original</p>
-                <p className="mt-3 text-[1.7rem] leading-tight text-[#eef1ff]">Hello, how are you today?</p>
-                <div className="mt-6 flex items-end gap-2">
-                  <div className="h-6 w-2 rounded-full bg-[#79b3ff]" />
-                  <div className="h-11 w-2 rounded-full bg-[#d0bcff]" />
-                  <div className="h-8 w-2 rounded-full bg-[#79b3ff]" />
-                  <div className="h-14 w-2 rounded-full bg-[#d0bcff]" />
-                  <div className="h-9 w-2 rounded-full bg-[#79b3ff]" />
+          <AudioRecorder
+            disabled={isSubmitting}
+            onError={setError}
+            onRecordingStateChange={setIsRecording}
+            onRecordingComplete={(audioBlob) => submitTurn({ audioBlob })}
+          >
+            {({ isSupported, startRecording, stopRecording }) => (
+              <div className="pointer-events-none relative z-20 -my-14 flex justify-center">
+                <div className="relative mx-auto flex h-36 w-36 items-center justify-center">
+                  <div className="absolute inset-0 rounded-full bg-[radial-gradient(circle,rgba(181,137,255,0.28)_0%,rgba(181,137,255,0.08)_48%,transparent_72%)]" />
+                  <div className="absolute inset-[18px] rounded-full border border-[#f0d5ff]/20 bg-[#120f2d]/90 shadow-[0_16px_40px_rgba(107,63,201,0.38)]" />
+                  <button
+                    type="button"
+                    onClick={() => {
+                      if (isRecording) {
+                        stopRecording()
+                      } else {
+                        void startRecording()
+                      }
+                    }}
+                    disabled={isSubmitting || !isSupported}
+                    className="pointer-events-auto relative z-10 flex h-20 w-20 items-center justify-center rounded-full bg-[linear-gradient(180deg,#d8b6ff_0%,#a45cff_100%)] text-[#2e0b5a] shadow-[0_12px_30px_rgba(164,92,255,0.45)] disabled:opacity-50"
+                    aria-label={isRecording ? "Stop recording" : "Start recording"}
+                  >
+                    {isSubmitting ? (
+                      <Loader2 size={36} className="animate-spin" strokeWidth={2.6} />
+                    ) : (
+                      <Mic size={36} strokeWidth={2.6} />
+                    )}
+                  </button>
                 </div>
               </div>
+            )}
+          </AudioRecorder>
 
-              <div className="mt-4 flex justify-end">
-                <div className="inline-flex items-center gap-2 rounded-full bg-[#202d54] px-4 py-2 text-sm text-[#d7def7]">
-                  <Volume2 size={14} className="text-[#c8aefc]" />
-                  Ready to speak
-                </div>
-              </div>
+          <SpeakerPanel
+            speaker={speakers[1]}
+            content={panelCopy.person2}
+            isActive={activeSpeakerKey === "person2"}
+            isRecording={isRecording}
+            isSubmitting={isSubmitting}
+            onActivate={() => setActiveSpeakerKey("person2")}
+          />
+
+          <div className="mt-5 rounded-[2rem] border border-[#b9c7df]/10 bg-[#0d1734]/85 p-4 shadow-[0_20px_40px_rgba(0,0,0,0.24)]">
+            <div className="flex items-center justify-between text-xs uppercase tracking-[0.18em] text-[#8ea0c9]">
+              <span>{activeSpeaker.name}</span>
+              <span>{activeSpeaker.sourceLanguage} to {activeSpeaker.targetLanguage}</span>
             </div>
-          </section>
 
-          <div className="pointer-events-none absolute inset-x-0 top-1/2 z-20 -translate-y-1/2 px-5">
-            <div className="relative mx-auto flex h-36 w-36 items-center justify-center">
-              <div className="absolute inset-0 rounded-full bg-[radial-gradient(circle,rgba(181,137,255,0.28)_0%,rgba(181,137,255,0.08)_48%,transparent_72%)]" />
-              <div className="absolute inset-[18px] rounded-full border border-[#f0d5ff]/20 bg-[#120f2d]/90 shadow-[0_16px_40px_rgba(107,63,201,0.38)]" />
-              <button className="pointer-events-auto relative z-10 flex h-24 w-24 items-center justify-center rounded-full bg-[linear-gradient(180deg,#d8b6ff_0%,#a45cff_100%)] text-[#2e0b5a] shadow-[0_12px_30px_rgba(164,92,255,0.45)]">
-                <Mic size={36} strokeWidth={2.6} />
+            <div className="mt-3 flex gap-3">
+              <textarea
+                value={draftText}
+                onChange={(event) => setDraftText(event.target.value)}
+                placeholder={`Type what ${activeSpeaker.name.toLowerCase()} wants to say...`}
+                className="min-h-[90px] flex-1 resize-none rounded-[1.4rem] border border-[#d0bcff]/10 bg-[#091127] px-4 py-3 text-sm text-[#eef1ff] outline-none placeholder:text-[#69789e]"
+              />
+              <button
+                type="button"
+                onClick={() => submitTurn({ transcriptText: draftText })}
+                disabled={isSubmitting || !draftText.trim()}
+                className="flex h-auto min-h-[90px] w-14 items-center justify-center rounded-[1.4rem] bg-[#1d2b55] text-[#d0bcff] disabled:opacity-40"
+                aria-label="Send typed turn"
+              >
+                <Send size={20} />
               </button>
             </div>
+
+            <div className="mt-3 flex items-center justify-between text-sm">
+              <div className="flex items-center gap-2 text-[#9fb0d4]">
+                {isRecording ? <Loader2 size={15} className="animate-spin" /> : <Mic size={15} />}
+                <span>
+                  {isRecording
+                    ? "Recording..."
+                    : "Use the center mic for speech or type a message here."}
+                </span>
+              </div>
+
+              {conversationId && (
+                <Link href="/history" className="text-[#d0bcff]">
+                  View history
+                </Link>
+              )}
+            </div>
+
+            {error && <p className="mt-3 text-sm text-red-300">{error}</p>}
           </div>
-
-          <section className="relative mt-8 flex-1 rounded-[2rem] border border-[#8ce2c3]/10 bg-[linear-gradient(180deg,rgba(13,24,45,0.92),rgba(20,40,53,0.96))] px-5 pb-10 pt-6 shadow-[0_24px_60px_rgba(0,0,0,0.28)]">
-            <div className="flex items-center justify-between">
-              <button className="flex h-11 w-11 items-center justify-center rounded-full bg-[#101936] text-[#d8def6]">
-                <Keyboard size={18} />
-              </button>
-              <div className="flex items-center gap-3 text-right">
-                <div>
-                  <p className="text-sm font-semibold text-[#eef1ff]">Person 2</p>
-                  <p className="text-xs uppercase tracking-[0.18em] text-[#89cdb4]">Spanish</p>
-                </div>
-                <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-[#8bd6b4]/14 text-lg">
-                  👤
-                </div>
-              </div>
-            </div>
-
-            <div className="mt-10 rounded-[1.75rem] border border-[#8bd6b4]/10 bg-[#0d1c2c]/80 p-5 text-right">
-              <p className="text-sm uppercase tracking-[0.2em] text-[#73b89f]">Translation</p>
-              <p className="mt-3 text-[1.7rem] leading-tight text-[#b9f0d8]">Hola, ¿cómo estás hoy?</p>
-              <div className="mt-6 flex items-end justify-end gap-2">
-                <div className="h-9 w-2 rounded-full bg-[#8bd6b4]" />
-                <div className="h-14 w-2 rounded-full bg-[#d0bcff]" />
-                <div className="h-8 w-2 rounded-full bg-[#8bd6b4]" />
-                <div className="h-11 w-2 rounded-full bg-[#d0bcff]" />
-                <div className="h-6 w-2 rounded-full bg-[#8bd6b4]" />
-              </div>
-            </div>
-
-            <div className="mt-4 flex justify-start">
-              <div className="inline-flex items-center gap-2 rounded-full bg-[#173343] px-4 py-2 text-sm text-[#d6fff0]">
-                <Volume2 size={14} className="text-[#8bd6b4]" />
-                Listening for reply
-              </div>
-            </div>
-          </section>
         </div>
 
         <div className="absolute bottom-0 flex w-full justify-around bg-[#07112b] px-4 py-6 text-sm">

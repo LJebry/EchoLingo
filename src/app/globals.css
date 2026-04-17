@@ -19,3 +19,28 @@ body {
   background: rgba(208, 188, 255, 0.3);
   color: #dae2fd;
 }
+
+@keyframes voiceBarA {
+  0%, 100% { transform: scaleY(0.42); }
+  50% { transform: scaleY(0.92); }
+}
+
+@keyframes voiceBarB {
+  0%, 100% { transform: scaleY(0.78); }
+  50% { transform: scaleY(1); }
+}
+
+@keyframes voiceBarC {
+  0%, 100% { transform: scaleY(0.56); }
+  50% { transform: scaleY(0.88); }
+}
+
+@keyframes voiceBarD {
+  0%, 100% { transform: scaleY(1); }
+  50% { transform: scaleY(0.68); }
+}
+
+@keyframes voiceBarE {
+  0%, 100% { transform: scaleY(0.64); }
+  50% { transform: scaleY(0.94); }
+}

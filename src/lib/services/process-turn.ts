@@ -4,6 +4,7 @@ import prisma from "@/lib/prisma"
 
 interface ProcessTurnOptions {
   audioBlob?: Blob
+  transcriptText?: string
   conversationId?: string
   speakerProfileId?: string
   sourceLang: string
@@ -13,6 +14,7 @@ interface ProcessTurnOptions {
 
 export async function processTurn({
   audioBlob,
+  transcriptText,
   conversationId,
   speakerProfileId,
   sourceLang,
@@ -20,9 +22,9 @@ export async function processTurn({
   userId
 }: ProcessTurnOptions) {
   // 1. Transcribe (Mocked)
-  const transcript = audioBlob 
-    ? await transcribeAudio(audioBlob) 
-    : "No audio provided - using manual input."
+  const transcript = audioBlob
+    ? await transcribeAudio(audioBlob)
+    : transcriptText?.trim() || "No audio provided - using manual input."
 
   // 2. Clean (Mocked)
   const cleanedTranscript = await cleanTranscript(transcript)

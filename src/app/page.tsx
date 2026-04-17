@@ -192,7 +192,7 @@ export default function Home() {
             value={text}
             onChange={(e) => setText(e.target.value.slice(0, MAX_CHARS))}
             placeholder="Enter text to translate..."
-            className="pointer-events-auto relative z-10 h-52 w-full resize-none bg-transparent text-[24px] leading-snug text-[#dae2fd] placeholder:text-[#737598] outline-none"
+            className="pointer-events-auto relative z-10 h-52 w-52 resize-none bg-transparent text-[24px] leading-snug text-[#dae2fd] placeholder:text-[#737598] outline-none"
           />
 
           <div className="mt-6 flex items-center justify-between">
