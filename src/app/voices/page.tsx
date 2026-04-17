@@ -6,6 +6,8 @@ import { Button } from "@/components/ui/Button"
 import Link from "next/link"
 import { Mic2, Plus } from "lucide-react"
 
+type SpeakerProfileListItem = Awaited<ReturnType<typeof getUserSpeakerProfiles>>[number]
+
 export default async function VoicesPage() {
   const session = await auth()
   if (!session?.user?.id) redirect("/login")
@@ -17,7 +19,7 @@ export default async function VoicesPage() {
       <MobileHeader title="My Voices" />
 
       <div className="grid gap-4">
-        {profiles.map((profile) => (
+        {profiles.map((profile: SpeakerProfileListItem) => (
           <div key={profile.id} className="p-5 rounded-[2rem] bg-[#131b2e] border border-[#b9c7df]/5 flex items-center justify-between">
             <div className="flex items-center gap-4">
               <div className="w-12 h-12 rounded-full bg-[#8bd6b4]/10 flex items-center justify-center text-[#8bd6b4]">

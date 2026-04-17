@@ -5,6 +5,8 @@ import { getUserConversations } from "@/lib/services/conversations"
 import Link from "next/link"
 import { MessageSquare } from "lucide-react"
 
+type ConversationListItem = Awaited<ReturnType<typeof getUserConversations>>[number]
+
 export default async function ConversationsPage() {
   const session = await auth()
   if (!session?.user?.id) redirect("/login")
@@ -19,7 +21,7 @@ export default async function ConversationsPage() {
         {conversations.length === 0 ? (
           <p className="text-[#b9c7df]/40 text-center py-12">No history found.</p>
         ) : (
-          conversations.map((conv) => (
+          conversations.map((conv: ConversationListItem) => (
             <Link key={conv.id} href={`/conversations/${conv.id}`}>
               <div className="p-4 rounded-2xl bg-[#131b2e] border border-[#b9c7df]/5 flex items-center justify-between group">
                 <div className="flex items-center gap-4">
