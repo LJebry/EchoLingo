@@ -1,0 +1,14 @@
+node_modules
+# Keep environment variables out of version control
+.env
+.env.local
+.env.local.example
+.env.example
+
+/src/generated/prisma
+
+# Next.js
+.next/
+
+# IDE
+.vscode/
