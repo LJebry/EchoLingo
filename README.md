@@ -30,6 +30,15 @@ Copy `.env.example` to `.env` and fill in the values:
 cp .env.example .env
 ```
 
+For Google sign-in, create an OAuth client in Google Cloud Console and add these redirect settings:
+
+- Authorized JavaScript origin: `http://localhost:3000`
+- Authorized redirect URI: `http://localhost:3000/api/auth/callback/google`
+
+Set `AUTH_URL` and `NEXT_PUBLIC_APP_URL` to your local or deployed app URL as well.
+
+For deployment, add the deployed app URL and matching callback URL too.
+
 ### 2. Install Dependencies
 
 ```bash
@@ -38,7 +47,10 @@ npm install
 
 ### 3. Database Setup
 
-Ensure you have a PostgreSQL instance running.
+Set `DATABASE_URL` to either:
+
+- a Prisma Accelerate or Prisma Postgres URL such as `prisma+postgres://...`
+- a direct PostgreSQL connection string such as `postgresql://...`
 
 ```bash
 # Generate Prisma Client
@@ -65,6 +77,13 @@ npm run dev
 ```
 
 Open [http://localhost:3000](http://localhost:3000) on your mobile device or browser.
+
+### 5. Verify Authentication
+
+- Visit `/login`
+- Click `Continue with Google`
+- Confirm you are redirected to `/dashboard`
+- Visit `/settings` and use `Sign Out` to end the session
 
 ## AI Integration Roadmap
 

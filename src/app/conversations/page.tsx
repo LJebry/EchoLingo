@@ -5,7 +5,14 @@ import { getUserConversations } from "@/lib/services/conversations"
 import Link from "next/link"
 import { MessageSquare } from "lucide-react"
 
-type ConversationListItem = Awaited<ReturnType<typeof getUserConversations>>[number]
+type ConversationListItem = {
+  id: string
+  title: string
+  updatedAt: Date
+  _count: {
+    turns: number
+  }
+}
 
 export default async function ConversationsPage() {
   const session = await auth()

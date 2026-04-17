@@ -11,14 +11,24 @@ declare module "next-auth" {
   }
 }
 
+export const isGoogleAuthConfigured = Boolean(
+  process.env.AUTH_SECRET &&
+    process.env.AUTH_GOOGLE_ID &&
+    process.env.AUTH_GOOGLE_SECRET
+)
+
 export const { handlers, auth, signIn, signOut } = NextAuth({
   adapter: PrismaAdapter(prisma),
-  providers: [
-    GoogleProvider({
-      clientId: process.env.AUTH_GOOGLE_ID as string,
-      clientSecret: process.env.AUTH_GOOGLE_SECRET as string,
-    }),
-  ],
+  secret: process.env.AUTH_SECRET,
+  trustHost: process.env.AUTH_TRUST_HOST === "true" || process.env.NODE_ENV !== "production",
+  providers: isGoogleAuthConfigured
+    ? [
+        GoogleProvider({
+          clientId: process.env.AUTH_GOOGLE_ID,
+          clientSecret: process.env.AUTH_GOOGLE_SECRET,
+        }),
+      ]
+    : [],
   callbacks: {
     session({ session, user }) {
       if (session.user) {

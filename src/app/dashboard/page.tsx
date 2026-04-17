@@ -7,8 +7,21 @@ import Link from "next/link"
 import { Button } from "@/components/ui/Button"
 import { MessageSquare, Mic2, Plus } from "lucide-react"
 
-type ConversationListItem = Awaited<ReturnType<typeof getUserConversations>>[number]
-type SpeakerProfileListItem = Awaited<ReturnType<typeof getUserSpeakerProfiles>>[number]
+type DashboardConversationItem = {
+  id: string
+  title: string
+  updatedAt: Date
+  _count: {
+    turns: number
+  }
+}
+
+type DashboardSpeakerProfileItem = {
+  id: string
+  displayName: string
+  sourceLanguage: string
+  targetLanguage: string
+}
 
 export default async function DashboardPage() {
   const session = await auth()
@@ -38,7 +51,7 @@ export default async function DashboardPage() {
           </div>
         ) : (
           <div className="space-y-3">
-            {conversations.slice(0, 3).map((conv: ConversationListItem) => (
+            {conversations.slice(0, 3).map((conv: DashboardConversationItem) => (
               <Link key={conv.id} href={`/conversations/${conv.id}`}>
                 <div className="p-4 rounded-2xl bg-[#131b2e] border border-[#b9c7df]/5 flex items-center justify-between">
                   <div className="flex items-center gap-4">
@@ -69,7 +82,7 @@ export default async function DashboardPage() {
         </div>
 
         <div className="grid grid-cols-2 gap-4">
-          {profiles.slice(0, 2).map((profile: SpeakerProfileListItem) => (
+          {profiles.slice(0, 2).map((profile: DashboardSpeakerProfileItem) => (
             <div key={profile.id} className="p-4 rounded-2xl bg-[#131b2e] border border-[#b9c7df]/5 space-y-2">
               <div className="w-10 h-10 rounded-full bg-[#8bd6b4]/20 flex items-center justify-center text-[#8bd6b4]">
                 <Mic2 size={18} />
