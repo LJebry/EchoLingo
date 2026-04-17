@@ -365,8 +365,8 @@ export function ConversationPage() {
   }
 
   return (
-    <main className="flex min-h-[calc(100dvh-5rem)] justify-center bg-[#020b23] text-white">
-      <div className="relative min-h-[calc(100dvh-5rem)] w-full max-w-md overflow-hidden bg-[radial-gradient(circle_at_top,rgba(124,92,255,0.22),transparent_28%),linear-gradient(180deg,#09142f_0%,#050c1f_48%,#09142f_100%)]">
+    <main className="min-h-[calc(100dvh-5rem)] bg-[#020b23] text-white">
+      <div className="relative min-h-[calc(100dvh-5rem)] w-full overflow-hidden bg-[radial-gradient(circle_at_top,rgba(124,92,255,0.22),transparent_28%),linear-gradient(180deg,#09142f_0%,#050c1f_48%,#09142f_100%)]">
         <div className="flex items-center justify-between px-4 pt-6 sm:px-6 sm:pt-8">
           <div className="flex items-center gap-2 text-[#c8aefc]">
             <Globe size={26} />
@@ -379,7 +379,7 @@ export function ConversationPage() {
           </div>
         </div>
 
-        <div className="relative flex min-h-[calc(100dvh-11rem)] flex-col px-4 pb-8 pt-6 sm:px-5 sm:pt-8">
+        <div className="relative flex min-h-[calc(100dvh-11rem)] flex-col px-4 pb-[max(2rem,env(safe-area-inset-bottom))] pt-6 sm:px-6 sm:pt-8">
           <SpeakerPanel
             speaker={speakers[0]}
             content={panelCopy.person1}
