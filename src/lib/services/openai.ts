@@ -1,18 +1,50 @@
+import openai from "@/lib/openai";
+
 /**
- * Mocked OpenAI Service
- * Replace with real implementation later using 'openai' package
+ * Real OpenAI Service for Transcription and Translation
  */
 export async function transcribeAudio(audioBlob: Blob): Promise<string> {
-  console.log("Mocking transcription for audio blob...")
-  return "This is a mocked transcript of the spoken audio."
+  try {
+    // Convert Blob to File for OpenAI API
+    const file = new File([audioBlob], "audio.webm", { type: audioBlob.type });
+
+    const transcription = await openai.audio.transcriptions.create({
+      file,
+      model: "whisper-1",
+    });
+
+    return transcription.text;
+  } catch (error) {
+    console.error("OpenAI Transcription Error:", error);
+    throw new Error("Failed to transcribe audio");
+  }
 }
 
 export async function cleanTranscript(text: string): Promise<string> {
-  console.log("Mocking transcript cleaning...")
-  return text.trim()
+  // Whisper is usually pretty clean, but we can do a simple trim
+  return text.trim();
 }
 
 export async function translateText(text: string, sourceLang: string, targetLang: string): Promise<string> {
-  console.log(`Mocking translation from ${sourceLang} to ${targetLang}...`)
-  return `[Mocked Translation to ${targetLang}]: ${text}`
+  try {
+    const response = await openai.chat.completions.create({
+      model: "gpt-4o-mini",
+      messages: [
+        {
+          role: "system",
+          content: "You are a professional translator. Preserve tone and intent. Return ONLY the translated text."
+        },
+        {
+          role: "user",
+          content: `Translate from ${sourceLang} to ${targetLang}: ${text}`
+        }
+      ],
+      temperature: 0.3,
+    });
+
+    return response.choices[0]?.message?.content?.trim() || "Translation failed";
+  } catch (error) {
+    console.error("OpenAI Translation Error:", error);
+    throw new Error("Failed to translate text");
+  }
 }

@@ -51,21 +51,6 @@ type PanelCopy = {
 
 const speakers: SpeakerConfig[] = [
   {
-    key: "person1",
-    name: "Person 1",
-    sourceLanguage: "English (US)",
-    targetLanguage: "Spanish",
-    accentColor: "#d0bcff",
-    borderColor: "border-[#d0bcff]/10",
-    panelClassName:
-      "bg-[linear-gradient(180deg,rgba(27,38,73,0.96),rgba(14,22,46,0.92))]",
-    cardClassName: "border-[#d0bcff]/10 bg-[#0e1731]/80",
-    wavePrimary: "bg-[#79b3ff]",
-    waveSecondary: "bg-[#d0bcff]",
-    align: "left",
-    upsideDown: true,
-  },
-  {
     key: "person2",
     name: "Person 2",
     sourceLanguage: "Spanish",
@@ -78,6 +63,21 @@ const speakers: SpeakerConfig[] = [
     wavePrimary: "bg-[#8bd6b4]",
     waveSecondary: "bg-[#d0bcff]",
     align: "right",
+    upsideDown: true,
+  },
+  {
+    key: "person1",
+    name: "Person 1",
+    sourceLanguage: "English (US)",
+    targetLanguage: "Spanish",
+    accentColor: "#d0bcff",
+    borderColor: "border-[#d0bcff]/10",
+    panelClassName:
+      "bg-[linear-gradient(180deg,rgba(27,38,73,0.96),rgba(14,22,46,0.92))]",
+    cardClassName: "border-[#d0bcff]/10 bg-[#0e1731]/80",
+    wavePrimary: "bg-[#79b3ff]",
+    waveSecondary: "bg-[#d0bcff]",
+    align: "left",
   },
 ]
 
@@ -355,7 +355,14 @@ export function ConversationPage() {
           saved: Boolean(currentConversationId),
         },
       ])
+      
+      // Auto-play translation
+      if (payload.audioUrl) {
+        playAudio(payload.audioUrl)
+      }
+
       setDraftText("")
+      // Automatic Turn-Taking
       setActiveSpeakerKey(activeSpeaker.key === "person1" ? "person2" : "person1")
     } catch (submitError) {
       setError(submitError instanceof Error ? submitError.message : "Something went wrong.")
@@ -382,11 +389,11 @@ export function ConversationPage() {
         <div className="relative flex min-h-[calc(100dvh-11rem)] flex-col px-4 pb-[max(2rem,env(safe-area-inset-bottom))] pt-6 sm:px-6 sm:pt-8">
           <SpeakerPanel
             speaker={speakers[0]}
-            content={panelCopy.person1}
-            isActive={activeSpeakerKey === "person1"}
+            content={panelCopy[speakers[0].key]}
+            isActive={activeSpeakerKey === speakers[0].key}
             isRecording={isRecording}
             isSubmitting={isSubmitting}
-            onActivate={() => setActiveSpeakerKey("person1")}
+            onActivate={() => setActiveSpeakerKey(speakers[0].key)}
           />
 
           <AudioRecorder
@@ -402,13 +409,10 @@ export function ConversationPage() {
                   <div className="absolute inset-[14px] rounded-full border border-[#f0d5ff]/20 bg-[#120f2d]/90 shadow-[0_16px_40px_rgba(107,63,201,0.38)] sm:inset-[18px]" />
                   <button
                     type="button"
-                    onClick={() => {
-                      if (isRecording) {
-                        stopRecording()
-                      } else {
-                        void startRecording()
-                      }
-                    }}
+                    onMouseDown={() => { if(!isSubmitting && isSupported) void startRecording(); }}
+                    onMouseUp={() => { if(isRecording) stopRecording(); }}
+                    onTouchStart={(e) => { e.preventDefault(); if(!isSubmitting && isSupported) void startRecording(); }}
+                    onTouchEnd={(e) => { e.preventDefault(); if(isRecording) stopRecording(); }}
                     disabled={isSubmitting || !isSupported}
                     className="pointer-events-auto relative z-10 flex h-16 w-16 items-center justify-center rounded-full bg-[linear-gradient(180deg,#d8b6ff_0%,#a45cff_100%)] text-[#2e0b5a] shadow-[0_12px_30px_rgba(164,92,255,0.45)] disabled:opacity-50 sm:h-20 sm:w-20"
                     aria-label={isRecording ? "Stop recording" : "Start recording"}
@@ -426,11 +430,11 @@ export function ConversationPage() {
 
           <SpeakerPanel
             speaker={speakers[1]}
-            content={panelCopy.person2}
-            isActive={activeSpeakerKey === "person2"}
+            content={panelCopy[speakers[1].key]}
+            isActive={activeSpeakerKey === speakers[1].key}
             isRecording={isRecording}
             isSubmitting={isSubmitting}
-            onActivate={() => setActiveSpeakerKey("person2")}
+            onActivate={() => setActiveSpeakerKey(speakers[1].key)}
           />
 
           <div className="mt-5 rounded-[2rem] border border-[#b9c7df]/10 bg-[#0d1734]/85 p-4 shadow-[0_20px_40px_rgba(0,0,0,0.24)]">

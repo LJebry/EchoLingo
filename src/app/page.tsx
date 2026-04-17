@@ -36,6 +36,7 @@ function TranslationPanel({
   cardClassName,
   align = "left",
   actions,
+  isPlaying = false,
   children,
 }: {
   title: string
@@ -45,6 +46,7 @@ function TranslationPanel({
   cardClassName: string
   align?: "left" | "right"
   actions?: ReactNode
+  isPlaying?: boolean
   children?: ReactNode
 }) {
   const isRightAligned = align === "right"
@@ -80,11 +82,11 @@ function TranslationPanel({
             </p>
           )}
           <div className={cn("mt-6 flex items-end gap-2", isRightAligned ? "justify-end" : "justify-start")}>
-            <div className="h-14 w-2 origin-bottom rounded-full bg-[#79b3ff] scale-y-[0.42]" />
-            <div className="h-14 w-2 origin-bottom rounded-full bg-[#d0bcff] scale-y-[0.78]" />
-            <div className="h-14 w-2 origin-bottom rounded-full bg-[#79b3ff] scale-y-[0.56]" />
-            <div className="h-14 w-2 origin-bottom rounded-full bg-[#d0bcff] scale-y-100" />
-            <div className="h-14 w-2 origin-bottom rounded-full bg-[#79b3ff] scale-y-[0.64]" />
+            <div className={cn("h-14 w-2 origin-bottom rounded-full bg-[#79b3ff] scale-y-[0.42]", isPlaying && "animate-wave-bar [animation-delay:0ms]")} />
+            <div className={cn("h-14 w-2 origin-bottom rounded-full bg-[#d0bcff] scale-y-[0.78]", isPlaying && "animate-wave-bar [animation-delay:150ms]")} />
+            <div className={cn("h-14 w-2 origin-bottom rounded-full bg-[#79b3ff] scale-y-[0.56]", isPlaying && "animate-wave-bar [animation-delay:300ms]")} />
+            <div className={cn("h-14 w-2 origin-bottom rounded-full bg-[#d0bcff] scale-y-100", isPlaying && "animate-wave-bar [animation-delay:450ms]")} />
+            <div className={cn("h-14 w-2 origin-bottom rounded-full bg-[#79b3ff] scale-y-[0.64]", isPlaying && "animate-wave-bar [animation-delay:600ms]")} />
           </div>
         </div>
       </div>
@@ -101,6 +103,9 @@ export default function Home() {
   const [translatedText, setTranslatedText] = useState("Your translated text will appear here.")
   const [loading, setLoading] = useState(false)
   const [audioLoading, setAudioLoading] = useState(false)
+  const [audioPlaying, setAudioPlaying] = useState(false)
+  const [audioLoadingOriginal, setAudioLoadingOriginal] = useState(false)
+  const [audioPlayingOriginal, setAudioPlayingOriginal] = useState(false)
   const [error, setError] = useState("")
   const [copied, setCopied] = useState(false)
   const [pastePending, setPastePending] = useState(false)
@@ -190,8 +195,72 @@ export default function Home() {
     }
   }
 
+  const playOriginal = async () => {
+    if (!text.trim()) return
+
+    if (audioPlayingOriginal && audioRef.current) {
+      audioRef.current.pause()
+      setAudioPlayingOriginal(false)
+      return
+    }
+
+    try {
+      setAudioLoadingOriginal(true)
+      setError("")
+
+      const response = await fetch("/api/synthesize", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          text: text,
+        }),
+      })
+
+      if (!response.ok) {
+        const payload = await response.json().catch(() => ({}))
+        throw new Error(payload?.error || "Unable to synthesize speech right now.")
+      }
+
+      const audioBlob = await response.blob()
+      const audioUrl = URL.createObjectURL(audioBlob)
+
+      if (audioRef.current) {
+        audioRef.current.pause()
+        URL.revokeObjectURL(audioRef.current.src)
+      }
+
+      const audio = new Audio(audioUrl)
+      audioRef.current = audio
+      
+      audio.onplay = () => setAudioPlayingOriginal(true)
+      audio.onended = () => {
+        setAudioPlayingOriginal(false)
+        URL.revokeObjectURL(audioUrl)
+        if (audioRef.current === audio) {
+          audioRef.current = null
+        }
+      }
+      audio.onpause = () => setAudioPlayingOriginal(false)
+
+      await audio.play()
+    } catch (playError) {
+      setError(playError instanceof Error ? playError.message : "Unable to play audio.")
+      setAudioPlayingOriginal(false)
+    } finally {
+      setAudioLoadingOriginal(false)
+    }
+  }
+
   const playTranslation = async () => {
     if (!translatedText || translatedText === "Your translated text will appear here.") return
+
+    if (audioPlaying && audioRef.current) {
+      audioRef.current.pause()
+      setAudioPlaying(false)
+      return
+    }
 
     try {
       setAudioLoading(true)
@@ -222,16 +291,21 @@ export default function Home() {
 
       const audio = new Audio(audioUrl)
       audioRef.current = audio
+      
+      audio.onplay = () => setAudioPlaying(true)
       audio.onended = () => {
+        setAudioPlaying(false)
         URL.revokeObjectURL(audioUrl)
         if (audioRef.current === audio) {
           audioRef.current = null
         }
       }
+      audio.onpause = () => setAudioPlaying(false)
 
       await audio.play()
     } catch (playError) {
       setError(playError instanceof Error ? playError.message : "Unable to play translated audio.")
+      setAudioPlaying(false)
     } finally {
       setAudioLoading(false)
     }
@@ -261,8 +335,18 @@ export default function Home() {
             accentColor="#d0bcff"
             borderClassName="border-[#d0bcff]/10 bg-[linear-gradient(180deg,rgba(27,38,73,0.96),rgba(14,22,46,0.92))]"
             cardClassName="border-[#d0bcff]/10 bg-[#0e1731]/80"
+            isPlaying={audioPlayingOriginal}
             actions={
               <>
+                <button
+                  type="button"
+                  onClick={playOriginal}
+                  disabled={audioLoadingOriginal || !text.trim()}
+                  className="flex h-11 w-11 items-center justify-center rounded-full bg-[#101936] text-[#d8def6] disabled:opacity-40"
+                  aria-label="Play original audio"
+                >
+                  {audioLoadingOriginal ? <Loader2 size={18} className="animate-spin" /> : <Volume2 size={18} />}
+                </button>
                 <select
                   className="rounded-full border border-[#d0bcff]/20 bg-[#101936] px-4 py-3 text-sm text-[#eef1ff] outline-none"
                   value={sourceLanguage}
@@ -317,6 +401,7 @@ export default function Home() {
             borderClassName="border-[#8bd6b4]/10 bg-[linear-gradient(180deg,rgba(13,24,45,0.92),rgba(20,40,53,0.96))]"
             cardClassName="border-[#8bd6b4]/10 bg-[#0d1c2c]/80"
             align="right"
+            isPlaying={audioPlaying}
             actions={
               <>
                 <button
