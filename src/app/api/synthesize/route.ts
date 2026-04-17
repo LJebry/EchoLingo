@@ -1,5 +1,4 @@
 import { NextResponse } from "next/server"
-import { Readable } from "node:stream"
 import elevenlabs from "@/lib/elevenlabs"
 import { z } from "zod"
 
@@ -8,14 +7,9 @@ const synthesizeSchema = z.object({
   voiceId: z.string().trim().optional(),
 })
 
-async function streamToBuffer(stream: Readable) {
-  const chunks: Buffer[] = []
-
-  for await (const chunk of stream) {
-    chunks.push(Buffer.isBuffer(chunk) ? chunk : Buffer.from(chunk))
-  }
-
-  return Buffer.concat(chunks)
+async function streamToBuffer(stream: ReadableStream<Uint8Array>) {
+  const arrayBuffer = await new Response(stream).arrayBuffer()
+  return Buffer.from(arrayBuffer)
 }
 
 async function getVoiceId(preferredVoiceId?: string) {
@@ -29,7 +23,7 @@ async function getVoiceId(preferredVoiceId?: string) {
 
   try {
     const voiceResponse = await elevenlabs.voices.getAll()
-    const firstVoice = voiceResponse.voices?.[0]?.voice_id
+    const firstVoice = voiceResponse.voices?.[0]?.voiceId
     if (!firstVoice) {
       console.error("ElevenLabs: No voices found in account.")
       return null
@@ -69,7 +63,7 @@ export async function POST(req: Request) {
 
     const audioStream = await elevenlabs.textToSpeech.convert(voiceId, {
       text: parsed.data.text,
-      model_id: "eleven_multilingual_v2",
+      modelId: "eleven_multilingual_v2",
     })
 
     const audioBuffer = await streamToBuffer(audioStream)
