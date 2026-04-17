@@ -233,39 +233,13 @@ export default function Home() {
           </div>
         </section>
 
-        <section className="relative mt-8 flex flex-1 items-center justify-center">
+        <section className="relative mt-8 flex flex-1 items-center justify-center pb-24 md:pb-8">
           <div className="flex h-[100px] w-[100px] items-center justify-center rounded-full bg-[radial-gradient(circle,rgba(8,16,50,0.75)_0%,rgba(6,14,47,0.95)_65%,rgba(4,12,45,1)_100%)]">
             <button className="flex h-[60px] w-[60px] items-center justify-center rounded-full bg-[#b997ff] shadow-[0_10px_30px_rgba(185,151,255,0.18)]" aria-label="Voice input">
               <Mic className="h-8 w-8 text-[#3f00a8]" strokeWidth={2.4} />
             </button>
           </div>
         </section>
-
-        <nav className="mt-4 rounded-t-[34px] bg-[#101c48] px-2 py-4">
-          <div className="grid grid-cols-4 items-end gap-2">
-            <button className="flex flex-col items-center">
-              <div className="flex w-full max-w-[128px] flex-col items-center rounded-full bg-[#29355b] px-5 py-3">
-                <Languages className="h-10 w-10 text-[#c7afff]" strokeWidth={2.2} />
-                <span className="mt-1 text-[16px] text-[#d8ccff]">Translate</span>
-              </div>
-            </button>
-
-            <button className="flex flex-col items-center py-2">
-              <MessageCircleMore className="h-10 w-10 text-[#c9d5eb]" strokeWidth={2.2} />
-              <span className="mt-2 text-[16px] text-[#c9d5eb]">Convo</span>
-            </button>
-
-            <button className="flex flex-col items-center py-2">
-              <Bot className="h-10 w-10 text-[#c9d5eb]" strokeWidth={2.2} />
-              <span className="mt-2 text-[16px] text-[#c9d5eb]">Voices</span>
-            </button>
-
-            <button className="flex flex-col items-center py-2">
-              <History className="h-10 w-10 text-[#c9d5eb]" strokeWidth={2.2} />
-              <span className="mt-2 text-[16px] text-[#c9d5eb]">History</span>
-            </button>
-          </div>
-        </nav>
       </div>
     </main>
   )

@@ -1,38 +1,49 @@
-"use client"
+"use client";
 
-import { Home, MessageSquare, Mic2, Settings, UserCircle } from 'lucide-react'
-import Link from 'next/link'
-import { usePathname } from 'next/navigation'
-import { cn } from '@/components/ui/Button'
+import Link from "next/link";
+import { usePathname } from "next/navigation";
+
+const navItems = [
+  { href: "/", label: "Translate", icon: "translate" },
+  { href: "/conversations/new", label: "Convo", icon: "settings_voice" },
+  { href: "/voices", label: "Voices", icon: "face" },
+  { href: "/conversations", label: "History", icon: "history" },
+];
+
+function cn(...classes: (string | boolean | undefined | null)[]) {
+  return classes.filter(Boolean).join(" ");
+}
 
 export function BottomNav() {
-  const pathname = usePathname()
-
-  const navItems = [
-    { href: '/', icon: Home, label: 'Home' },
-    { href: '/conversations', icon: MessageSquare, label: 'History' },
-    { href: '/voices', icon: UserCircle, label: 'Voices' },
-    { href: '/settings', icon: Settings, label: 'Settings' },
-  ]
+  const pathname = usePathname();
 
   return (
-    <nav className="fixed bottom-0 left-0 right-0 z-50 bg-[#131b2e] border-t border-[#b9c7df]/10 px-6 py-3 pb-8 flex items-center justify-between">
+    <nav className="fixed bottom-0 left-0 right-0 z-50 flex h-20 items-center justify-around rounded-t-[2rem] bg-surface-low border-t border-outline-ghost/10 px-4 pb-safe shadow-[0_-4px_24px_rgba(0,0,0,0.4)]">
       {navItems.map((item) => {
-        const isActive = pathname === item.href
+        const isActive = pathname === item.href;
         return (
           <Link
             key={item.href}
             href={item.href}
             className={cn(
-              "flex flex-col items-center gap-1 transition-colors",
-              isActive ? "text-[#d0bcff]" : "text-[#b9c7df]/60 hover:text-[#b9c7df]"
+              "flex flex-col items-center justify-center gap-1 transition-all active:scale-95 px-5 py-1.5 rounded-full",
+              isActive 
+                ? "bg-surface-high text-pulse" 
+                : "text-support hover:text-pulse"
             )}
           >
-            <item.icon size={24} />
-            <span className="text-[10px] uppercase tracking-wider font-bold">{item.label}</span>
+            <span 
+              className="material-symbols-outlined text-[24px]"
+              style={{ fontVariationSettings: isActive ? "'FILL' 1" : "'FILL' 0" }}
+            >
+              {item.icon}
+            </span>
+            <span className="font-sans text-[10px] font-bold uppercase tracking-tight">
+              {item.label}
+            </span>
           </Link>
-        )
+        );
       })}
     </nav>
-  )
+  );
 }
