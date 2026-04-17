@@ -134,10 +134,10 @@ export default async function VoicesPage() {
               <Link
                 key={profile.id}
                 href={`/voices/${profile.id}`}
-                className="relative bg-[#0a1744] px-6 py-7 transition-transform hover:-translate-y-0.5"
+                className="relative rounded-[30px] bg-[#0a1744] px-6 py-7 transition-transform hover:-translate-y-0.5"
               >
                 {index === 0 && (
-                  <span className="absolute right-5 top-4 h-3 w-3 rounded-full bg-[#caaaff] shadow-[0_0_12px_3px_rgba(202,170,255,0.7)]" />
+                  <span className="absolute right-5 top-4 h-10 w-10 rounded-full bg-[#caaaff] shadow-[0_0_12px_3px_rgba(202,170,255,0.7)]" />
                 )}
 
                 <div className="flex flex-col items-center text-center">
@@ -158,7 +158,7 @@ export default async function VoicesPage() {
 
             <Link
               href="/voices/new"
-              className="border border-dashed border-[#25345e] bg-[#0a1744] px-6 py-7 transition-transform hover:-translate-y-0.5"
+              className="rounded-[30px] border border-dashed border-[#25345e] bg-[#0a1744] px-6 py-7 transition-transform hover:-translate-y-0.5"
             >
               <div className="flex flex-col items-center text-center">
                 <div className="flex h-[82px] w-[82px] items-center justify-center rounded-full bg-[#111f50] text-[42px]">
@@ -189,7 +189,7 @@ export default async function VoicesPage() {
 
           <div className="mt-8 space-y-5">
             {recentTranslations.map((item) => (
-              <article key={item.id} className="bg-black px-6 py-7">
+              <article key={item.id} className="rounded-[30px] bg-black px-6 py-7">
                 <div className="flex gap-5">
                   <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-full bg-[#162965] text-[21px] text-[#b997ff]">
                     {item.icon}
