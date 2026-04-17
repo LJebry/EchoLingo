@@ -1,9 +1,37 @@
+import elevenlabs from "@/lib/elevenlabs";
+
 /**
- * Mocked ElevenLabs Service
- * Replace with real implementation later using 'elevenlabs' package
+ * Real ElevenLabs Service
  */
 export async function synthesizeSpeech(text: string, voiceId?: string): Promise<string> {
-  console.log(`Mocking speech synthesis for voice: ${voiceId || 'default'}...`)
-  // Returning a dummy URL for the MVP
-  return "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3"
+  try {
+    const selectedVoiceId = voiceId || process.env.ELEVENLABS_VOICE_ID;
+    
+    if (!selectedVoiceId) {
+      // Fallback to first available voice if none configured
+      const voices = await elevenlabs.voices.getAll();
+      if (!voices.voices[0]) throw new Error("No voices found in account");
+      voiceId = voices.voices[0].voice_id;
+    } else {
+      voiceId = selectedVoiceId;
+    }
+
+    const audioStream = await elevenlabs.textToSpeech.convert(voiceId, {
+      text,
+      model_id: "eleven_multilingual_v2",
+    });
+
+    // Convert Stream to Buffer
+    const chunks: Buffer[] = [];
+    for await (const chunk of audioStream) {
+      chunks.push(Buffer.isBuffer(chunk) ? chunk : Buffer.from(chunk));
+    }
+    const buffer = Buffer.concat(chunks);
+
+    // Convert Buffer to Base64 Data URL for easy frontend playback
+    return `data:audio/mpeg;base64,${buffer.toString("base64")}`;
+  } catch (error) {
+    console.error("ElevenLabs Synthesis Error:", error);
+    throw new Error("Failed to synthesize speech");
+  }
 }
