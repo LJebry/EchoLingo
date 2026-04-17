@@ -27,12 +27,29 @@ async function getVoiceId(preferredVoiceId?: string) {
     return process.env.ELEVENLABS_VOICE_ID
   }
 
-  const voiceResponse = await elevenlabs.voices.getAll()
-  return voiceResponse.voices[0]?.voice_id
+  try {
+    const voiceResponse = await elevenlabs.voices.getAll()
+    const firstVoice = voiceResponse.voices?.[0]?.voice_id
+    if (!firstVoice) {
+      console.error("ElevenLabs: No voices found in account.")
+      return null
+    }
+    return firstVoice
+  } catch (error) {
+    console.error("ElevenLabs: Failed to fetch voices:", error)
+    return null
+  }
 }
 
 export async function POST(req: Request) {
   try {
+    if (!process.env.ELEVENLABS_API_KEY) {
+      return NextResponse.json(
+        { error: "ElevenLabs API key is not configured" },
+        { status: 500 }
+      )
+    }
+
     const body = await req.json()
     const parsed = synthesizeSchema.safeParse(body)
 
@@ -45,8 +62,10 @@ export async function POST(req: Request) {
 
     const voiceId = await getVoiceId(parsed.data.voiceId)
     if (!voiceId) {
-      return NextResponse.json({ error: "No ElevenLabs voice available" }, { status: 500 })
+      return NextResponse.json({ error: "No ElevenLabs voice available or found" }, { status: 500 })
     }
+
+    console.log(`ElevenLabs: Synthesizing with voiceId: ${voiceId}`)
 
     const audioStream = await elevenlabs.textToSpeech.convert(voiceId, {
       text: parsed.data.text,
@@ -61,8 +80,13 @@ export async function POST(req: Request) {
         "Cache-Control": "no-store",
       },
     })
-  } catch (error) {
-    console.error("Synthesize API error:", error)
-    return NextResponse.json({ error: "API Failure" }, { status: 500 })
+  } catch (error: any) {
+    console.error("Synthesize API error details:", error)
+    
+    // Check for specific ElevenLabs errors if possible
+    const status = error?.status || 500
+    const message = error?.message || "Speech synthesis failed"
+    
+    return NextResponse.json({ error: message }, { status })
   }
 }

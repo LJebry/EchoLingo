@@ -10,6 +10,13 @@ const translateSchema = z.object({
 
 export async function POST(req: Request) {
   try {
+    if (!process.env.OPENAI_API_KEY || process.env.OPENAI_API_KEY.startsWith("sk-abcdef")) {
+      return NextResponse.json(
+        { error: "OpenAI API key is missing or invalid" },
+        { status: 500 }
+      )
+    }
+
     const body = await req.json()
     const parsed = translateSchema.safeParse(body)
 
@@ -45,8 +52,17 @@ export async function POST(req: Request) {
     }
 
     return NextResponse.json({ translatedText })
-  } catch (error) {
+  } catch (error: any) {
     console.error("Translate API error:", error)
-    return NextResponse.json({ error: "API Failure" }, { status: 500 })
+    
+    // Check for common OpenAI errors
+    if (error?.status === 401) {
+      return NextResponse.json({ error: "Invalid OpenAI API Key" }, { status: 401 })
+    }
+    if (error?.status === 429) {
+      return NextResponse.json({ error: "OpenAI Rate Limit Exceeded" }, { status: 429 })
+    }
+
+    return NextResponse.json({ error: "Translation API Failure" }, { status: 500 })
   }
 }
