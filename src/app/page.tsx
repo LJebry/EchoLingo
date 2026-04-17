@@ -1,130 +1,255 @@
-const waveformBars = [
-  "h-8",
-  "h-14",
-  "h-10",
-  "h-16",
-  "h-9",
-  "h-12",
-  "h-7",
-  "h-14",
-  "h-10",
-];
+"use client"
 
-const liveTurns = [
-  {
-    speaker: "You • English",
-    text: "Can we move our check-in to six?",
-    tone: "bg-surface-highest",
-    shape: "rounded-t-3xl rounded-r-3xl rounded-bl-md",
-  },
-  {
-    speaker: "Mika • Japanese",
-    text: "6時にチェックインへ変更してもいいですか？",
-    tone: "bg-surface-high",
-    shape: "rounded-t-3xl rounded-l-3xl rounded-br-md",
-  },
-];
+import { useMemo, useState } from "react"
+import {
+  Globe,
+  ChevronDown,
+  ArrowRightLeft,
+  X,
+  Volume2,
+  Copy,
+  Share2,
+  Mic,
+  Languages,
+  MessageCircleMore,
+  Bot,
+  History,
+} from "lucide-react"
+
+const MAX_CHARS = 5000
+const languages = [
+  "English",
+  "Spanish",
+  "French",
+  "German",
+  "Italian",
+  "Portuguese",
+  "Hindi",
+  "Japanese",
+]
 
 export default function Home() {
+  const [sourceLanguage, setSourceLanguage] = useState("English")
+  const [targetLanguage, setTargetLanguage] = useState("Spanish")
+  const [text, setText] = useState("")
+  const [translatedText, setTranslatedText] = useState("Introduce el texto a traducir...")
+  const [loading, setLoading] = useState(false)
+  const [error, setError] = useState("")
+
+  const canTranslate = text.trim().length > 0 && !loading
+
+  const helperText = useMemo(() => {
+    if (loading) return "Translating..."
+    if (error) return error
+    return `${text.length} / ${MAX_CHARS}`
+  }, [error, loading, text.length])
+
+  const translate = async () => {
+    if (!canTranslate) return
+
+    try {
+      setError("")
+      setLoading(true)
+
+      const response = await fetch("/api/translate", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          text,
+          sourceLanguage,
+          targetLanguage,
+        }),
+      })
+
+      const data = await response.json()
+      if (!response.ok) {
+        throw new Error(data?.error || "Translation request failed")
+      }
+
+      setTranslatedText(data.translatedText)
+    } catch (err) {
+      const message = err instanceof Error ? err.message : "Unable to translate right now"
+      setError(message)
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  const swapLanguages = () => {
+    setSourceLanguage(targetLanguage)
+    setTargetLanguage(sourceLanguage)
+    if (translatedText && translatedText !== "Introduce el texto a traducir...") {
+      setText(translatedText)
+      setTranslatedText(text || "Introduce el texto a traducir...")
+    }
+  }
+
+  const copyTranslation = async () => {
+    if (!translatedText || translatedText === "Introduce el texto a traducir...") return
+    await navigator.clipboard.writeText(translatedText)
+  }
+
+  const shareTranslation = async () => {
+    if (!translatedText || translatedText === "Introduce el texto a traducir...") return
+
+    if (navigator.share) {
+      await navigator.share({
+        title: "EchoLingo Translation",
+        text: translatedText,
+      })
+      return
+    }
+
+    await navigator.clipboard.writeText(translatedText)
+  }
+
+  const clearInput = () => {
+    setText("")
+    setError("")
+  }
+
   return (
-    <main className="mx-auto flex min-h-screen w-full max-w-6xl flex-col px-4 pb-10 pt-6 sm:px-8 md:pt-10">
-      <header className="animate-fade-up rounded-3xl bg-surface-low/90 p-3 shadow-ambient backdrop-blur-sm sm:p-4">
-        <div className="flex items-center justify-between gap-3">
-          <div>
-            <p className="font-display text-lg tracking-wide text-support">EchoLingo</p>
-            <p className="text-sm text-on-surface/70">The Digital Polyglot</p>
-          </div>
-
-          <div className="flex h-12 min-w-[172px] items-center rounded-[999px_999px_999px_20px] bg-surface-high p-1">
-            <button className="h-10 min-w-0 flex-1 rounded-[999px] bg-pulse px-4 text-sm font-semibold text-on-pulse transition hover:shadow-glow">
-              EN
-            </button>
-            <button className="h-10 min-w-0 flex-1 rounded-[999px_20px_999px_999px] px-4 text-sm font-medium text-support transition hover:bg-surface-bright/80">
-              JA
-            </button>
-          </div>
-        </div>
-      </header>
-
-      <section className="mt-8 grid gap-6 lg:grid-cols-[1.05fr_0.95fr]">
-        <div className="animate-fade-up rounded-3xl bg-surface-low p-6 shadow-ambient [animation-delay:120ms] sm:p-8">
-          <p className="text-sm uppercase tracking-[0.18em] text-accent">Live Translation</p>
-          <h1 className="mt-3 font-display text-4xl leading-tight text-on-surface sm:text-5xl md:text-6xl">
-            Speak naturally.
-            <br />
-            <span className="text-pulse">Translate fluidly.</span>
-          </h1>
-          <p className="mt-4 max-w-lg text-base text-on-surface/75 sm:text-lg">
-            A seamless voice-first bridge for multilingual conversations with atmospheric clarity.
-          </p>
-
-          <div className="mt-8 flex flex-col gap-3 sm:flex-row">
-            <button className="min-h-12 rounded-full bg-gradient-to-br from-pulse to-pulse-container px-7 py-3 text-base font-semibold text-on-pulse transition hover:shadow-glow">
-              Start Live Session
-            </button>
-            <button className="min-h-12 rounded-full border border-outline-ghost px-7 py-3 text-base font-medium text-support transition hover:bg-surface-bright/70">
-              Preview Voices
-            </button>
-          </div>
-
-          <div className="mt-8 rounded-2xl bg-surface-high p-4">
-            <div className="flex items-center justify-between gap-3">
-              <p className="text-sm text-on-surface/75">Waveform Visualizer</p>
-              <span className="inline-flex items-center gap-2 rounded-full bg-accent/20 px-3 py-1 text-xs font-semibold text-accent">
-                <span className="h-2 w-2 rounded-full bg-accent animate-pulse" />
-                LIVE
-              </span>
+    <main className="min-h-screen bg-[#000f3d] text-white">
+      <div className="mx-auto flex min-h-screen w-full max-w-md flex-col px-4 pb-6 pt-8">
+        <header className="flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <div className="flex h-10 w-10 items-center justify-center rounded-full">
+              <Globe className="h-9 w-9 text-[#c7afff]" strokeWidth={2.2} />
             </div>
-            <div className="mt-5 flex h-20 items-end gap-2">
-              {waveformBars.map((size, index) => (
-                <span
-                  key={`${size}-${index}`}
-                  className={`w-2 origin-bottom rounded-full ${size} ${
-                    index % 3 === 0 ? "bg-pulse" : "bg-accent"
-                  } animate-wave-bar`}
-                  style={{ animationDelay: `${index * 80}ms` }}
-                />
-              ))}
-            </div>
-          </div>
-        </div>
-
-        <div className="animate-fade-up rounded-3xl bg-surface-high p-5 shadow-ambient [animation-delay:220ms] sm:p-6">
-          <div className="mb-6 flex items-center justify-between">
-            <p className="font-display text-2xl text-on-surface">Conversation Stream</p>
-            <p className="rounded-full bg-surface-bright px-3 py-1 text-xs text-support">New Engine</p>
+            <h1 className="text-[28px] font-semibold tracking-tight text-[#c7afff]">EchoLingo</h1>
           </div>
 
-          <div className="space-y-4">
-            {liveTurns.map((turn, idx) => (
-              <article
-                key={turn.speaker}
-                className={`min-h-[136px] p-5 ${turn.tone} ${turn.shape} ${
-                  idx === 1 ? "ml-8" : "mr-8"
-                }`}
+          <div className="flex h-14 w-14 items-center justify-center rounded-full border border-[#44607b] bg-[#214461]">
+            <span className="text-[26px]">👩🏻</span>
+          </div>
+        </header>
+
+        <section className="mt-12 rounded-[800px] bg-[#222d52] px-5 py-5 shadow-[0_12px_30px_rgba(0,0,0,0.22)]">
+          <div className="grid grid-cols-[1fr_auto_1fr] items-center">
+            <label className="flex items-center justify-center gap-2 text-[#e6e8f5]">
+              <span className="sr-only">Source language</span>
+              <select
+                className="w-full bg-transparent text-center text-[20px] font-medium outline-none"
+                value={sourceLanguage}
+                onChange={(e) => setSourceLanguage(e.target.value)}
               >
-                <p className="text-sm text-support">{turn.speaker}</p>
-                <p className="mt-6 font-display text-2xl leading-snug text-on-surface">{turn.text}</p>
-              </article>
-            ))}
-          </div>
+                {languages.map((lang) => (
+                  <option key={`src-${lang}`} value={lang} className="bg-[#222d52] text-white">
+                    {lang}
+                  </option>
+                ))}
+              </select>
+              <ChevronDown className="h-5 w-5" />
+            </label>
 
-          <label className="mt-6 block rounded-2xl bg-surface-bright/95 px-4 pb-3 pt-3">
-            <span className="text-xs uppercase tracking-[0.14em] text-support">Whisper Input</span>
-            <div className="mt-2 flex items-center gap-3">
-              <input
-                type="text"
-                placeholder="Type or hold mic to capture speech"
-                className="h-12 w-full rounded-xl bg-surface-high px-4 text-sm text-on-surface placeholder:text-on-surface/55 outline-none"
-              />
-              <button className="flex h-12 min-w-12 items-center justify-center rounded-full bg-pulse text-on-pulse transition hover:shadow-glow">
-                Go
+            <button
+              onClick={swapLanguages}
+              className="mx-3 flex h-[74px] w-[74px] items-center justify-center rounded-full bg-[#283458] shadow-inner"
+              aria-label="Swap languages"
+            >
+              <ArrowRightLeft className="h-9 w-9 text-[#c7afff]" strokeWidth={2.2} />
+            </button>
+
+            <label className="flex items-center justify-center gap-2 text-[#e6e8f5]">
+              <span className="sr-only">Target language</span>
+              <select
+                className="w-full bg-transparent text-center text-[20px] font-medium outline-none"
+                value={targetLanguage}
+                onChange={(e) => setTargetLanguage(e.target.value)}
+              >
+                {languages.map((lang) => (
+                  <option key={`tgt-${lang}`} value={lang} className="bg-[#222d52] text-white">
+                    {lang}
+                  </option>
+                ))}
+              </select>
+              <ChevronDown className="h-5 w-5" />
+            </label>
+          </div>
+        </section>
+
+        <section className="mt-10 rounded-[34px] bg-[#0f1c49] px-8 pb-8 pt-10 shadow-[0_18px_35px_rgba(0,0,0,0.22)]">
+          <textarea
+            value={text}
+            onChange={(e) => setText(e.target.value.slice(0, MAX_CHARS))}
+            placeholder="Enter text to translate..."
+            className="h-52 w-full resize-none bg-transparent text-[24px] leading-snug text-[#dae2fd] placeholder:text-[#737598] outline-none"
+          />
+
+          <div className="mt-6 flex items-center justify-between">
+            <button onClick={clearInput} className="text-[#c7c3de]" aria-label="Clear text">
+              <X className="h-10 w-10" strokeWidth={2.2} />
+            </button>
+
+            <button
+              onClick={translate}
+              disabled={!canTranslate}
+              className="rounded-full bg-gradient-to-br from-[#d0bcff] to-[#7a5ac9] px-6 py-2 text-sm font-semibold text-[#3c0091] disabled:cursor-not-allowed disabled:opacity-40"
+            >
+              {loading ? "Translating" : "Translate"}
+            </button>
+
+            <span className={`text-[15px] ${error ? "text-red-300" : "text-[#777995]"}`}>{helperText}</span>
+          </div>
+        </section>
+
+        <section className="mt-8 rounded-[34px] bg-[#232d52] px-8 pb-12 pt-10 shadow-[0_18px_35px_rgba(0,0,0,0.22)]">
+          <p className="max-w-[270px] text-[28px] leading-[1.15] text-[#c7afff]">{translatedText}</p>
+
+          <div className="mt-24 border-t border-[#2e395f]" />
+
+          <div className="mt-8 flex items-center justify-between">
+            <button className="flex h-[92px] w-[92px] items-center justify-center rounded-full bg-[#313b61]" aria-label="Play translation audio">
+              <Volume2 className="h-11 w-11 text-[#c7afff]" strokeWidth={2.2} />
+            </button>
+
+            <div className="flex items-center gap-8 text-[#d1c9e2]">
+              <button onClick={copyTranslation} aria-label="Copy translation">
+                <Copy className="h-8 w-8" strokeWidth={2.2} />
+              </button>
+              <button onClick={shareTranslation} aria-label="Share translation">
+                <Share2 className="h-8 w-8" strokeWidth={2.2} />
               </button>
             </div>
-            <span className="mt-3 block h-0.5 w-full rounded-full bg-pulse/85" />
-          </label>
-        </div>
-      </section>
+          </div>
+        </section>
+
+        <section className="relative mt-8 flex flex-1 items-center justify-center">
+          <div className="flex h-[100px] w-[100px] items-center justify-center rounded-full bg-[radial-gradient(circle,rgba(8,16,50,0.75)_0%,rgba(6,14,47,0.95)_65%,rgba(4,12,45,1)_100%)]">
+            <button className="flex h-[60px] w-[60px] items-center justify-center rounded-full bg-[#b997ff] shadow-[0_10px_30px_rgba(185,151,255,0.18)]" aria-label="Voice input">
+              <Mic className="h-8 w-8 text-[#3f00a8]" strokeWidth={2.4} />
+            </button>
+          </div>
+        </section>
+
+        <nav className="mt-4 rounded-t-[34px] bg-[#101c48] px-2 py-4">
+          <div className="grid grid-cols-4 items-end gap-2">
+            <button className="flex flex-col items-center">
+              <div className="flex w-full max-w-[128px] flex-col items-center rounded-full bg-[#29355b] px-5 py-3">
+                <Languages className="h-10 w-10 text-[#c7afff]" strokeWidth={2.2} />
+                <span className="mt-1 text-[16px] text-[#d8ccff]">Translate</span>
+              </div>
+            </button>
+
+            <button className="flex flex-col items-center py-2">
+              <MessageCircleMore className="h-10 w-10 text-[#c9d5eb]" strokeWidth={2.2} />
+              <span className="mt-2 text-[16px] text-[#c9d5eb]">Convo</span>
+            </button>
+
+            <button className="flex flex-col items-center py-2">
+              <Bot className="h-10 w-10 text-[#c9d5eb]" strokeWidth={2.2} />
+              <span className="mt-2 text-[16px] text-[#c9d5eb]">Voices</span>
+            </button>
+
+            <button className="flex flex-col items-center py-2">
+              <History className="h-10 w-10 text-[#c9d5eb]" strokeWidth={2.2} />
+              <span className="mt-2 text-[16px] text-[#c9d5eb]">History</span>
+            </button>
+          </div>
+        </nav>
+      </div>
     </main>
-  );
+  )
 }
