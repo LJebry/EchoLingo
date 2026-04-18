@@ -31,7 +31,7 @@ export default async function DashboardPage() {
   const profiles = await getUserSpeakerProfiles(session.user.id)
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-8 px-4 pb-28 pt-5">
       <MobileHeader title="Dashboard" />
 
       <section className="space-y-4">

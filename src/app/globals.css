@@ -9,6 +9,7 @@
 body {
   @apply bg-surface text-on-surface antialiased;
   min-height: 100vh;
+  overflow-x: hidden;
   background-image:
     radial-gradient(circle at 15% 10%, rgba(208, 188, 255, 0.16), transparent 35%),
     radial-gradient(circle at 80% 0%, rgba(139, 214, 180, 0.1), transparent 30%),

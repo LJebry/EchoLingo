@@ -372,21 +372,21 @@ export function ConversationPage() {
   }
 
   return (
-    <main className="min-h-[calc(100dvh-5rem)] bg-[#020b23] text-white">
-      <div className="relative min-h-[calc(100dvh-5rem)] w-full overflow-hidden bg-[radial-gradient(circle_at_top,rgba(124,92,255,0.22),transparent_28%),linear-gradient(180deg,#09142f_0%,#050c1f_48%,#09142f_100%)]">
-        <div className="flex items-center justify-between px-4 pt-6 sm:px-6 sm:pt-8">
+    <main className="min-h-dvh bg-[#020b23] text-white">
+      <div className="relative min-h-dvh overflow-hidden bg-[radial-gradient(circle_at_top,rgba(124,92,255,0.22),transparent_28%),linear-gradient(180deg,#09142f_0%,#050c1f_48%,#09142f_100%)]">
+        <div className="flex items-center justify-between px-4 pt-5">
           <div className="flex items-center gap-2 text-[#c8aefc]">
-            <Globe size={26} />
-            <h1 className="text-xl font-semibold">EchoLingo</h1>
+            <Globe size={18} />
+            <h1 className="text-sm font-semibold tracking-tight">EchoLingo</h1>
           </div>
 
-          <div className="flex items-center gap-2 rounded-full border border-[#c8aefc]/15 bg-[#12203f]/80 px-3 py-2 text-sm text-[#d8def6]">
+          <div className="flex items-center gap-2 rounded-full border border-[#c8aefc]/15 bg-[#12203f]/80 px-3 py-2 text-xs text-[#d8def6]">
             <ArrowRightLeft size={14} className="text-[#c8aefc]" />
             {persistenceState === "saved" ? "Synced" : "Live"}
           </div>
         </div>
 
-        <div className="relative flex min-h-[calc(100dvh-11rem)] flex-col px-4 pb-[max(2rem,env(safe-area-inset-bottom))] pt-6 sm:px-6 sm:pt-8">
+        <div className="relative flex min-h-[calc(100dvh-3.5rem)] flex-col px-4 pb-[6.75rem] pt-5">
           <SpeakerPanel
             speaker={speakers[0]}
             content={panelCopy[speakers[0].key]}

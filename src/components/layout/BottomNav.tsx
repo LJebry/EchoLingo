@@ -18,30 +18,34 @@ export function BottomNav() {
   const pathname = usePathname();
 
   return (
-    <nav className="fixed bottom-0 left-0 right-0 z-50 flex h-20 items-center justify-around rounded-t-[2rem] border-t border-outline-ghost/10 bg-surface-low px-4 pb-safe shadow-[0_-4px_24px_rgba(0,0,0,0.4)]">
-      {navItems.map((item) => {
-        const isActive = pathname === item.href;
-        return (
-          <Link
-            key={item.href}
-            href={item.href}
-            className={cn(
-              "flex flex-col items-center justify-center gap-1 rounded-full px-5 py-1.5 transition-all active:scale-95",
-              isActive ? "bg-surface-high text-pulse" : "text-support hover:text-pulse"
-            )}
-          >
-            <span
-              className="material-symbols-outlined text-[24px]"
-              style={{ fontVariationSettings: isActive ? "'FILL' 1" : "'FILL' 0" }}
+    <nav className="fixed bottom-0 left-1/2 z-50 w-full max-w-[390px] -translate-x-1/2 px-4 pb-[max(0.75rem,env(safe-area-inset-bottom))]">
+      <div className="grid grid-cols-4 items-center gap-1 rounded-[1.75rem] border border-white/8 bg-[#101b39]/95 px-2 py-2 shadow-[0_-12px_35px_rgba(0,0,0,0.38)] backdrop-blur-xl">
+        {navItems.map((item) => {
+          const isActive =
+            pathname === item.href ||
+            (item.href !== "/" && pathname.startsWith(`${item.href}/`));
+          return (
+            <Link
+              key={item.href}
+              href={item.href}
+              className={cn(
+                "flex flex-col items-center justify-center gap-1 rounded-[1.25rem] px-2 py-2.5 text-[#8ea0c9] transition-all active:scale-95",
+                isActive && "bg-[#202c52] text-[#d9cbff]"
+              )}
             >
-              {item.icon}
-            </span>
-            <span className="font-sans text-[10px] font-bold uppercase tracking-tight">
-              {item.label}
-            </span>
-          </Link>
-        );
-      })}
+              <span
+                className="material-symbols-outlined text-[22px]"
+                style={{ fontVariationSettings: isActive ? "'FILL' 1" : "'FILL' 0" }}
+              >
+                {item.icon}
+              </span>
+              <span className="font-sans text-[10px] font-semibold tracking-tight">
+                {item.label}
+              </span>
+            </Link>
+          );
+        })}
+      </div>
     </nav>
   );
 }
