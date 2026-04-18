@@ -284,7 +284,7 @@ export default function Home() {
   return (
     <main className="min-h-full bg-[radial-gradient(circle_at_top,rgba(124,92,255,0.22),transparent_28%),linear-gradient(180deg,#09142f_0%,#050c1f_48%,#09142f_100%)] text-white">
       <div className="flex min-h-full flex-col px-4 pb-[6.75rem] pt-5 md:px-6 lg:px-8 lg:pb-28 lg:pt-8">
-        <header className="sticky top-0 z-40 -mx-4 flex items-center justify-between gap-3 border-b border-white/5 bg-[#09142f]/95 px-4 pb-4 pt-[max(1.25rem,env(safe-area-inset-top))] backdrop-blur-md md:-mx-6 md:px-6 lg:-mx-8 lg:px-8">
+        <header className="flex items-center justify-between gap-3 pt-[max(0rem,env(safe-area-inset-top))]">
           <div className="flex items-center gap-2 text-[#c8aefc]">
             <Globe size={18} />
             <h1 className="text-sm font-semibold tracking-tight">EchoLingo</h1>
@@ -303,7 +303,7 @@ export default function Home() {
                   <option key={p.id} value={p.id}>{p.displayName}</option>
                 ))}
               </select>
-              <div className="flex h-9 items-center gap-2 rounded-full bg-[#162242] pl-3 pr-4 text-xs font-semibold text-[#8ea0c9] border border-white/10 group-hover:bg-[#1f2b47] transition-colors">
+              <div className="flex h-9 items-center gap-2 rounded-full bg-[#162242]/50 pl-3 pr-4 text-xs font-semibold text-[#8ea0c9] border border-white/10 group-hover:bg-[#1f2b47]/80 transition-colors backdrop-blur-sm">
                 <Settings2 size={14} className="text-[#c8aefc]" />
                 <span className="max-w-[100px] truncate">
                   {availableProfiles.find(p => p.id === selectedProfileId)?.displayName || "Select Voice"}
