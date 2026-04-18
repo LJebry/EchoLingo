@@ -14,6 +14,7 @@ import {
   Volume2,
   Settings2,
 } from "lucide-react"
+import { UserProfile } from "@/components/layout/UserProfile"
 
 const MAX_CHARS = 5000
 const EMPTY_TRANSLATION = "Your translated text will appear here."
@@ -272,8 +273,6 @@ export default function Home() {
             <h1 className="text-sm font-semibold tracking-tight">EchoLingo</h1>
           </div>
 
-import { UserProfile } from "@/components/layout/UserProfile"
-...
           <div className="flex items-center gap-3">
             <div className="relative group">
               <select
