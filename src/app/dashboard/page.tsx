@@ -27,8 +27,8 @@ export default async function DashboardPage() {
   const session = await auth()
   if (!session?.user?.id) redirect("/login")
 
-  const conversations = await getUserConversations(session.user.id)
-  const profiles = await getUserSpeakerProfiles(session.user.id)
+  const conversations = await getUserConversations(session.user.id) as any
+  const profiles = await getUserSpeakerProfiles(session.user.id) as any
 
   return (
     <div className="space-y-8 px-4 pb-28 pt-5">
