@@ -5,6 +5,7 @@ import { useEffect, useMemo, useRef, useState } from "react"
 import {
   ArrowRightLeft,
   Check,
+  ChevronDown,
   Clipboard,
   Copy,
   Globe,
@@ -39,6 +40,8 @@ type SpeakerProfile = {
 export default function Home() {
   const inputRef = useRef<HTMLTextAreaElement>(null)
   const audioRef = useRef<HTMLAudioElement | null>(null)
+  const sourceSelectRef = useRef<HTMLSelectElement>(null)
+  const targetSelectRef = useRef<HTMLSelectElement>(null)
   const [sourceLanguage, setSourceLanguage] = useState("English")
   const [targetLanguage, setTargetLanguage] = useState("Spanish")
   const [text, setText] = useState("")
@@ -117,6 +120,19 @@ export default function Home() {
       setText(translatedText)
       setTranslatedText(text || EMPTY_TRANSLATION)
     }
+  }
+
+  const openLanguagePicker = (selectRef: React.RefObject<HTMLSelectElement | null>) => {
+    const select = selectRef.current
+    if (!select) return
+
+    if (typeof select.showPicker === "function") {
+      select.showPicker()
+      return
+    }
+
+    select.focus()
+    select.click()
   }
 
   const copyTranslation = async () => {
@@ -298,19 +314,32 @@ export default function Home() {
           </div>
         </header>
 
-        <section className="mt-5 grid grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)] items-center gap-2 rounded-full border border-white/8 bg-[#151f3c] px-3 py-2.5 shadow-[0_18px_35px_rgba(0,0,0,0.22)] lg:mt-6 lg:max-w-3xl">
-          <select
-            className="max-w-[110px] sm:max-w-none min-w-0 flex-1 appearance-none rounded-full bg-[#202b4d] px-3 sm:px-4 py-3 text-sm font-medium text-[#eef1ff] outline-none"
-            value={sourceLanguage}
-            onChange={(event) => setSourceLanguage(event.target.value)}
-            aria-label="Source language"
-          >
-            {languages.map((lang) => (
-              <option key={`src-${lang}`} value={lang} className="bg-[#132041] text-white">
-                {lang}
-              </option>
-            ))}
-          </select>
+        <section className="mt-5 grid grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)] items-center gap-2 lg:mt-6 lg:max-w-3xl">
+          <div className="min-w-0 rounded-full border border-white/8 bg-[#151f3c] px-2 py-2 shadow-[0_18px_35px_rgba(0,0,0,0.22)]">
+            <div className="relative">
+              <select
+                ref={sourceSelectRef}
+                className="max-w-[110px] sm:max-w-none min-w-0 w-full appearance-none rounded-full bg-[#202b4d] px-3 py-3 pr-11 text-sm font-medium text-[#eef1ff] outline-none sm:px-4 sm:pr-12"
+                value={sourceLanguage}
+                onChange={(event) => setSourceLanguage(event.target.value)}
+                aria-label="Source language"
+              >
+                {languages.map((lang) => (
+                  <option key={`src-${lang}`} value={lang} className="bg-[#132041] text-white">
+                    {lang}
+                  </option>
+                ))}
+              </select>
+              <button
+                type="button"
+                onClick={() => openLanguagePicker(sourceSelectRef)}
+                className="absolute right-1.5 top-1/2 flex h-8 w-8 -translate-y-1/2 items-center justify-center rounded-full text-[#8ea0c9] transition-colors hover:bg-white/5 hover:text-[#d9cbff]"
+                aria-label="Open source language options"
+              >
+                <ChevronDown size={16} />
+              </button>
+            </div>
+          </div>
 
           <button
             type="button"
@@ -321,18 +350,31 @@ export default function Home() {
             <ArrowRightLeft size={18} />
           </button>
 
-          <select
-            className="min-w-0 flex-1 appearance-none rounded-full bg-[#202b4d] px-4 py-3 text-sm font-medium text-[#eef1ff] outline-none"
-            value={targetLanguage}
-            onChange={(event) => setTargetLanguage(event.target.value)}
-            aria-label="Target language"
-          >
-            {languages.map((lang) => (
-              <option key={`tgt-${lang}`} value={lang} className="bg-[#132041] text-white">
-                {lang}
-              </option>
-            ))}
-          </select>
+          <div className="min-w-0 rounded-full border border-white/8 bg-[#151f3c] px-2 py-2 shadow-[0_18px_35px_rgba(0,0,0,0.22)]">
+            <div className="relative">
+              <select
+                ref={targetSelectRef}
+                className="min-w-0 w-full appearance-none rounded-full bg-[#202b4d] px-4 py-3 pr-12 text-sm font-medium text-[#eef1ff] outline-none"
+                value={targetLanguage}
+                onChange={(event) => setTargetLanguage(event.target.value)}
+                aria-label="Target language"
+              >
+                {languages.map((lang) => (
+                  <option key={`tgt-${lang}`} value={lang} className="bg-[#132041] text-white">
+                    {lang}
+                  </option>
+                ))}
+              </select>
+              <button
+                type="button"
+                onClick={() => openLanguagePicker(targetSelectRef)}
+                className="absolute right-1.5 top-1/2 flex h-8 w-8 -translate-y-1/2 items-center justify-center rounded-full text-[#8ea0c9] transition-colors hover:bg-white/5 hover:text-[#d9cbff]"
+                aria-label="Open target language options"
+              >
+                <ChevronDown size={16} />
+              </button>
+            </div>
+          </div>
         </section>
 
         <div className="mt-4 flex flex-1 flex-col gap-4 lg:min-h-0 lg:grid lg:grid-cols-2 lg:gap-6">
