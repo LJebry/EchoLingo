@@ -1,103 +1,146 @@
-# EchoLingo - The Digital Polyglot
+# EchoLingo
 
-EchoLingo is a mobile-first PWA for live translation and voice cloning. It allows users to speak in one language and get an immediate translation in another, optionally synthesized with a cloned version of their own voice.
+EchoLingo is a mobile-first translation app built with Next.js. It supports fast typed translation on the home page, dual-speaker conversation mode, saved history for signed-in users, and optional speech playback through ElevenLabs.
 
-## Tech Stack
+## What Works
 
-- **Framework:** Next.js 14 (App Router)
-- **Language:** TypeScript
-- **Styling:** Tailwind CSS (following [DESIGN.MD](./DESIGN.MD))
-- **Database:** PostgreSQL with Prisma ORM
-- **Auth:** Auth.js (NextAuth v5) with Google Provider
-- **PWA:** Service Workers and Manifest for "Add to Home Screen"
-- **AI Integrations:** OpenAI (Whisper/GPT-4) & ElevenLabs (Voice Cloning) - *Mocked in MVP*
+- Typed translation on `/` through `POST /api/translate`
+- Conversation turns on `/conversations` through `POST /api/process-turn`
+- OpenAI transcription for audio conversation turns
+- OpenAI translation for both typed and conversation flows
+- ElevenLabs speech synthesis for translated playback when a usable voice is configured
+- Google sign-in, saved conversations, history, and speaker profiles
 
-## Features
+## Stack
 
-- **Guest Mode:** Try the translator immediately on the landing page.
-- **Persistence:** Logged-in users can save their conversation history.
-- **Voice Profiles:** Manage multiple speaker profiles for different language pairs.
-- **PWA Ready:** Installable on iOS and Android.
-- **Mobile-First UI:** Designed for handheld use with high-touch targets and atmospheric depth.
+- Next.js 14 App Router
+- React 18
+- TypeScript
+- Tailwind CSS
+- Prisma + PostgreSQL
+- Auth.js / NextAuth v5 beta
+- OpenAI for transcription and translation
+- ElevenLabs for speech synthesis
 
-## Getting Started
+## Environment Variables
 
-### 1. Setup Environment Variables
-
-Copy `.env.example` to `.env` and fill in the values:
+Copy `.env.example` to `.env` and fill in the values you need:
 
 ```bash
 cp .env.example .env
 ```
 
-For Google sign-in, create an OAuth client in Google Cloud Console and add these redirect settings:
+Required for local app startup:
+
+- `DATABASE_URL`
+- `AUTH_SECRET`
+- `AUTH_URL`
+- `AUTH_TRUST_HOST`
+- `NEXT_PUBLIC_APP_URL`
+
+Required for Google sign-in:
+
+- `AUTH_GOOGLE_ID`
+- `AUTH_GOOGLE_SECRET`
+
+Required for AI features:
+
+- `OPENAI_API_KEY`
+- `ELEVENLABS_API_KEY`
+
+Recommended for reliable ElevenLabs playback:
+
+- `ELEVENLABS_VOICE_ID`
+
+`ELEVENLABS_VOICE_ID` is optional in code, but strongly recommended in practice. If it is missing, EchoLingo tries to look up the first available ElevenLabs voice with `voices.getAll()`. That fallback requires an API key with the `voices_read` permission. If your key does not have that permission, typed and conversation translation still work, but audio playback will be unavailable until you either:
+
+- set `ELEVENLABS_VOICE_ID` explicitly
+- or create an ElevenLabs API key that includes `voices_read`
+
+## Google OAuth Setup
+
+Create a Google OAuth client and add:
 
 - Authorized JavaScript origin: `http://localhost:3000`
 - Authorized redirect URI: `http://localhost:3000/api/auth/callback/google`
 
-Set `AUTH_URL` and `NEXT_PUBLIC_APP_URL` to your local or deployed app URL as well.
+If you deploy the app, add the production app URL and callback URL too.
 
-For deployment, add the deployed app URL and matching callback URL too.
+If Google shows `Error 403: org_internal`, switch the consent screen to external or add your account as a test user.
 
-### 2. Install Dependencies
+## Install And Run
+
+Install dependencies:
 
 ```bash
 npm install
 ```
 
-### 3. Database Setup
-
-Set `DATABASE_URL` to either:
-
-- a Prisma Accelerate or Prisma Postgres URL such as `prisma+postgres://...`
-- a direct PostgreSQL connection string such as `postgresql://...`
+Generate Prisma client and run migrations:
 
 ```bash
-# Generate Prisma Client
 npx prisma generate
-
-# Run Migrations
-npx prisma migrate dev --name init
-
-# Seed Database
-npm run seed
+npx prisma migrate dev
 ```
 
-Add the seed script to your `package.json`:
-```json
-"prisma": {
-  "seed": "ts-node --compiler-options {\"module\":\"CommonJS\"} prisma/seed.ts"
-}
-```
-
-### 4. Run Development Server
+Start the development server:
 
 ```bash
 npm run dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) on your mobile device or browser.
+Open `http://localhost:3000`.
 
-### 5. Verify Authentication
+## Translation Pipeline
 
-- Visit `/login`
-- Click `Continue with Google`
-- Confirm you are redirected to `/dashboard`
-- Visit `/settings` and use `Sign Out` to end the session
+Home page typed translation:
 
-## AI Integration Roadmap
+- UI: `src/app/page.tsx`
+- Route: `src/app/api/translate/route.ts`
+- Shared OpenAI helper: `src/lib/services/openai.ts`
 
-The AI pipeline is centralized in `src/lib/services/process-turn.ts`. To go live:
+Conversation mode:
 
-1. **Transcription:** Replace mock in `openai.ts` with `openai.audio.transcriptions.create`.
-2. **Translation:** Replace mock in `openai.ts` with a GPT-4 prompt for precise translation.
-3. **Speech Synthesis:** Replace mock in `elevenlabs.ts` with the ElevenLabs SDK `generate` method using the `elevenLabsVoiceId`.
+- UI: `src/components/conversation/ConversationPage.tsx`
+- Route: `src/app/api/process-turn/route.ts`
+- Turn pipeline: `src/lib/services/process-turn.ts`
+- ElevenLabs helper: `src/lib/services/elevenlabs.ts`
 
-## PWA Installation
+Current behavior:
 
-- **iOS:** Tap "Share" -> "Add to Home Screen".
-- **Android:** Tap "Add to Home Screen" or the install banner.
+1. Audio turns are transcribed with OpenAI `whisper-1`.
+2. Text is translated with OpenAI `gpt-4o-mini`.
+3. EchoLingo attempts translated speech playback through ElevenLabs.
+4. If ElevenLabs playback fails, the translated text still returns and the conversation continues without audio.
 
----
+## Troubleshooting
 
-Built for the future of global communication.
+`OpenAI API key is missing or invalid`
+
+- Check that `OPENAI_API_KEY` is present in `.env`
+- Restart the Next.js dev server after editing env vars
+
+`Set ELEVENLABS_VOICE_ID in .env or use an ElevenLabs API key with the voices_read permission.`
+
+- Add `ELEVENLABS_VOICE_ID` to `.env`
+- or create an ElevenLabs API key with `voices_read`
+
+Conversation turn succeeds but no audio plays
+
+- Translation completed successfully
+- Check the warning shown in the conversation UI
+- Verify `ELEVENLABS_API_KEY` and `ELEVENLABS_VOICE_ID`
+
+Build warnings about the Material Symbols stylesheet
+
+- These come from `src/app/layout.tsx`
+- They do not currently block `npm run build`
+
+## Verification
+
+Useful local checks:
+
+```bash
+npx tsc --noEmit
+npm run build
+```

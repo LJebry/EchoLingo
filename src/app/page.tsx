@@ -247,8 +247,8 @@ export default function Home() {
   }
 
   return (
-    <main className="min-h-dvh bg-[radial-gradient(circle_at_top,rgba(124,92,255,0.22),transparent_28%),linear-gradient(180deg,#09142f_0%,#050c1f_48%,#09142f_100%)] text-white">
-      <div className="flex min-h-dvh flex-col px-4 pb-[6.75rem] pt-5">
+    <main className="min-h-full bg-[radial-gradient(circle_at_top,rgba(124,92,255,0.22),transparent_28%),linear-gradient(180deg,#09142f_0%,#050c1f_48%,#09142f_100%)] text-white">
+      <div className="flex min-h-full flex-col px-4 pb-[6.75rem] pt-5 md:px-6 lg:px-8 lg:pb-28 lg:pt-8">
         <header className="flex items-center justify-between gap-3">
           <div className="flex items-center gap-2 text-[#c8aefc]">
             <Globe size={18} />
@@ -263,7 +263,7 @@ export default function Home() {
           </Link>
         </header>
 
-        <section className="mt-5 flex items-center gap-2 rounded-full border border-white/8 bg-[#151f3c] px-3 py-2.5 shadow-[0_18px_35px_rgba(0,0,0,0.22)]">
+        <section className="mt-5 grid grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)] items-center gap-2 rounded-full border border-white/8 bg-[#151f3c] px-3 py-2.5 shadow-[0_18px_35px_rgba(0,0,0,0.22)] lg:mt-6 lg:max-w-3xl">
           <select
             className="min-w-0 flex-1 appearance-none rounded-full bg-[#202b4d] px-4 py-3 text-sm font-medium text-[#eef1ff] outline-none"
             value={sourceLanguage}
@@ -300,108 +300,115 @@ export default function Home() {
           </select>
         </section>
 
-        <section className="mt-4 rounded-[1.9rem] border border-white/6 bg-[#121b33] p-4 shadow-[0_22px_45px_rgba(0,0,0,0.24)]">
-          <textarea
-            ref={inputRef}
-            value={text}
-            onChange={(event) => setText(event.target.value.slice(0, MAX_CHARS))}
-            placeholder="Enter text to translate..."
-            className="min-h-[9rem] w-full resize-none bg-transparent text-base leading-relaxed text-[#eef1ff] outline-none placeholder:text-[#6f7fa8]"
-          />
+        <div className="mt-4 flex flex-1 flex-col gap-4 lg:min-h-0 lg:grid lg:grid-cols-2 lg:gap-6">
+          <section className="flex flex-col rounded-[1.9rem] border border-white/6 bg-[#121b33] p-4 shadow-[0_22px_45px_rgba(0,0,0,0.24)] lg:min-h-0 lg:p-6">
+            <p className="text-xs font-semibold uppercase tracking-[0.22em] text-[#7e8cb1]">
+              Original
+            </p>
+            <textarea
+              ref={inputRef}
+              value={text}
+              onChange={(event) => setText(event.target.value.slice(0, MAX_CHARS))}
+              placeholder="Enter text to translate..."
+              className="mt-3 min-h-[9rem] w-full resize-none bg-transparent text-base leading-relaxed text-[#eef1ff] outline-none placeholder:text-[#6f7fa8] lg:flex-1 lg:min-h-[22rem]"
+            />
 
-          <div className="mt-4 flex items-center justify-between gap-3">
-            <div className="flex items-center gap-2">
-              <button
-                type="button"
-                onClick={playOriginal}
-                disabled={audioLoadingOriginal || !text.trim()}
-                className="flex h-10 w-10 items-center justify-center rounded-full bg-[#202b4d] text-[#d7def7] disabled:opacity-40"
-                aria-label="Play original audio"
-              >
-                {audioLoadingOriginal ? <Loader2 size={16} className="animate-spin" /> : <Volume2 size={16} />}
-              </button>
+            <div className="mt-4 flex items-center justify-between gap-3">
+              <div className="flex items-center gap-2">
+                <button
+                  type="button"
+                  onClick={playOriginal}
+                  disabled={audioLoadingOriginal || !text.trim()}
+                  className="flex h-10 w-10 items-center justify-center rounded-full bg-[#202b4d] text-[#d7def7] disabled:opacity-40"
+                  aria-label="Play original audio"
+                >
+                  {audioLoadingOriginal ? <Loader2 size={16} className="animate-spin" /> : <Volume2 size={16} />}
+                </button>
 
-              <button
-                type="button"
-                onClick={pasteIntoInput}
-                className="flex h-10 w-10 items-center justify-center rounded-full bg-[#202b4d] text-[#d7def7]"
-                aria-label="Paste into translation input"
-              >
-                {pastePending ? <Loader2 size={16} className="animate-spin" /> : <Clipboard size={16} />}
-              </button>
+                <button
+                  type="button"
+                  onClick={pasteIntoInput}
+                  className="flex h-10 w-10 items-center justify-center rounded-full bg-[#202b4d] text-[#d7def7]"
+                  aria-label="Paste into translation input"
+                >
+                  {pastePending ? <Loader2 size={16} className="animate-spin" /> : <Clipboard size={16} />}
+                </button>
 
-              <button
-                type="button"
-                onClick={() => {
-                  setText("")
-                  setError("")
-                }}
-                className="flex h-10 w-10 items-center justify-center rounded-full bg-[#202b4d] text-[#9fb0d4]"
-                aria-label="Clear input"
-              >
-                <span className="text-lg leading-none">×</span>
-              </button>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setText("")
+                    setError("")
+                  }}
+                  className="flex h-10 w-10 items-center justify-center rounded-full bg-[#202b4d] text-[#9fb0d4]"
+                  aria-label="Clear input"
+                >
+                  <span className="text-lg leading-none">×</span>
+                </button>
+              </div>
+
+              <div className="flex items-center gap-3">
+                <span className={`text-xs ${error ? "text-red-300" : "text-[#7e8cb1]"}`}>
+                  {helperText}
+                </span>
+                <button
+                  type="button"
+                  onClick={translate}
+                  disabled={!canTranslate}
+                  className="inline-flex h-11 w-11 items-center justify-center rounded-full bg-[linear-gradient(180deg,#d8b6ff_0%,#a45cff_100%)] text-[#2e0b5a] disabled:opacity-40"
+                  aria-label="Translate text"
+                >
+                  {loading ? <Loader2 size={18} className="animate-spin" /> : <Send size={18} />}
+                </button>
+              </div>
+            </div>
+          </section>
+
+          <section className="flex flex-col rounded-[1.9rem] border border-white/6 bg-[#121b33] p-4 shadow-[0_22px_45px_rgba(0,0,0,0.24)] lg:min-h-0 lg:p-6">
+            <p className="text-xs font-semibold uppercase tracking-[0.22em] text-[#7e8cb1]">
+              Translation
+            </p>
+            <div className="mt-3 flex-1">
+              <p className="min-h-[8rem] text-[1.65rem] leading-tight text-[#eef1ff] lg:min-h-[22rem]">
+                {translatedText}
+              </p>
             </div>
 
-            <div className="flex items-center gap-3">
-              <span className={`text-xs ${error ? "text-red-300" : "text-[#7e8cb1]"}`}>
-                {helperText}
-              </span>
+            <div className="mt-6 flex items-center justify-between">
               <button
                 type="button"
-                onClick={translate}
-                disabled={!canTranslate}
-                className="inline-flex h-11 w-11 items-center justify-center rounded-full bg-[linear-gradient(180deg,#d8b6ff_0%,#a45cff_100%)] text-[#2e0b5a] disabled:opacity-40"
-                aria-label="Translate text"
-              >
-                {loading ? <Loader2 size={18} className="animate-spin" /> : <Send size={18} />}
-              </button>
-            </div>
-          </div>
-        </section>
-
-        <section className="mt-4 rounded-[1.9rem] border border-white/6 bg-[#121b33] p-4 shadow-[0_22px_45px_rgba(0,0,0,0.24)]">
-          <p className="text-xs font-semibold uppercase tracking-[0.22em] text-[#7e8cb1]">
-            Translation
-          </p>
-          <p className="mt-3 min-h-[8rem] text-[1.65rem] leading-tight text-[#eef1ff]">
-            {translatedText}
-          </p>
-
-          <div className="mt-6 flex items-center justify-between">
-            <button
-              type="button"
-              onClick={playTranslation}
-              disabled={audioLoading}
-              className="flex h-10 w-10 items-center justify-center rounded-full bg-[#202b4d] text-[#d7def7]"
-              aria-label="Play translated audio"
-            >
-              {audioLoading ? <Loader2 size={16} className="animate-spin" /> : <Volume2 size={16} />}
-            </button>
-
-            <div className="flex items-center gap-2">
-              <button
-                type="button"
-                onClick={copyTranslation}
+                onClick={playTranslation}
+                disabled={audioLoading}
                 className="flex h-10 w-10 items-center justify-center rounded-full bg-[#202b4d] text-[#d7def7]"
-                aria-label="Copy translated text"
+                aria-label="Play translated audio"
               >
-                {copied ? <Check size={16} /> : <Copy size={16} />}
+                {audioLoading ? <Loader2 size={16} className="animate-spin" /> : <Volume2 size={16} />}
               </button>
 
-              <button
-                type="button"
-                onClick={shareTranslation}
-                className="flex h-10 w-10 items-center justify-center rounded-full bg-[#202b4d] text-[#d7def7]"
-                aria-label="Share translated text"
-              >
-                <Share2 size={16} />
-              </button>
+              <div className="flex items-center gap-2">
+                <button
+                  type="button"
+                  onClick={copyTranslation}
+                  className="flex h-10 w-10 items-center justify-center rounded-full bg-[#202b4d] text-[#d7def7]"
+                  aria-label="Copy translated text"
+                >
+                  {copied ? <Check size={16} /> : <Copy size={16} />}
+                </button>
+
+                <button
+                  type="button"
+                  onClick={shareTranslation}
+                  className="flex h-10 w-10 items-center justify-center rounded-full bg-[#202b4d] text-[#d7def7]"
+                  aria-label="Share translated text"
+                >
+                  <Share2 size={16} />
+                </button>
+              </div>
             </div>
-          </div>
-        </section>
+          </section>
+        </div>
 
-        <div className="mt-auto flex justify-center pt-8">
+        <div className="mt-auto flex justify-center pt-8 lg:hidden">
           <button
             type="button"
             onClick={() => inputRef.current?.focus()}

@@ -21,21 +21,29 @@ export async function processTurn({
   targetLang,
   userId
 }: ProcessTurnOptions) {
-  // 1. Transcribe (Mocked)
   const transcript = audioBlob
     ? await transcribeAudio(audioBlob)
     : transcriptText?.trim() || "No audio provided - using manual input."
 
-  // 2. Clean (Mocked)
   const cleanedTranscript = await cleanTranscript(transcript)
 
-  // 3. Translate (Mocked)
-  const translatedText = await translateText(cleanedTranscript, sourceLang, targetLang)
+  const translatedText = await translateText({
+    text: cleanedTranscript,
+    sourceLanguage: sourceLang,
+    targetLanguage: targetLang,
+  })
 
-  // 4. Synthesize (Mocked)
-  const audioUrl = await synthesizeSpeech(translatedText)
+  let audioUrl: string | null = null
+  let audioError: string | null = null
 
-  // 5. Save to DB if authenticated and conversationId exists
+  try {
+    audioUrl = await synthesizeSpeech(translatedText)
+  } catch (error) {
+    audioError =
+      error instanceof Error ? error.message : "Speech synthesis is unavailable right now."
+    console.warn("Continuing without synthesized audio:", audioError)
+  }
+
   if (userId && conversationId) {
     const turnCount = await prisma.conversationTurn.count({
       where: { conversationId }
@@ -55,14 +63,14 @@ export async function processTurn({
       }
     })
 
-    return { ...turn, success: true }
+    return { ...turn, audioError, success: true }
   }
 
-  // If guest or no conversation, just return the result
   return {
     transcript: cleanedTranscript,
     translatedText,
     audioUrl,
+    audioError,
     success: true
   }
 }

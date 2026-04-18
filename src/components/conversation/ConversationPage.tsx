@@ -140,7 +140,9 @@ function SpeakerPanel({
   isSubmitting: boolean
   onActivate: () => void
 }) {
-  const wrapperClassName = speaker.upsideDown ? "flex h-full flex-col justify-between rotate-180" : "flex h-full flex-col justify-between"
+  const wrapperClassName = speaker.upsideDown
+    ? "flex h-full flex-col justify-between rotate-180 lg:rotate-0"
+    : "flex h-full flex-col justify-between"
   const textAlignClassName = speaker.align === "right" ? "text-right" : "text-left"
   const justifyClassName = speaker.align === "right" ? "justify-end" : "justify-start"
   const pillTextClassName = speaker.align === "right" ? "justify-start" : "justify-end"
@@ -148,7 +150,13 @@ function SpeakerPanel({
   const isLive = isActive && isRecording
 
   return (
-    <section className={cn("relative flex-1 rounded-[2rem] border px-5 pb-10 pt-6 shadow-[0_24px_60px_rgba(0,0,0,0.32)]", speaker.borderColor, speaker.panelClassName)}>
+    <section
+      className={cn(
+        "relative flex-1 rounded-[2rem] border px-5 pb-10 pt-6 shadow-[0_24px_60px_rgba(0,0,0,0.32)] lg:min-h-[32rem] lg:px-6 lg:pb-8",
+        speaker.borderColor,
+        speaker.panelClassName
+      )}
+    >
       <div className={wrapperClassName}>
         <div className={cn("flex items-center justify-between", speaker.align === "right" && "flex-row-reverse")}>
           <button
@@ -175,9 +183,9 @@ function SpeakerPanel({
           </div>
         </div>
 
-        <div className={cn("mt-10 rounded-[1.75rem] border p-5", speaker.cardClassName, textAlignClassName)}>
+        <div className={cn("mt-10 rounded-[1.75rem] border p-5 lg:flex-1", speaker.cardClassName, textAlignClassName)}>
           <p className="text-sm uppercase tracking-[0.2em] text-[#7f91be]">{content.heading}</p>
-          <p className="mt-3 min-h-[5.5rem] text-[1.55rem] leading-tight text-[#eef1ff]">{content.body}</p>
+          <p className="mt-3 min-h-[5.5rem] text-[1.55rem] leading-tight text-[#eef1ff] lg:min-h-[11rem] lg:text-[1.85rem]">{content.body}</p>
           <div className={cn("mt-6 flex items-end gap-2", justifyClassName)}>
             <div
               className={cn(
@@ -253,6 +261,7 @@ export function ConversationPage() {
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [isRecording, setIsRecording] = useState(false)
   const [error, setError] = useState("")
+  const [notice, setNotice] = useState("")
   const [persistenceState, setPersistenceState] = useState<"unknown" | "saved" | "guest">("unknown")
 
   const activeSpeaker = useMemo(
@@ -309,6 +318,7 @@ export function ConversationPage() {
 
     setIsSubmitting(true)
     setError("")
+    setNotice("")
 
     try {
       const currentConversationId = await ensureConversation().catch((saveError) => {
@@ -355,14 +365,16 @@ export function ConversationPage() {
           saved: Boolean(currentConversationId),
         },
       ])
-      
-      // Auto-play translation
+
+      if (payload.audioError) {
+        setNotice(payload.audioError)
+      }
+
       if (payload.audioUrl) {
         playAudio(payload.audioUrl)
       }
 
       setDraftText("")
-      // Automatic Turn-Taking
       setActiveSpeakerKey(activeSpeaker.key === "person1" ? "person2" : "person1")
     } catch (submitError) {
       setError(submitError instanceof Error ? submitError.message : "Something went wrong.")
@@ -372,9 +384,9 @@ export function ConversationPage() {
   }
 
   return (
-    <main className="min-h-dvh bg-[#020b23] text-white">
-      <div className="relative min-h-dvh overflow-hidden bg-[radial-gradient(circle_at_top,rgba(124,92,255,0.22),transparent_28%),linear-gradient(180deg,#09142f_0%,#050c1f_48%,#09142f_100%)]">
-        <div className="flex items-center justify-between px-4 pt-5">
+    <main className="min-h-full bg-[#020b23] text-white">
+      <div className="relative min-h-full overflow-hidden bg-[radial-gradient(circle_at_top,rgba(124,92,255,0.22),transparent_28%),linear-gradient(180deg,#09142f_0%,#050c1f_48%,#09142f_100%)]">
+        <div className="flex items-center justify-between px-4 pt-5 md:px-6 lg:px-8 lg:pt-8">
           <div className="flex items-center gap-2 text-[#c8aefc]">
             <Globe size={18} />
             <h1 className="text-sm font-semibold tracking-tight">EchoLingo</h1>
@@ -386,58 +398,64 @@ export function ConversationPage() {
           </div>
         </div>
 
-        <div className="relative flex min-h-[calc(100dvh-3.5rem)] flex-col px-4 pb-[6.75rem] pt-5">
-          <SpeakerPanel
-            speaker={speakers[0]}
-            content={panelCopy[speakers[0].key]}
-            isActive={activeSpeakerKey === speakers[0].key}
-            isRecording={isRecording}
-            isSubmitting={isSubmitting}
-            onActivate={() => setActiveSpeakerKey(speakers[0].key)}
-          />
+        <div className="relative flex min-h-full flex-col px-4 pb-[6.75rem] pt-5 md:px-6 lg:px-8 lg:pb-28 lg:pt-6">
+          <div className="relative flex flex-col gap-5 lg:grid lg:flex-1 lg:min-h-0 lg:grid-cols-[minmax(0,1fr)_7rem_minmax(0,1fr)] lg:items-center lg:gap-6">
+            <div className="order-1 lg:order-3 lg:col-start-3 lg:self-stretch">
+              <SpeakerPanel
+                speaker={speakers[0]}
+                content={panelCopy[speakers[0].key]}
+                isActive={activeSpeakerKey === speakers[0].key}
+                isRecording={isRecording}
+                isSubmitting={isSubmitting}
+                onActivate={() => setActiveSpeakerKey(speakers[0].key)}
+              />
+            </div>
 
-          <AudioRecorder
-            disabled={isSubmitting}
-            onError={setError}
-            onRecordingStateChange={setIsRecording}
-            onRecordingComplete={(audioBlob) => submitTurn({ audioBlob })}
-          >
-            {({ isSupported, startRecording, stopRecording }) => (
-              <div className="pointer-events-none relative z-20 -my-10 flex justify-center sm:-my-14">
-                <div className="relative mx-auto flex h-28 w-28 items-center justify-center sm:h-36 sm:w-36">
-                  <div className="absolute inset-0 rounded-full bg-[radial-gradient(circle,rgba(181,137,255,0.28)_0%,rgba(181,137,255,0.08)_48%,transparent_72%)]" />
-                  <div className="absolute inset-[14px] rounded-full border border-[#f0d5ff]/20 bg-[#120f2d]/90 shadow-[0_16px_40px_rgba(107,63,201,0.38)] sm:inset-[18px]" />
-                  <button
-                    type="button"
-                    onMouseDown={() => { if(!isSubmitting && isSupported) void startRecording(); }}
-                    onMouseUp={() => { if(isRecording) stopRecording(); }}
-                    onTouchStart={(e) => { e.preventDefault(); if(!isSubmitting && isSupported) void startRecording(); }}
-                    onTouchEnd={(e) => { e.preventDefault(); if(isRecording) stopRecording(); }}
-                    disabled={isSubmitting || !isSupported}
-                    className="pointer-events-auto relative z-10 flex h-16 w-16 items-center justify-center rounded-full bg-[linear-gradient(180deg,#d8b6ff_0%,#a45cff_100%)] text-[#2e0b5a] shadow-[0_12px_30px_rgba(164,92,255,0.45)] disabled:opacity-50 sm:h-20 sm:w-20"
-                    aria-label={isRecording ? "Stop recording" : "Start recording"}
-                  >
-                    {isSubmitting ? (
-                      <Loader2 size={28} className="animate-spin sm:h-9 sm:w-9" strokeWidth={2.6} />
-                    ) : (
-                      <Mic size={28} className="sm:h-9 sm:w-9" strokeWidth={2.6} />
-                    )}
-                  </button>
+            <AudioRecorder
+              disabled={isSubmitting}
+              onError={setError}
+              onRecordingStateChange={setIsRecording}
+              onRecordingComplete={(audioBlob) => submitTurn({ audioBlob })}
+            >
+              {({ isSupported, startRecording, stopRecording }) => (
+                <div className="pointer-events-none order-2 relative z-20 -my-10 flex justify-center sm:-my-14 lg:my-0 lg:self-center">
+                  <div className="relative mx-auto flex h-28 w-28 items-center justify-center sm:h-36 sm:w-36">
+                    <div className="absolute inset-0 rounded-full bg-[radial-gradient(circle,rgba(181,137,255,0.28)_0%,rgba(181,137,255,0.08)_48%,transparent_72%)]" />
+                    <div className="absolute inset-[14px] rounded-full border border-[#f0d5ff]/20 bg-[#120f2d]/90 shadow-[0_16px_40px_rgba(107,63,201,0.38)] sm:inset-[18px]" />
+                    <button
+                      type="button"
+                      onMouseDown={() => { if(!isSubmitting && isSupported) void startRecording(); }}
+                      onMouseUp={() => { if(isRecording) stopRecording(); }}
+                      onTouchStart={(e) => { e.preventDefault(); if(!isSubmitting && isSupported) void startRecording(); }}
+                      onTouchEnd={(e) => { e.preventDefault(); if(isRecording) stopRecording(); }}
+                      disabled={isSubmitting || !isSupported}
+                      className="pointer-events-auto relative z-10 flex h-16 w-16 items-center justify-center rounded-full bg-[linear-gradient(180deg,#d8b6ff_0%,#a45cff_100%)] text-[#2e0b5a] shadow-[0_12px_30px_rgba(164,92,255,0.45)] disabled:opacity-50 sm:h-20 sm:w-20"
+                      aria-label={isRecording ? "Stop recording" : "Start recording"}
+                    >
+                      {isSubmitting ? (
+                        <Loader2 size={28} className="animate-spin sm:h-9 sm:w-9" strokeWidth={2.6} />
+                      ) : (
+                        <Mic size={28} className="sm:h-9 sm:w-9" strokeWidth={2.6} />
+                      )}
+                    </button>
+                  </div>
                 </div>
-              </div>
-            )}
-          </AudioRecorder>
+              )}
+            </AudioRecorder>
 
-          <SpeakerPanel
-            speaker={speakers[1]}
-            content={panelCopy[speakers[1].key]}
-            isActive={activeSpeakerKey === speakers[1].key}
-            isRecording={isRecording}
-            isSubmitting={isSubmitting}
-            onActivate={() => setActiveSpeakerKey(speakers[1].key)}
-          />
+            <div className="order-3 lg:order-1 lg:col-start-1 lg:self-stretch">
+              <SpeakerPanel
+                speaker={speakers[1]}
+                content={panelCopy[speakers[1].key]}
+                isActive={activeSpeakerKey === speakers[1].key}
+                isRecording={isRecording}
+                isSubmitting={isSubmitting}
+                onActivate={() => setActiveSpeakerKey(speakers[1].key)}
+              />
+            </div>
+          </div>
 
-          <div className="mt-5 rounded-[2rem] border border-[#b9c7df]/10 bg-[#0d1734]/85 p-4 shadow-[0_20px_40px_rgba(0,0,0,0.24)]">
+          <div className="mt-5 rounded-[2rem] border border-[#b9c7df]/10 bg-[#0d1734]/85 p-4 shadow-[0_20px_40px_rgba(0,0,0,0.24)] lg:mx-auto lg:mt-6 lg:w-full lg:max-w-4xl lg:p-5">
             <div className="flex items-center justify-between gap-3 text-[10px] uppercase tracking-[0.18em] text-[#8ea0c9] sm:text-xs">
               <span>{activeSpeaker.name}</span>
               <span className="text-right">{activeSpeaker.sourceLanguage} to {activeSpeaker.targetLanguage}</span>
@@ -479,6 +497,7 @@ export function ConversationPage() {
             </div>
 
             {error && <p className="mt-3 text-sm text-red-300">{error}</p>}
+            {!error && notice && <p className="mt-3 text-sm text-amber-200">{notice}</p>}
           </div>
         </div>
       </div>

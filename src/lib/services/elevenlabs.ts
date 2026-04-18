@@ -1,44 +1,113 @@
-import elevenlabs from "@/lib/elevenlabs";
-import { Readable } from "node:stream";
+import elevenlabs from "@/lib/elevenlabs"
+import { Readable } from "node:stream"
 
-/**
- * Real ElevenLabs Service
- */
-export async function synthesizeSpeech(text: string, voiceId?: string): Promise<string> {
-  try {
-    const selectedVoiceId = voiceId || process.env.ELEVENLABS_VOICE_ID;
-    
-    if (!selectedVoiceId) {
-      // Fallback to first available voice if none configured
-      const voices = await elevenlabs.voices.getAll();
-      if (!voices.voices[0]) throw new Error("No voices found in account");
-      const firstVoice = voices.voices[0] as {
-        voiceId?: string;
-        voice_id?: string;
-      };
-      voiceId = firstVoice.voiceId || firstVoice.voice_id;
-      if (!voiceId) throw new Error("No voices found in account");
-    } else {
-      voiceId = selectedVoiceId;
-    }
+const DEFAULT_TTS_MODEL = "eleven_multilingual_v2"
 
-    const audioStream = await elevenlabs.textToSpeech.convert(voiceId, {
-      text,
-      modelId: "eleven_multilingual_v2",
-    });
-
-    // Convert Stream to Buffer
-    const readable = audioStream instanceof Readable ? audioStream : Readable.fromWeb(audioStream as any);
-    const chunks: Buffer[] = [];
-    for await (const chunk of readable) {
-      chunks.push(Buffer.isBuffer(chunk) ? chunk : Buffer.from(chunk));
-    }
-    const buffer = Buffer.concat(chunks);
-
-    // Convert Buffer to Base64 Data URL for easy frontend playback
-    return `data:audio/mpeg;base64,${buffer.toString("base64")}`;
-  } catch (error) {
-    console.error("ElevenLabs Synthesis Error:", error);
-    throw new Error("Failed to synthesize speech");
+function getRawElevenLabsMessage(error: unknown) {
+  if (
+    error &&
+    typeof error === "object" &&
+    "body" in error &&
+    error.body &&
+    typeof error.body === "object" &&
+    "detail" in error.body &&
+    error.body.detail &&
+    typeof error.body.detail === "object" &&
+    "message" in error.body.detail &&
+    typeof error.body.detail.message === "string"
+  ) {
+    return error.body.detail.message
   }
+
+  if (error instanceof Error) {
+    return error.message
+  }
+
+  return null
+}
+
+function getElevenLabsErrorMessage(error: unknown) {
+  const rawMessage = getRawElevenLabsMessage(error)
+
+  if (!process.env.ELEVENLABS_API_KEY) {
+    return "ElevenLabs API key is not configured."
+  }
+
+  if (rawMessage?.includes("voices_read")) {
+    return "Set ELEVENLABS_VOICE_ID in .env or use an ElevenLabs API key with the voices_read permission."
+  }
+
+  if (rawMessage) {
+    return rawMessage
+  }
+
+  return "Speech synthesis failed."
+}
+
+function getConfiguredVoiceId(preferredVoiceId?: string) {
+  return preferredVoiceId?.trim() || process.env.ELEVENLABS_VOICE_ID?.trim() || null
+}
+
+async function streamToBuffer(stream: Readable | ReadableStream<Uint8Array>) {
+  const readable = stream instanceof Readable ? stream : Readable.fromWeb(stream as any)
+  const chunks: Buffer[] = []
+
+  for await (const chunk of readable) {
+    chunks.push(Buffer.isBuffer(chunk) ? chunk : Buffer.from(chunk))
+  }
+
+  return Buffer.concat(chunks)
+}
+
+async function resolveVoiceId(preferredVoiceId?: string) {
+  const configuredVoiceId = getConfiguredVoiceId(preferredVoiceId)
+  if (configuredVoiceId) {
+    return configuredVoiceId
+  }
+
+  try {
+    const voices = await elevenlabs.voices.getAll()
+    const firstVoice = voices.voices[0] as
+      | {
+          voiceId?: string
+          voice_id?: string
+        }
+      | undefined
+    const firstVoiceId = firstVoice?.voiceId || firstVoice?.voice_id
+
+    if (!firstVoiceId) {
+      throw new Error("No ElevenLabs voice found. Set ELEVENLABS_VOICE_ID in .env to choose a voice explicitly.")
+    }
+
+    return firstVoiceId
+  } catch (error) {
+    throw new Error(getElevenLabsErrorMessage(error))
+  }
+}
+
+export async function synthesizeSpeechToBuffer(text: string, voiceId?: string): Promise<Buffer> {
+  if (!process.env.ELEVENLABS_API_KEY) {
+    throw new Error("ElevenLabs API key is not configured.")
+  }
+
+  try {
+    const resolvedVoiceId = await resolveVoiceId(voiceId)
+    const audioStream = await elevenlabs.textToSpeech.convert(resolvedVoiceId, {
+      text,
+      modelId: DEFAULT_TTS_MODEL,
+    })
+
+    return streamToBuffer(audioStream)
+  } catch (error) {
+    if (error instanceof Error) {
+      throw error
+    }
+
+    throw new Error(getElevenLabsErrorMessage(error))
+  }
+}
+
+export async function synthesizeSpeech(text: string, voiceId?: string): Promise<string> {
+  const buffer = await synthesizeSpeechToBuffer(text, voiceId)
+  return `data:audio/mpeg;base64,${buffer.toString("base64")}`
 }

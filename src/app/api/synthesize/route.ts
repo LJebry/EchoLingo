@@ -1,6 +1,5 @@
 import { NextResponse } from "next/server"
-import { Readable } from "node:stream"
-import elevenlabs from "@/lib/elevenlabs"
+import { synthesizeSpeechToBuffer } from "@/lib/services/elevenlabs"
 import { z } from "zod"
 
 const synthesizeSchema = z.object({
@@ -8,56 +7,8 @@ const synthesizeSchema = z.object({
   voiceId: z.string().trim().optional(),
 })
 
-async function streamToBuffer(stream: Readable | ReadableStream<Uint8Array>) {
-  const readable = stream instanceof Readable ? stream : Readable.fromWeb(stream as any)
-  const chunks: Buffer[] = []
-
-  for await (const chunk of readable) {
-    chunks.push(Buffer.isBuffer(chunk) ? chunk : Buffer.from(chunk))
-  }
-
-  return Buffer.concat(chunks)
-}
-
-async function getVoiceId(preferredVoiceId?: string) {
-  if (preferredVoiceId) {
-    return preferredVoiceId
-  }
-
-  if (process.env.ELEVENLABS_VOICE_ID) {
-    return process.env.ELEVENLABS_VOICE_ID
-  }
-
-  try {
-    const voiceResponse = await elevenlabs.voices.getAll()
-    const firstVoice = voiceResponse.voices?.[0] as
-      | {
-          voiceId?: string
-          voice_id?: string
-        }
-      | undefined
-    const firstVoiceId = firstVoice?.voiceId ?? firstVoice?.voice_id
-
-    if (!firstVoiceId) {
-      console.error("ElevenLabs: No voices found in account.")
-      return null
-    }
-    return firstVoiceId
-  } catch (error) {
-    console.error("ElevenLabs: Failed to fetch voices:", error)
-    return null
-  }
-}
-
 export async function POST(req: Request) {
   try {
-    if (!process.env.ELEVENLABS_API_KEY) {
-      return NextResponse.json(
-        { error: "ElevenLabs API key is not configured" },
-        { status: 500 }
-      )
-    }
-
     const body = await req.json()
     const parsed = synthesizeSchema.safeParse(body)
 
@@ -68,21 +19,9 @@ export async function POST(req: Request) {
       )
     }
 
-    const voiceId = await getVoiceId(parsed.data.voiceId)
-    if (!voiceId) {
-      return NextResponse.json({ error: "No ElevenLabs voice available or found" }, { status: 500 })
-    }
+    const audioBuffer = await synthesizeSpeechToBuffer(parsed.data.text, parsed.data.voiceId)
 
-    console.log(`ElevenLabs: Synthesizing with voiceId: ${voiceId}`)
-
-    const audioStream = await elevenlabs.textToSpeech.convert(voiceId, {
-      text: parsed.data.text,
-      modelId: "eleven_multilingual_v2",
-    })
-
-    const audioBuffer = await streamToBuffer(audioStream)
-
-    return new NextResponse(audioBuffer, {
+    return new NextResponse(new Uint8Array(audioBuffer), {
       headers: {
         "Content-Type": "audio/mpeg",
         "Cache-Control": "no-store",
@@ -90,11 +29,10 @@ export async function POST(req: Request) {
     })
   } catch (error: any) {
     console.error("Synthesize API error details:", error)
-    
-    // Check for specific ElevenLabs errors if possible
-    const status = error?.status || 500
-    const message = error?.message || "Speech synthesis failed"
-    
+
+    const status = error?.statusCode || error?.status || 500
+    const message = error instanceof Error ? error.message : "Speech synthesis failed"
+
     return NextResponse.json({ error: message }, { status })
   }
 }

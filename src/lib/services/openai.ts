@@ -1,50 +1,81 @@
-import openai from "@/lib/openai";
+import openai from "@/lib/openai"
 
-/**
- * Real OpenAI Service for Transcription and Translation
- */
+const PLACEHOLDER_OPENAI_KEY_PREFIX = "sk-abcdef"
+const TRANSLATION_MODEL = "gpt-4o-mini"
+const TRANSCRIPTION_MODEL = "whisper-1"
+
+function ensureOpenAiApiKey() {
+  const apiKey = process.env.OPENAI_API_KEY
+
+  if (!apiKey || apiKey.startsWith(PLACEHOLDER_OPENAI_KEY_PREFIX)) {
+    throw new Error("OpenAI API key is missing or invalid")
+  }
+}
+
 export async function transcribeAudio(audioBlob: Blob): Promise<string> {
+  ensureOpenAiApiKey()
+
   try {
-    // Convert Blob to File for OpenAI API
-    const file = new File([audioBlob], "audio.webm", { type: audioBlob.type });
+    const file = new File([audioBlob], "audio.webm", { type: audioBlob.type || "audio/webm" })
 
     const transcription = await openai.audio.transcriptions.create({
       file,
-      model: "whisper-1",
-    });
+      model: TRANSCRIPTION_MODEL,
+    })
 
-    return transcription.text;
+    return transcription.text.trim()
   } catch (error) {
-    console.error("OpenAI Transcription Error:", error);
-    throw new Error("Failed to transcribe audio");
+    console.error("OpenAI Transcription Error:", error)
+    throw error
   }
 }
 
 export async function cleanTranscript(text: string): Promise<string> {
-  // Whisper is usually pretty clean, but we can do a simple trim
-  return text.trim();
+  return text.trim()
 }
 
-export async function translateText(text: string, sourceLang: string, targetLang: string): Promise<string> {
+export async function translateText({
+  text,
+  sourceLanguage,
+  targetLanguage,
+}: {
+  text: string
+  sourceLanguage?: string
+  targetLanguage: string
+}): Promise<string> {
+  ensureOpenAiApiKey()
+
   try {
     const response = await openai.chat.completions.create({
-      model: "gpt-4o-mini",
+      model: TRANSLATION_MODEL,
+      temperature: 0.2,
       messages: [
         {
           role: "system",
-          content: "You are a professional translator. Preserve tone and intent. Return ONLY the translated text."
+          content:
+            "You are a professional translator. Preserve tone, meaning, names, and formatting. Return only the translated text.",
         },
         {
           role: "user",
-          content: `Translate from ${sourceLang} to ${targetLang}: ${text}`
-        }
+          content: [
+            `Source language: ${sourceLanguage?.trim() || "auto-detect"}`,
+            `Target language: ${targetLanguage.trim()}`,
+            "Text:",
+            text,
+          ].join("\n"),
+        },
       ],
-      temperature: 0.3,
-    });
+    })
 
-    return response.choices[0]?.message?.content?.trim() || "Translation failed";
+    const translatedText = response.choices[0]?.message?.content?.trim()
+
+    if (!translatedText) {
+      throw new Error("No translation returned from OpenAI")
+    }
+
+    return translatedText
   } catch (error) {
-    console.error("OpenAI Translation Error:", error);
-    throw new Error("Failed to translate text");
+    console.error("OpenAI Translation Error:", error)
+    throw error
   }
 }

@@ -18,8 +18,8 @@ export function BottomNav() {
   const pathname = usePathname();
 
   return (
-    <nav className="fixed bottom-0 left-1/2 z-50 w-full max-w-[390px] -translate-x-1/2 px-4 pb-[max(0.75rem,env(safe-area-inset-bottom))]">
-      <div className="grid grid-cols-4 items-center gap-1 rounded-[1.75rem] border border-white/8 bg-[#101b39]/95 px-2 py-2 shadow-[0_-12px_35px_rgba(0,0,0,0.38)] backdrop-blur-xl">
+    <nav className="absolute inset-x-0 bottom-0 z-50 px-4 pb-[max(0.75rem,env(safe-area-inset-bottom))] md:px-6">
+      <div className="mx-auto grid max-w-[26rem] grid-cols-4 items-center gap-1 rounded-[1.75rem] border border-white/8 bg-[#101b39]/95 px-2 py-2 shadow-[0_-12px_35px_rgba(0,0,0,0.38)] backdrop-blur-xl md:max-w-[32rem]">
         {navItems.map((item) => {
           const isActive =
             pathname === item.href ||
