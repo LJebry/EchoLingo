@@ -20,28 +20,28 @@ export default function VoicesPage() {
   const [deletingId, setDeletingId] = useState<string | null>(null)
   const [error, setError] = useState("")
 
-  async function fetchProfiles() {
-    try {
-      setLoading(true)
-      const response = await fetch("/api/speaker-profiles")
-      if (response.status === 401) {
-        router.push("/login?redirectTo=/voices")
-        return
-      }
-      if (!response.ok) throw new Error("Failed to load profiles")
-      const data = await response.json()
-      setProfiles(data)
-    } catch (err) {
-      setError("Unable to load voice profiles.")
-      console.error(err)
-    } finally {
-      setLoading(false)
-    }
-  }
-
   useEffect(() => {
+    async function fetchProfiles() {
+      try {
+        setLoading(true)
+        const response = await fetch("/api/speaker-profiles")
+        if (response.status === 401) {
+          router.push("/login?redirectTo=/voices")
+          return
+        }
+        if (!response.ok) throw new Error("Failed to load profiles")
+        const data = await response.json()
+        setProfiles(data)
+      } catch (err) {
+        setError("Unable to load voice profiles.")
+        console.error(err)
+      } finally {
+        setLoading(false)
+      }
+    }
+
     fetchProfiles()
-  }, [])
+  }, [router])
 
   const handleDelete = async (id: string) => {
     if (!confirm("Are you sure you want to delete this voice profile? This cannot be undone.")) return
