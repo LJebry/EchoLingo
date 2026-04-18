@@ -6,6 +6,7 @@ import { z } from "zod"
 const turnSchema = z.object({
   conversationId: z.string().optional(),
   speakerProfileId: z.string().optional(),
+  voiceId: z.string().optional(),
   sourceLang: z.string(),
   targetLang: z.string(),
   transcriptText: z.string().trim().min(1).optional(),
@@ -19,6 +20,7 @@ export async function POST(req: NextRequest) {
     const audioBlob = formData.get('audio') as Blob | null
     const conversationId = (formData.get('conversationId') as string | null) || undefined
     const speakerProfileId = (formData.get('speakerProfileId') as string | null) || undefined
+    const voiceId = (formData.get('voiceId') as string | null) || undefined
     const sourceLang = formData.get('sourceLang') as string
     const targetLang = formData.get('targetLang') as string
     const transcriptText = (formData.get('transcriptText') as string | null)?.trim() || undefined
@@ -26,6 +28,7 @@ export async function POST(req: NextRequest) {
     const validation = turnSchema.safeParse({
       conversationId,
       speakerProfileId,
+      voiceId,
       sourceLang,
       targetLang,
       transcriptText,
@@ -44,6 +47,7 @@ export async function POST(req: NextRequest) {
       transcriptText,
       conversationId,
       speakerProfileId,
+      voiceId,
       sourceLang,
       targetLang,
       userId: session?.user?.id

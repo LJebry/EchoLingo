@@ -7,6 +7,7 @@ interface ProcessTurnOptions {
   transcriptText?: string
   conversationId?: string
   speakerProfileId?: string
+  voiceId?: string
   sourceLang: string
   targetLang: string
   userId?: string
@@ -17,6 +18,7 @@ export async function processTurn({
   transcriptText,
   conversationId,
   speakerProfileId,
+  voiceId,
   sourceLang,
   targetLang,
   userId
@@ -37,7 +39,7 @@ export async function processTurn({
   let audioError: string | null = null
 
   try {
-    audioUrl = await synthesizeSpeech(translatedText)
+    audioUrl = await synthesizeSpeech(translatedText, voiceId)
   } catch (error) {
     audioError =
       error instanceof Error ? error.message : "Speech synthesis is unavailable right now."

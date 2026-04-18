@@ -1,7 +1,7 @@
 "use client"
 
 import Link from "next/link"
-import { useMemo, useRef, useState } from "react"
+import { useEffect, useMemo, useRef, useState } from "react"
 import {
   ArrowRightLeft,
   Check,
@@ -12,6 +12,7 @@ import {
   Mic,
   Send,
   Volume2,
+  Settings2,
 } from "lucide-react"
 
 const MAX_CHARS = 5000
@@ -28,6 +29,12 @@ const languages = [
   "Japanese",
 ]
 
+type SpeakerProfile = {
+  id: string
+  displayName: string
+  elevenLabsVoiceId?: string | null
+}
+
 export default function Home() {
   const inputRef = useRef<HTMLTextAreaElement>(null)
   const audioRef = useRef<HTMLAudioElement | null>(null)
@@ -43,6 +50,23 @@ export default function Home() {
   const [error, setError] = useState("")
   const [copied, setCopied] = useState(false)
   const [pastePending, setPastePending] = useState(false)
+  const [availableProfiles, setAvailableProfiles] = useState<SpeakerProfile[]>([])
+  const [selectedProfileId, setSelectedProfileId] = useState("default")
+
+  useEffect(() => {
+    async function fetchProfiles() {
+      try {
+        const response = await fetch("/api/speaker-profiles")
+        if (response.ok) {
+          const data = await response.json()
+          setAvailableProfiles(data)
+        }
+      } catch (err) {
+        console.error("Failed to fetch speaker profiles", err)
+      }
+    }
+    fetchProfiles()
+  }, [])
 
   const canTranslate = text.trim().length > 0 && !loading
 
@@ -128,6 +152,9 @@ export default function Home() {
       setAudioLoadingOriginal(true)
       setError("")
 
+      const profile = availableProfiles.find(p => p.id === selectedProfileId)
+      const voiceId = profile?.elevenLabsVoiceId || undefined
+
       const response = await fetch("/api/synthesize", {
         method: "POST",
         headers: {
@@ -135,6 +162,7 @@ export default function Home() {
         },
         body: JSON.stringify({
           text,
+          voiceId,
         }),
       })
 
@@ -186,6 +214,9 @@ export default function Home() {
       setAudioLoading(true)
       setError("")
 
+      const profile = availableProfiles.find(p => p.id === selectedProfileId)
+      const voiceId = profile?.elevenLabsVoiceId || undefined
+
       const response = await fetch("/api/synthesize", {
         method: "POST",
         headers: {
@@ -193,6 +224,7 @@ export default function Home() {
         },
         body: JSON.stringify({
           text: translatedText,
+          voiceId,
         }),
       })
 
@@ -240,12 +272,34 @@ export default function Home() {
             <h1 className="text-sm font-semibold tracking-tight">EchoLingo</h1>
           </div>
 
-          <Link
-            href="/login"
-            className="inline-flex items-center rounded-full border border-white/10 bg-[#162242] px-4 py-2 text-sm font-medium text-[#eef1ff]"
-          >
-            Log In
-          </Link>
+          <div className="flex items-center gap-3">
+            <div className="relative group">
+              <select
+                value={selectedProfileId}
+                onChange={(e) => setSelectedProfileId(e.target.value)}
+                className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10"
+                aria-label="Select Voice Profile"
+              >
+                <option value="default">Default AI Voice</option>
+                {availableProfiles.map((p) => (
+                  <option key={p.id} value={p.id}>{p.displayName}</option>
+                ))}
+              </select>
+              <div className="flex h-9 items-center gap-2 rounded-full bg-[#162242] pl-3 pr-4 text-xs font-semibold text-[#8ea0c9] border border-white/10 group-hover:bg-[#1f2b47] transition-colors">
+                <Settings2 size={14} className="text-[#c8aefc]" />
+                <span className="max-w-[100px] truncate">
+                  {availableProfiles.find(p => p.id === selectedProfileId)?.displayName || "Select Voice"}
+                </span>
+              </div>
+            </div>
+
+            <Link
+              href="/login"
+              className="inline-flex items-center rounded-full border border-white/10 bg-[#162242] px-4 py-2 text-sm font-medium text-[#eef1ff]"
+            >
+              Log In
+            </Link>
+          </div>
         </header>
 
         <section className="mt-5 grid grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)] items-center gap-2 rounded-full border border-white/8 bg-[#151f3c] px-3 py-2.5 shadow-[0_18px_35px_rgba(0,0,0,0.22)] lg:mt-6 lg:max-w-3xl">
