@@ -1,6 +1,7 @@
+import type { SpeakerProfile } from "@prisma/client"
 import prisma from "@/lib/prisma"
 
-export async function getUserSpeakerProfiles(userId: string) {
+export async function getUserSpeakerProfiles(userId: string): Promise<SpeakerProfile[]> {
   return await prisma.speakerProfile.findMany({
     where: { userId },
     orderBy: { createdAt: 'desc' }
@@ -13,7 +14,7 @@ export async function createSpeakerProfile(data: {
   sourceLanguage: string
   targetLanguage: string
   elevenLabsVoiceId?: string
-}) {
+}): Promise<SpeakerProfile> {
   return await prisma.speakerProfile.create({
     data
   })

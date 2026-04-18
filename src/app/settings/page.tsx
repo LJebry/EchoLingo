@@ -10,7 +10,7 @@ export default async function SettingsPage() {
   if (!session?.user?.id) redirect("/login")
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-8 px-4 pb-28 pt-5">
       <MobileHeader title="Settings" />
 
       <div className="flex flex-col items-center gap-4 py-4">

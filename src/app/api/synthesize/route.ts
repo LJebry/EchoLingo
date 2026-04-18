@@ -8,10 +8,11 @@ const synthesizeSchema = z.object({
   voiceId: z.string().trim().optional(),
 })
 
-async function streamToBuffer(stream: Readable) {
+async function streamToBuffer(stream: Readable | ReadableStream<Uint8Array>) {
+  const readable = stream instanceof Readable ? stream : Readable.fromWeb(stream as any)
   const chunks: Buffer[] = []
 
-  for await (const chunk of stream) {
+  for await (const chunk of readable) {
     chunks.push(Buffer.isBuffer(chunk) ? chunk : Buffer.from(chunk))
   }
 
@@ -29,12 +30,19 @@ async function getVoiceId(preferredVoiceId?: string) {
 
   try {
     const voiceResponse = await elevenlabs.voices.getAll()
-    const firstVoice = voiceResponse.voices?.[0]?.voice_id
-    if (!firstVoice) {
+    const firstVoice = voiceResponse.voices?.[0] as
+      | {
+          voiceId?: string
+          voice_id?: string
+        }
+      | undefined
+    const firstVoiceId = firstVoice?.voiceId ?? firstVoice?.voice_id
+
+    if (!firstVoiceId) {
       console.error("ElevenLabs: No voices found in account.")
       return null
     }
-    return firstVoice
+    return firstVoiceId
   } catch (error) {
     console.error("ElevenLabs: Failed to fetch voices:", error)
     return null
@@ -69,7 +77,7 @@ export async function POST(req: Request) {
 
     const audioStream = await elevenlabs.textToSpeech.convert(voiceId, {
       text: parsed.data.text,
-      model_id: "eleven_multilingual_v2",
+      modelId: "eleven_multilingual_v2",
     })
 
     const audioBuffer = await streamToBuffer(audioStream)

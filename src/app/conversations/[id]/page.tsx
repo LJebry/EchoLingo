@@ -15,13 +15,13 @@ type ConversationTurnItem = {
 
 export default async function ConversationDetailPage({ params }: { params: { id: string } }) {
   const session = await auth()
-  if (!session?.user?.id) redirect("/login")
+  if (!session?.user?.id) redirect(`/login?redirectTo=${encodeURIComponent(`/conversations/${params.id}`)}`)
 
   const conversation = await getConversationWithTurns(params.id, session.user.id)
   if (!conversation) redirect("/history")
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 px-4 pb-28 pt-5">
       <MobileHeader title={conversation.title} />
 
       <div className="space-y-8 pb-32">

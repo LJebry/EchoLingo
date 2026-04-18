@@ -1,5 +1,5 @@
 import "./globals.css";
-import { BottomNav } from "@/components/layout/BottomNav";
+import { AppShell } from "@/components/layout/AppShell";
 
 export const metadata = {
   title: "EchoLingo",
@@ -19,9 +19,8 @@ export default function RootLayout({
           href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=block"
         />
       </head>
-      <body className="font-sans bg-surface text-on-surface pb-24">
-        {children}
-        <BottomNav />
+      <body className="font-sans bg-[#040915] text-on-surface antialiased">
+        <AppShell>{children}</AppShell>
       </body>
     </html>
   );

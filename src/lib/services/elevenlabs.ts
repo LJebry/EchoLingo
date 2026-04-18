@@ -1,4 +1,5 @@
 import elevenlabs from "@/lib/elevenlabs";
+import { Readable } from "node:stream";
 
 /**
  * Real ElevenLabs Service
@@ -11,19 +12,25 @@ export async function synthesizeSpeech(text: string, voiceId?: string): Promise<
       // Fallback to first available voice if none configured
       const voices = await elevenlabs.voices.getAll();
       if (!voices.voices[0]) throw new Error("No voices found in account");
-      voiceId = voices.voices[0].voice_id;
+      const firstVoice = voices.voices[0] as {
+        voiceId?: string;
+        voice_id?: string;
+      };
+      voiceId = firstVoice.voiceId || firstVoice.voice_id;
+      if (!voiceId) throw new Error("No voices found in account");
     } else {
       voiceId = selectedVoiceId;
     }
 
     const audioStream = await elevenlabs.textToSpeech.convert(voiceId, {
       text,
-      model_id: "eleven_multilingual_v2",
+      modelId: "eleven_multilingual_v2",
     });
 
     // Convert Stream to Buffer
+    const readable = audioStream instanceof Readable ? audioStream : Readable.fromWeb(audioStream as any);
     const chunks: Buffer[] = [];
-    for await (const chunk of audioStream) {
+    for await (const chunk of readable) {
       chunks.push(Buffer.isBuffer(chunk) ? chunk : Buffer.from(chunk));
     }
     const buffer = Buffer.concat(chunks);

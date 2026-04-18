@@ -1,53 +1,92 @@
 import Link from "next/link"
+import type { ReactNode } from "react"
 import { redirect } from "next/navigation"
-import { Globe, ChevronLeft } from "lucide-react"
+import { ChevronLeft, Globe, Lock, Mail } from "lucide-react"
 import { GoogleSignInButton } from "@/components/auth/GoogleSignInButton"
 import { auth, isGoogleAuthConfigured } from "@/lib/auth"
 
-export default async function LoginPage() {
+interface LoginPageProps {
+  searchParams?: {
+    redirectTo?: string | string[]
+  }
+}
+
+function getSafeRedirectTo(redirectTo?: string | string[]) {
+  const resolvedRedirect = Array.isArray(redirectTo) ? redirectTo[0] : redirectTo
+
+  if (!resolvedRedirect || !resolvedRedirect.startsWith("/") || resolvedRedirect.startsWith("//")) {
+    return "/dashboard"
+  }
+
+  return resolvedRedirect
+}
+
+function FauxInput({
+  icon,
+  label,
+}: {
+  icon: ReactNode
+  label: string
+}) {
+  return (
+    <div className="flex items-center gap-3 rounded-full bg-[#121c38] px-4 py-3.5 text-sm text-[#7483a8]">
+      <span className="text-[#8696bd]">{icon}</span>
+      <span>{label}</span>
+    </div>
+  )
+}
+
+export default async function LoginPage({ searchParams }: LoginPageProps) {
+  const redirectTo = getSafeRedirectTo(searchParams?.redirectTo)
   const session = await auth()
 
   if (session?.user?.id) {
-    redirect("/dashboard")
+    redirect(redirectTo)
   }
 
   return (
-    <main className="min-h-screen bg-[#000f3d] text-white">
-      <div className="mx-auto flex min-h-screen w-full max-w-md flex-col px-4 pb-10 pt-8">
-        <header className="flex items-center justify-between gap-4">
-          <div className="flex items-center gap-3">
-            <div className="flex h-10 w-10 items-center justify-center rounded-full">
-              <Globe className="h-9 w-9 text-[#c7afff]" strokeWidth={2.2} />
-            </div>
-            <h1 className="text-[28px] font-semibold tracking-tight text-[#c7afff]">EchoLingo</h1>
+    <main className="min-h-dvh bg-[radial-gradient(circle_at_top,rgba(124,92,255,0.18),transparent_28%),linear-gradient(180deg,#09142f_0%,#050c1f_48%,#09142f_100%)] text-white">
+      <div className="flex min-h-dvh flex-col px-4 pb-8 pt-5">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-2 text-[#c8aefc]">
+            <Globe size={18} />
+            <span className="text-sm font-semibold tracking-tight">EchoLingo</span>
           </div>
 
           <Link
             href="/"
-            className="inline-flex items-center gap-2 rounded-full border border-[#44607b] bg-[#214461] px-4 py-3 text-sm font-medium text-[#e6e8f5] transition-colors hover:bg-[#2a4e6f]"
+            className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-[#162242] px-3.5 py-2 text-sm text-[#eef1ff]"
           >
             <ChevronLeft className="h-4 w-4" />
             Guest
           </Link>
-        </header>
+        </div>
 
-        <div className="flex flex-1 flex-col justify-center">
-          <section className="mt-12 rounded-[34px] bg-[#0f1c49] px-8 pb-10 pt-10 shadow-[0_18px_35px_rgba(0,0,0,0.22)]">
-            <div className="space-y-3 text-left">
-              <p className="text-sm font-medium uppercase tracking-[0.22em] text-[#7e8cb1]">Welcome back</p>
-              <h2 className="text-[38px] font-semibold leading-tight text-[#dae2fd]">
-                Save your conversations and voices.
-              </h2>
-              <p className="max-w-sm text-base leading-relaxed text-[#9ea8c7]">
-                Sign in with Google to sync your history, speaker profiles, and future saved sessions.
+        <div className="flex flex-1 items-center">
+          <section className="w-full rounded-[2rem] border border-white/8 bg-[#0f1832] px-6 pb-7 pt-8 shadow-[0_25px_50px_rgba(0,0,0,0.3)]">
+            <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-[#201c47] text-[#c7afff]">
+              <Globe className="h-6 w-6" />
+            </div>
+
+            <div className="mt-6 space-y-2 text-center">
+              <h1 className="text-[2rem] font-semibold tracking-tight text-[#eef1ff]">
+                Welcome back
+              </h1>
+              <p className="mx-auto max-w-[16rem] text-sm leading-relaxed text-[#8b9aba]">
+                Log in to sync your voice profiles and translation history seamlessly.
               </p>
             </div>
 
-            <div className="mt-8 space-y-4">
+            <div className="mt-7 space-y-3">
+              <FauxInput icon={<Mail className="h-4 w-4" />} label="Email address" />
+              <FauxInput icon={<Lock className="h-4 w-4" />} label="Password" />
+            </div>
+
+            <div className="mt-6">
               {isGoogleAuthConfigured ? (
-                <GoogleSignInButton className="w-full" />
+                <GoogleSignInButton className="w-full" redirectTo={redirectTo} />
               ) : (
-                <div className="w-full rounded-[28px] border border-amber-300/20 bg-amber-300/10 p-5 text-left">
+                <div className="rounded-[1.6rem] border border-amber-300/20 bg-amber-300/10 p-5 text-left">
                   <p className="font-semibold text-amber-100">Google sign-in is not configured yet.</p>
                   <p className="mt-2 text-sm leading-relaxed text-amber-100/70">
                     Add `AUTH_SECRET`, `AUTH_URL`, `AUTH_GOOGLE_ID`, and `AUTH_GOOGLE_SECRET` to your local env before
@@ -55,22 +94,18 @@ export default async function LoginPage() {
                   </p>
                 </div>
               )}
-
-              <p className="text-sm leading-relaxed text-[#7e8cb1]">
-                By continuing, you agree to our Terms and Privacy Policy.
-              </p>
             </div>
-          </section>
 
-          <section className="mt-8 rounded-[34px] bg-[#232d52] px-8 py-8 shadow-[0_18px_35px_rgba(0,0,0,0.22)]">
-            <p className="text-sm font-medium uppercase tracking-[0.2em] text-[#7e8cb1]">No account yet?</p>
-            <p className="mt-3 text-[24px] leading-tight text-[#c7afff]">You can still explore the translator in guest mode.</p>
-            <Link
-              href="/"
-              className="mt-6 inline-flex items-center rounded-full border border-[#3b4a74] bg-[#1a254d] px-5 py-3 text-sm font-medium text-[#e6e8f5] transition-colors hover:bg-[#24305d]"
-            >
-              Continue as guest
-            </Link>
+            <p className="mt-4 text-center text-xs uppercase tracking-[0.2em] text-[#6f7da1]">
+              Or connect with Google
+            </p>
+
+            <div className="mt-6 flex items-center justify-between text-xs text-[#8b9aba]">
+              <Link href="/" className="hover:text-[#d6caff]">
+                Forgot password?
+              </Link>
+              <span>Google sign-in only</span>
+            </div>
           </section>
         </div>
       </div>
