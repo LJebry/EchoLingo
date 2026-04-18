@@ -315,7 +315,7 @@ export default function Home() {
           </div>
         </header>
 
-        <section className="mt-5 grid grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)] items-center gap-2 lg:mt-6 lg:max-w-3xl">
+        <section className="mx-auto mt-5 grid grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)] items-center gap-2 lg:mt-6 lg:max-w-3xl">
           <div className="min-w-0 rounded-full border border-white/8 bg-[#151f3c] px-2 py-2 shadow-[0_18px_35px_rgba(0,0,0,0.22)]">
             <div className="relative">
               <select
