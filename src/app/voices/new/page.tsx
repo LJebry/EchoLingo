@@ -151,7 +151,7 @@ export default function NewVoicePage() {
                 </div>
               </div>
               <p className="mt-2 text-xs text-[#7e8cb1] leading-relaxed px-1">
-                We'll use this language to analyze your voice during the training guided session.
+                We&apos;ll use this language to analyze your voice during the training guided session.
               </p>
             </div>
           </div>
@@ -185,7 +185,7 @@ export default function NewVoicePage() {
                </div>
                
                <p className="text-center text-2xl font-semibold leading-relaxed tracking-tight text-[#eef1ff]">
-                 "{TRAINING_PHRASES[0]}"
+                 &quot;{TRAINING_PHRASES[0]}&quot;
                </p>
                
                <div className="mt-10 flex justify-center gap-2 h-12">
