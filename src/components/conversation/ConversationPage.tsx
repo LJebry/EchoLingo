@@ -490,10 +490,13 @@ export function ConversationPage() {
                     <div className="absolute inset-[14px] rounded-full border border-[#f0d5ff]/20 bg-[#120f2d]/90 shadow-[0_16px_40px_rgba(107,63,201,0.38)] sm:inset-[18px]" />
                     <button
                       type="button"
-                      onMouseDown={() => { if(!isSubmitting && isSupported) void startRecording(); }}
-                      onMouseUp={() => { if(isRecording) stopRecording(); }}
-                      onTouchStart={(e) => { e.preventDefault(); if(!isSubmitting && isSupported) void startRecording(); }}
-                      onTouchEnd={(e) => { e.preventDefault(); if(isRecording) stopRecording(); }}
+                      onClick={() => {
+                        if (isRecording) {
+                          stopRecording()
+                        } else {
+                          if (!isSubmitting && isSupported) void startRecording()
+                        }
+                      }}
                       disabled={isSubmitting || !isSupported}
                       className="pointer-events-auto relative z-10 flex h-16 w-16 items-center justify-center rounded-full bg-[linear-gradient(180deg,#d8b6ff_0%,#a45cff_100%)] text-[#2e0b5a] shadow-[0_12px_30px_rgba(164,92,255,0.45)] disabled:opacity-50 sm:h-20 sm:w-20"
                       aria-label={isRecording ? "Stop recording" : "Start recording"}

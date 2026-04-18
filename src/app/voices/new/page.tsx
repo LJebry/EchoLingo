@@ -219,11 +219,13 @@ export default function NewVoicePage() {
                     isRecording ? "bg-red-500/20 scale-[1.8] blur-3xl opacity-100" : "bg-primary/20 scale-110 blur-2xl opacity-0"
                   )} />
                   <button
-                    onMouseDown={() => startRecording()}
-                    onMouseUp={() => stopRecording()}
-                    onMouseLeave={() => isRecording && stopRecording()}
-                    onTouchStart={(e) => { e.preventDefault(); startRecording(); }}
-                    onTouchEnd={() => stopRecording()}
+                    onClick={() => {
+                      if (isRecording) {
+                        stopRecording();
+                      } else {
+                        void startRecording();
+                      }
+                    }}
                     className={cn(
                       "relative z-10 flex h-28 w-28 items-center justify-center rounded-full transition-all duration-300 shadow-2xl",
                       isRecording 
