@@ -55,13 +55,13 @@ const speakers: SpeakerConfig[] = [
     name: "Person 2",
     sourceLanguage: "Spanish",
     targetLanguage: "English (US)",
-    accentColor: "#8bd6b4",
-    borderColor: "border-[#8bd6b4]/10",
+    accentColor: "rgb(var(--color-accent))",
+    borderColor: "border-accent/10",
     panelClassName:
-      "bg-[linear-gradient(180deg,rgba(13,24,45,0.92),rgba(20,40,53,0.96))]",
-    cardClassName: "border-[#8bd6b4]/10 bg-[#0d1c2c]/80",
-    wavePrimary: "bg-[#8bd6b4]",
-    waveSecondary: "bg-[#d0bcff]",
+      "bg-[linear-gradient(180deg,rgba(var(--color-surface-low),0.96),rgba(var(--color-accent),0.10))]",
+    cardClassName: "border-accent/10 bg-surface/70",
+    wavePrimary: "bg-accent",
+    waveSecondary: "bg-pulse",
     align: "right",
     upsideDown: true,
   },
@@ -70,13 +70,13 @@ const speakers: SpeakerConfig[] = [
     name: "Person 1",
     sourceLanguage: "English (US)",
     targetLanguage: "Spanish",
-    accentColor: "#d0bcff",
-    borderColor: "border-[#d0bcff]/10",
+    accentColor: "rgb(var(--color-pulse))",
+    borderColor: "border-pulse/10",
     panelClassName:
-      "bg-[linear-gradient(180deg,rgba(27,38,73,0.96),rgba(14,22,46,0.92))]",
-    cardClassName: "border-[#d0bcff]/10 bg-[#0e1731]/80",
-    wavePrimary: "bg-[#79b3ff]",
-    waveSecondary: "bg-[#d0bcff]",
+      "bg-[linear-gradient(180deg,rgba(var(--color-surface-high),0.96),rgba(var(--color-surface-low),0.94))]",
+    cardClassName: "border-pulse/10 bg-surface/70",
+    wavePrimary: "bg-accent/70",
+    waveSecondary: "bg-pulse",
     align: "left",
   },
 ]
@@ -163,7 +163,7 @@ function SpeakerPanel({
             type="button"
             onClick={onActivate}
             className={cn(
-              "flex h-11 w-11 items-center justify-center rounded-full bg-[#101936] text-[#d8def6] transition-colors",
+              "flex h-11 w-11 items-center justify-center rounded-full bg-surface-high text-on-surface transition-colors hover:bg-surface-highest",
               isActive && "ring-2 ring-offset-2 ring-offset-transparent",
             )}
             style={isActive ? { boxShadow: `0 0 0 2px ${speaker.accentColor}` } : undefined}
@@ -177,19 +177,19 @@ function SpeakerPanel({
               👤
             </div>
             <div className={textAlignClassName}>
-              <p className="text-sm font-semibold text-[#eef1ff]">{speaker.name}</p>
-              <p className="text-xs uppercase tracking-[0.18em] text-[#8ea0c9]">{speaker.sourceLanguage}</p>
+              <p className="text-sm font-semibold text-on-surface">{speaker.name}</p>
+              <p className="text-xs uppercase tracking-[0.18em] text-support">{speaker.sourceLanguage}</p>
             </div>
           </div>
         </div>
 
         <div className={cn("mt-10 rounded-[1.75rem] border p-5 lg:flex-1", speaker.cardClassName, textAlignClassName)}>
-          <p className="text-sm uppercase tracking-[0.2em] text-[#7f91be]">{content.heading}</p>
+          <p className="text-sm uppercase tracking-[0.2em] text-support">{content.heading}</p>
           <p className={cn(
             "mt-3 min-h-[5.5rem] leading-tight lg:min-h-[11rem]",
             content.statusVariant === "waiting"
-              ? "text-base text-[#6f7fa8] leading-relaxed"
-              : "text-[1.55rem] text-[#eef1ff] lg:text-[1.85rem]"
+              ? "text-base leading-relaxed text-support"
+              : "text-[1.55rem] text-on-surface lg:text-[1.85rem]"
           )}>
             {content.body}
           </p>
@@ -237,10 +237,10 @@ function SpeakerPanel({
             type="button"
             onClick={() => playAudio(content.audioUrl)}
             disabled={!content.audioUrl}
-            className="inline-flex items-center gap-2 rounded-full px-4 py-2 text-sm text-[#d7def7] disabled:cursor-default disabled:opacity-70"
+            className="inline-flex items-center gap-2 rounded-full px-4 py-2 text-sm disabled:cursor-default disabled:opacity-70"
             style={{
-              backgroundColor: speaker.key === "person1" ? "#202d54" : "#173343",
-              color: speaker.key === "person1" ? "#d7def7" : "#d6fff0",
+              backgroundColor: speaker.key === "person1" ? "rgba(var(--color-pulse),0.12)" : "rgba(var(--color-accent),0.14)",
+              color: speaker.key === "person1" ? "rgb(var(--color-pulse))" : "rgb(var(--color-accent))",
             }}
           >
             {isSubmitting && isActive ? (
@@ -391,16 +391,16 @@ export function ConversationPage() {
   }
 
   return (
-    <main className="min-h-full bg-[#020b23] text-white">
-      <div className="relative min-h-full overflow-hidden bg-[radial-gradient(circle_at_top,rgba(124,92,255,0.22),transparent_28%),linear-gradient(180deg,#09142f_0%,#050c1f_48%,#09142f_100%)]">
+    <main className="min-h-full bg-transparent text-on-surface">
+      <div className="relative min-h-full overflow-hidden bg-transparent">
         <div className="flex items-center justify-between px-4 pt-5 md:px-6 lg:px-8 lg:pt-8">
-          <div className="flex items-center gap-2 text-[#c8aefc]">
+          <div className="flex items-center gap-2 text-pulse">
             <Globe size={18} />
             <h1 className="text-sm font-semibold tracking-tight">EchoLingo</h1>
           </div>
 
-          <div className="flex items-center gap-2 rounded-full border border-[#c8aefc]/15 bg-[#12203f]/80 px-3 py-2 text-xs text-[#d8def6]">
-            <ArrowRightLeft size={14} className="text-[#c8aefc]" />
+          <div className="flex items-center gap-2 rounded-full border border-outline-ghost/10 bg-surface-high/80 px-3 py-2 text-xs text-on-surface">
+            <ArrowRightLeft size={14} className="text-pulse" />
             {persistenceState === "saved" ? "Synced" : "Live"}
           </div>
         </div>
@@ -427,8 +427,8 @@ export function ConversationPage() {
               {({ isSupported, startRecording, stopRecording }) => (
                 <div className="pointer-events-none order-2 relative z-20 -my-10 flex justify-center sm:-my-14 lg:my-0 lg:self-center">
                   <div className="relative mx-auto flex h-28 w-28 items-center justify-center sm:h-36 sm:w-36">
-                    <div className="absolute inset-0 rounded-full bg-[radial-gradient(circle,rgba(181,137,255,0.28)_0%,rgba(181,137,255,0.08)_48%,transparent_72%)]" />
-                    <div className="absolute inset-[14px] rounded-full border border-[#f0d5ff]/20 bg-[#120f2d]/90 shadow-[0_16px_40px_rgba(107,63,201,0.38)] sm:inset-[18px]" />
+                    <div className="absolute inset-0 rounded-full bg-[radial-gradient(circle,rgba(var(--color-pulse),0.24)_0%,rgba(var(--color-pulse),0.08)_48%,transparent_72%)]" />
+                    <div className="absolute inset-[14px] rounded-full border border-pulse/20 bg-surface/90 shadow-[0_16px_40px_rgba(var(--color-pulse),0.18)] sm:inset-[18px]" />
                     <button
                       type="button"
                       onMouseDown={() => { if(!isSubmitting && isSupported) void startRecording(); }}
@@ -436,7 +436,7 @@ export function ConversationPage() {
                       onTouchStart={(e) => { e.preventDefault(); if(!isSubmitting && isSupported) void startRecording(); }}
                       onTouchEnd={(e) => { e.preventDefault(); if(isRecording) stopRecording(); }}
                       disabled={isSubmitting || !isSupported}
-                      className="pointer-events-auto relative z-10 flex h-16 w-16 items-center justify-center rounded-full bg-[linear-gradient(180deg,#d8b6ff_0%,#a45cff_100%)] text-[#2e0b5a] shadow-[0_12px_30px_rgba(164,92,255,0.45)] disabled:opacity-50 sm:h-20 sm:w-20"
+                      className="pointer-events-auto relative z-10 flex h-16 w-16 items-center justify-center rounded-full bg-pulse text-on-pulse shadow-[0_12px_30px_rgba(var(--color-pulse),0.38)] disabled:opacity-50 sm:h-20 sm:w-20"
                       aria-label={isRecording ? "Stop recording" : "Start recording"}
                     >
                       {isSubmitting ? (
@@ -462,8 +462,8 @@ export function ConversationPage() {
             </div>
           </div>
 
-          <div className="mt-5 rounded-[2rem] border border-[#b9c7df]/10 bg-[#0d1734]/85 p-4 shadow-[0_20px_40px_rgba(0,0,0,0.24)] lg:mx-auto lg:mt-6 lg:w-full lg:max-w-4xl lg:p-5">
-            <div className="flex items-center justify-between gap-3 text-[10px] uppercase tracking-[0.18em] text-[#8ea0c9] sm:text-xs">
+          <div className="mt-5 rounded-[2rem] border border-outline-ghost/10 bg-surface-low/85 p-4 shadow-[0_20px_40px_rgba(0,0,0,0.16)] lg:mx-auto lg:mt-6 lg:w-full lg:max-w-4xl lg:p-5">
+            <div className="flex items-center justify-between gap-3 text-[10px] uppercase tracking-[0.18em] text-support sm:text-xs">
               <span>{activeSpeaker.name}</span>
               <span className="text-right">{activeSpeaker.sourceLanguage} to {activeSpeaker.targetLanguage}</span>
             </div>
@@ -473,13 +473,13 @@ export function ConversationPage() {
                 value={draftText}
                 onChange={(event) => setDraftText(event.target.value)}
                 placeholder={`Type what ${activeSpeaker.name.toLowerCase()} wants to say...`}
-                className="min-h-[84px] flex-1 resize-none rounded-[1.4rem] border border-[#d0bcff]/10 bg-[#091127] px-4 py-3 text-sm text-[#eef1ff] outline-none placeholder:text-[#69789e] sm:min-h-[90px]"
+                className="min-h-[84px] flex-1 resize-none rounded-[1.4rem] border border-outline-ghost/10 bg-surface px-4 py-3 text-sm text-on-surface outline-none placeholder:text-support sm:min-h-[90px]"
               />
               <button
                 type="button"
                 onClick={() => submitTurn({ transcriptText: draftText })}
                 disabled={isSubmitting || !draftText.trim()}
-                className="flex h-auto min-h-[84px] w-12 items-center justify-center rounded-[1.4rem] bg-[#1d2b55] text-[#d0bcff] disabled:opacity-40 sm:min-h-[90px] sm:w-14"
+                className="flex h-auto min-h-[84px] w-12 items-center justify-center rounded-[1.4rem] bg-pulse/12 text-pulse disabled:opacity-40 sm:min-h-[90px] sm:w-14"
                 aria-label="Send typed turn"
               >
                 <Send size={20} />
@@ -487,7 +487,7 @@ export function ConversationPage() {
             </div>
 
             <div className="mt-3 flex items-center justify-between text-sm">
-              <div className="flex items-center gap-2 text-[#9fb0d4]">
+              <div className="flex items-center gap-2 text-support">
                 {isRecording ? <Loader2 size={15} className="animate-spin" /> : <Mic size={15} />}
                 <span>
                   {isRecording
@@ -497,14 +497,14 @@ export function ConversationPage() {
               </div>
 
               {conversationId && (
-                <Link href="/history" className="text-[#d0bcff]">
+                <Link href="/history" className="text-pulse">
                   View history
                 </Link>
               )}
             </div>
 
-            {error && <p className="mt-3 text-sm text-red-300">{error}</p>}
-            {!error && notice && <p className="mt-3 text-sm text-amber-200">{notice}</p>}
+            {error && <p className="mt-3 text-sm text-red-400">{error}</p>}
+            {!error && notice && <p className="mt-3 text-sm text-amber-300">{notice}</p>}
           </div>
         </div>
       </div>

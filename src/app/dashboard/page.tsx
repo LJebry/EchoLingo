@@ -36,15 +36,15 @@ export default async function DashboardPage() {
 
       <section className="space-y-4">
         <div className="flex items-center justify-between">
-          <h3 className="text-xl font-bold text-[#dae2fd]">Recent Sessions</h3>
+          <h3 className="text-xl font-bold text-on-surface">Recent Sessions</h3>
           <Link href="/history">
-            <span className="text-sm text-[#d0bcff]">View All</span>
+            <span className="text-sm text-pulse">View All</span>
           </Link>
         </div>
 
         {conversations.length === 0 ? (
-          <div className="p-8 rounded-3xl bg-[#131b2e] border border-dashed border-[#b9c7df]/20 text-center space-y-4">
-            <p className="text-[#b9c7df]/60">No conversations yet.</p>
+          <div className="space-y-4 rounded-3xl border border-dashed border-outline-ghost/20 bg-surface-low p-8 text-center">
+            <p className="text-support/80">No conversations yet.</p>
             <Link href="/">
               <Button size="sm">Start Translating</Button>
             </Link>
@@ -53,19 +53,19 @@ export default async function DashboardPage() {
           <div className="space-y-3">
             {conversations.slice(0, 3).map((conv: DashboardConversationItem) => (
               <Link key={conv.id} href={`/conversations/${conv.id}`}>
-                <div className="p-4 rounded-2xl bg-[#131b2e] border border-[#b9c7df]/5 flex items-center justify-between">
+                <div className="flex items-center justify-between rounded-2xl border border-outline-ghost/10 bg-surface-low p-4 transition-colors hover:bg-surface-high">
                   <div className="flex items-center gap-4">
-                    <div className="w-10 h-10 rounded-full bg-[#3c0091]/20 flex items-center justify-center text-[#d0bcff]">
+                    <div className="flex h-10 w-10 items-center justify-center rounded-full bg-pulse/20 text-pulse">
                       <MessageSquare size={18} />
                     </div>
                     <div>
-                      <h4 className="font-bold text-[#dae2fd]">{conv.title}</h4>
-                      <p className="text-xs text-[#b9c7df]/40">
+                      <h4 className="font-bold text-on-surface">{conv.title}</h4>
+                      <p className="text-xs text-support/70">
                         {conv._count.turns} turns • {new Date(conv.updatedAt).toLocaleDateString()}
                       </p>
                     </div>
                   </div>
-                  <span className="text-[#b9c7df]/20"></span>
+                  <span className="text-support/40"></span>
                 </div>
               </Link>
             ))}
@@ -75,27 +75,27 @@ export default async function DashboardPage() {
 
       <section className="space-y-4">
         <div className="flex items-center justify-between">
-          <h3 className="text-xl font-bold text-[#dae2fd]">Speaker Profiles</h3>
+          <h3 className="text-xl font-bold text-on-surface">Speaker Profiles</h3>
           <Link href="/voices">
-            <span className="text-sm text-[#d0bcff]">Manage</span>
+            <span className="text-sm text-pulse">Manage</span>
           </Link>
         </div>
 
         <div className="grid grid-cols-2 gap-4">
           {profiles.slice(0, 2).map((profile: DashboardSpeakerProfileItem) => (
-            <div key={profile.id} className="p-4 rounded-2xl bg-[#131b2e] border border-[#b9c7df]/5 space-y-2">
-              <div className="w-10 h-10 rounded-full bg-[#8bd6b4]/20 flex items-center justify-center text-[#8bd6b4]">
+            <div key={profile.id} className="space-y-2 rounded-2xl border border-outline-ghost/10 bg-surface-low p-4">
+              <div className="flex h-10 w-10 items-center justify-center rounded-full bg-accent/20 text-accent">
                 <Mic2 size={18} />
               </div>
               <div>
-                <h4 className="font-bold text-sm text-[#dae2fd]">{profile.displayName}</h4>
-                <p className="text-[10px] text-[#b9c7df]/40 uppercase tracking-wider">
+                <h4 className="text-sm font-bold text-on-surface">{profile.displayName}</h4>
+                <p className="text-[10px] uppercase tracking-wider text-support/70">
                   {profile.sourceLanguage} → {profile.targetLanguage}
                 </p>
               </div>
             </div>
           ))}
-          <Link href="/voices/new" className="p-4 rounded-2xl bg-[#131b2e]/50 border border-dashed border-[#b9c7df]/10 flex flex-col items-center justify-center gap-2 text-[#b9c7df]/40">
+          <Link href="/voices/new" className="flex flex-col items-center justify-center gap-2 rounded-2xl border border-dashed border-outline-ghost/10 bg-surface-low/50 p-4 text-support/70 transition-colors hover:bg-surface-low">
             <Plus size={24} />
             <span className="text-[10px] font-bold uppercase tracking-widest">Add Voice</span>
           </Link>

@@ -30,7 +30,7 @@ export function UserProfile() {
   }, [])
 
   if (status === "loading") {
-    return <div className="h-10 w-10 animate-pulse rounded-full bg-white/5" />
+    return <div className="h-10 w-10 animate-pulse rounded-full bg-surface-high" />
   }
 
   if (!session) {
@@ -39,7 +39,7 @@ export function UserProfile() {
         <ThemeIconToggle />
         <Link
           href="/login"
-          className="inline-flex h-10 items-center justify-center rounded-full border border-white/10 bg-[#162242] px-5 text-sm font-medium text-[#eef1ff] transition-all hover:bg-[#1f2b47] active:scale-95"
+          className="inline-flex h-10 items-center justify-center rounded-full border border-outline-ghost/10 bg-surface-high px-5 text-sm font-medium text-on-surface transition-all hover:bg-surface-highest active:scale-95"
         >
           Log In
         </Link>
@@ -55,9 +55,9 @@ export function UserProfile() {
       <div className="relative" ref={dropdownRef}>
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="flex items-center gap-2 rounded-full border border-white/10 bg-[#131d39] p-1 pr-3 transition-all hover:bg-[#1f2b47]"
+        className="flex items-center gap-2 rounded-full border border-outline-ghost/10 bg-surface-high p-1 pr-3 transition-all hover:bg-surface-highest"
       >
-        <div className="flex h-8 w-8 items-center justify-center overflow-hidden rounded-full bg-[#201c47] text-[#c7afff] shadow-inner">
+        <div className="flex h-8 w-8 items-center justify-center overflow-hidden rounded-full bg-pulse/15 text-pulse shadow-inner">
           {user?.image && !imgError ? (
             <img 
               src={user.image} 
@@ -70,34 +70,34 @@ export function UserProfile() {
             <User size={16} />
           )}
         </div>
-        <ChevronDown size={14} className={cn("text-[#7e8cb1] transition-transform", isOpen && "rotate-180")} />
+        <ChevronDown size={14} className={cn("text-support transition-transform", isOpen && "rotate-180")} />
       </button>
 
       {isOpen && (
-        <div className="absolute right-0 mt-2 w-48 origin-top-right overflow-hidden rounded-2xl border border-white/10 bg-[#131d39] shadow-2xl ring-1 ring-black ring-opacity-5 focus:outline-none z-50 animate-in fade-in zoom-in duration-100">
-          <div className="px-4 py-3 border-b border-white/5">
-            <p className="text-sm font-medium text-[#eef1ff] truncate">{user?.name}</p>
-            <p className="text-xs text-[#7e8cb1] truncate">{user?.email}</p>
+        <div className="absolute right-0 z-50 mt-2 w-48 origin-top-right overflow-hidden rounded-2xl border border-outline-ghost/10 bg-surface-high shadow-2xl ring-1 ring-black/5 focus:outline-none animate-in fade-in zoom-in duration-100">
+          <div className="border-b border-outline-ghost/10 px-4 py-3">
+            <p className="truncate text-sm font-medium text-on-surface">{user?.name}</p>
+            <p className="truncate text-xs text-support">{user?.email}</p>
           </div>
           <div className="py-1">
             <Link
               href="/dashboard"
               onClick={() => setIsOpen(false)}
-              className="flex items-center gap-2 px-4 py-2 text-sm text-[#d7def7] hover:bg-white/5"
+              className="flex items-center gap-2 px-4 py-2 text-sm text-on-surface hover:bg-surface-highest"
             >
-              <LayoutDashboard size={16} className="text-[#c8aefc]" />
+              <LayoutDashboard size={16} className="text-pulse" />
               Dashboard
             </Link>
             <Link
               href="/settings"
               onClick={() => setIsOpen(false)}
-              className="flex items-center gap-2 px-4 py-2 text-sm text-[#d7def7] hover:bg-white/5"
+              className="flex items-center gap-2 px-4 py-2 text-sm text-on-surface hover:bg-surface-highest"
             >
-              <Settings size={16} className="text-[#c8aefc]" />
+              <Settings size={16} className="text-pulse" />
               Settings
             </Link>
           </div>
-          <div className="py-1 border-t border-white/5">
+          <div className="border-t border-outline-ghost/10 py-1">
             <button
               onClick={() => signOut()}
               className="flex w-full items-center gap-2 px-4 py-2 text-sm text-red-400 hover:bg-red-500/10"
