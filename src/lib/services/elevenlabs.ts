@@ -90,7 +90,7 @@ async function resolveVoiceId(preferredVoiceId?: string) {
   }
 }
 
-export async function synthesizeSpeechToBuffer(text: string, voiceId?: string): Promise<Buffer> {
+export const synthesizeSpeechToBuffer = async (text: string, voiceId?: string): Promise<Buffer> => {
   if (!process.env.ELEVENLABS_API_KEY) {
     throw new Error("ElevenLabs API key is not configured.")
   }
@@ -112,15 +112,40 @@ export async function synthesizeSpeechToBuffer(text: string, voiceId?: string): 
   }
 }
 
-export async function synthesizeSpeech(text: string, voiceId?: string): Promise<string> {
+export const synthesizeSpeech = async (text: string, voiceId?: string): Promise<string> => {
   const buffer = await synthesizeSpeechToBuffer(text, voiceId)
   return `data:audio/mpeg;base64,${buffer.toString("base64")}`
 }
 
 /**
+ * Instant Voice Cloning
+ */
+export const cloneVoice = async (audioBlob: Blob, name: string): Promise<string> => {
+  if (!process.env.ELEVENLABS_API_KEY) {
+    throw new Error("ElevenLabs API key is not configured.")
+  }
+
+  try {
+    const buffer = Buffer.from(await audioBlob.arrayBuffer());
+    const stream = Readable.from(buffer);
+
+    const voice = await elevenlabs.voices.add({
+      name,
+      files: [stream],
+      description: `Custom voice profile created for EchoLingo.`,
+    });
+
+    return voice.voice_id;
+  } catch (error) {
+    console.error("ElevenLabs Cloning Error:", error);
+    throw new Error(getElevenLabsErrorMessage(error));
+  }
+}
+
+/**
  * Delete a custom voice
  */
-export async function deleteVoice(voiceId: string): Promise<void> {
+export const deleteVoice = async (voiceId: string): Promise<void> => {
   if (!process.env.ELEVENLABS_API_KEY) {
     throw new Error("ElevenLabs API key is not configured.")
   }
@@ -129,7 +154,5 @@ export async function deleteVoice(voiceId: string): Promise<void> {
     await elevenlabs.voices.delete(voiceId)
   } catch (error) {
     console.error("ElevenLabs Voice Deletion Error:", error)
-    // We don't necessarily want to block DB deletion if ElevenLabs fails, 
-    // but we should log it.
   }
 }
