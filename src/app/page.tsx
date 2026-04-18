@@ -318,7 +318,7 @@ export default function Home() {
           <div className="relative min-w-0 flex-1">
             <select
               ref={sourceSelectRef}
-              className="max-w-[110px] min-w-0 w-full appearance-none rounded-full border border-white/8 bg-[#151f3c] px-3 py-3 pr-12 text-sm font-medium text-[#eef1ff] outline-none shadow-[0_18px_35px_rgba(0,0,0,0.22)] sm:max-w-none sm:px-4"
+              className="min-w-0 w-full appearance-none rounded-full border border-white/8 bg-[#151f3c] px-3 py-3 pr-12 text-sm font-medium text-[#eef1ff] outline-none shadow-[0_18px_35px_rgba(0,0,0,0.22)] sm:px-4"
               value={sourceLanguage}
               onChange={(event) => setSourceLanguage(event.target.value)}
               aria-label="Source language"
