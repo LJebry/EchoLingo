@@ -15,6 +15,7 @@ import {
 } from "lucide-react"
 import AudioRecorder from "@/components/AudioRecorder"
 import { cn } from "@/components/ui/Button"
+import { UserProfile } from "@/components/layout/UserProfile"
 
 type SpeakerKey = "person1" | "person2"
 
@@ -449,8 +450,6 @@ export function ConversationPage() {
   return (
     <main className="min-h-full bg-[#020b23] text-white">
       <div className="relative min-h-full overflow-hidden bg-[radial-gradient(circle_at_top,rgba(124,92,255,0.22),transparent_28%),linear-gradient(180deg,#09142f_0%,#050c1f_48%,#09142f_100%)]">
-import { UserProfile } from "@/components/layout/UserProfile"
-...
         <div className="flex items-center justify-between px-4 pt-5 md:px-6 lg:px-8 lg:pt-8">
           <div className="flex items-center gap-2 text-[#c8aefc]">
             <Globe size={18} />
