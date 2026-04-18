@@ -54,24 +54,21 @@ export default function NewVoicePage() {
       setIsSubmitting(true)
       setError("")
 
-      // 1. In a real scenario, we would upload the blob to ElevenLabs 
-      // for Instant Voice Cloning and get a voice_id back.
-      // For this prototype, we'll mock the success and save the profile.
-      
+      const formData = new FormData()
+      formData.append("audio", recordedBlob, "sample.webm")
+      formData.append("displayName", displayName)
+      formData.append("sourceLanguage", sourceLanguage)
+      formData.append("targetLanguage", "Universal")
+
       const response = await fetch("/api/speaker-profiles", {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          displayName,
-          sourceLanguage,
-          targetLanguage: "Universal", // Indicating this voice is for all targets
-        }),
+        body: formData,
       })
 
+      const result = await response.json()
+
       if (!response.ok) {
-        throw new Error("Failed to save voice profile")
+        throw new Error(result.error || "Failed to save voice profile")
       }
 
       setStep(3) // Success step

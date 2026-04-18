@@ -116,3 +116,31 @@ export async function synthesizeSpeech(text: string, voiceId?: string): Promise<
   const buffer = await synthesizeSpeechToBuffer(text, voiceId)
   return `data:audio/mpeg;base64,${buffer.toString("base64")}`
 }
+
+/**
+ * Instant Voice Cloning
+ */
+export async function cloneVoice(audioBlob: Blob, name: string): Promise<string> {
+  if (!process.env.ELEVENLABS_API_KEY) {
+    throw new Error("ElevenLabs API key is not configured.")
+  }
+
+  try {
+    // Convert Blob to something the SDK can handle in Node.js
+    const buffer = Buffer.from(await audioBlob.arrayBuffer());
+    
+    // The SDK expects files to be readable streams or similar
+    const stream = Readable.from(buffer);
+
+    const voice = await elevenlabs.voices.add({
+      name,
+      files: [stream],
+      description: `Custom voice profile created for EchoLingo.`,
+    });
+
+    return voice.voice_id;
+  } catch (error) {
+    console.error("ElevenLabs Cloning Error:", error);
+    throw new Error(getElevenLabsErrorMessage(error));
+  }
+}
