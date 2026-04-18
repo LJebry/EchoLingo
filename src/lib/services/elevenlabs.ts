@@ -118,29 +118,18 @@ export async function synthesizeSpeech(text: string, voiceId?: string): Promise<
 }
 
 /**
- * Instant Voice Cloning
+ * Delete a custom voice
  */
-export async function cloneVoice(audioBlob: Blob, name: string): Promise<string> {
+export async function deleteVoice(voiceId: string): Promise<void> {
   if (!process.env.ELEVENLABS_API_KEY) {
     throw new Error("ElevenLabs API key is not configured.")
   }
 
   try {
-    // Convert Blob to something the SDK can handle in Node.js
-    const buffer = Buffer.from(await audioBlob.arrayBuffer());
-    
-    // The SDK expects files to be readable streams or similar
-    const stream = Readable.from(buffer);
-
-    const voice = await elevenlabs.voices.add({
-      name,
-      files: [stream],
-      description: `Custom voice profile created for EchoLingo.`,
-    });
-
-    return voice.voice_id;
+    await elevenlabs.voices.delete(voiceId)
   } catch (error) {
-    console.error("ElevenLabs Cloning Error:", error);
-    throw new Error(getElevenLabsErrorMessage(error));
+    console.error("ElevenLabs Voice Deletion Error:", error)
+    // We don't necessarily want to block DB deletion if ElevenLabs fails, 
+    // but we should log it.
   }
 }
