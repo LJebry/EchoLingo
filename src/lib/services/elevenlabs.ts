@@ -2,6 +2,7 @@ import elevenlabs from "@/lib/elevenlabs"
 import { Readable } from "node:stream"
 
 const DEFAULT_TTS_MODEL = "eleven_multilingual_v2"
+const DEFAULT_FALLBACK_VOICE_ID = "EXAVITQu4vr4xnSDxMaL"
 
 function getRawElevenLabsMessage(error: unknown) {
   if (
@@ -34,7 +35,7 @@ function getElevenLabsErrorMessage(error: unknown) {
   }
 
   if (rawMessage?.includes("voices_read")) {
-    return "Set ELEVENLABS_VOICE_ID in .env or use an ElevenLabs API key with the voices_read permission."
+    return "Voice lookup requires the ElevenLabs voices_read permission. Set ELEVENLABS_VOICE_ID in .env to skip voice discovery."
   }
 
   if (rawMessage) {
@@ -45,7 +46,11 @@ function getElevenLabsErrorMessage(error: unknown) {
 }
 
 function getConfiguredVoiceId(preferredVoiceId?: string) {
-  return preferredVoiceId?.trim() || process.env.ELEVENLABS_VOICE_ID?.trim() || null
+  return (
+    preferredVoiceId?.trim() ||
+    process.env.ELEVENLABS_VOICE_ID?.trim() ||
+    DEFAULT_FALLBACK_VOICE_ID
+  )
 }
 
 async function streamToBuffer(stream: Readable | ReadableStream<Uint8Array>) {
