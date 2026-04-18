@@ -250,7 +250,7 @@ export default function Home() {
 
         <section className="mt-5 grid grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)] items-center gap-2 rounded-full border border-white/8 bg-[#151f3c] px-3 py-2.5 shadow-[0_18px_35px_rgba(0,0,0,0.22)] lg:mt-6 lg:max-w-3xl">
           <select
-            className="min-w-0 flex-1 appearance-none rounded-full bg-[#202b4d] px-4 py-3 text-sm font-medium text-[#eef1ff] outline-none"
+            className="max-w-[110px] sm:max-w-none min-w-0 flex-1 appearance-none rounded-full bg-[#202b4d] px-3 sm:px-4 py-3 text-sm font-medium text-[#eef1ff] outline-none"
             value={sourceLanguage}
             onChange={(event) => setSourceLanguage(event.target.value)}
             aria-label="Source language"
