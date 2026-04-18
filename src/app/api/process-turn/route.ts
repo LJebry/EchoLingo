@@ -15,15 +15,14 @@ export async function POST(req: NextRequest) {
   try {
     const session = await auth()
     const formData = await req.formData()
-    
+
     const audioBlob = formData.get('audio') as Blob | null
-    const conversationId = formData.get('conversationId') as string | undefined
-    const speakerProfileId = formData.get('speakerProfileId') as string | undefined
+    const conversationId = (formData.get('conversationId') as string | null) || undefined
+    const speakerProfileId = (formData.get('speakerProfileId') as string | null) || undefined
     const sourceLang = formData.get('sourceLang') as string
     const targetLang = formData.get('targetLang') as string
     const transcriptText = (formData.get('transcriptText') as string | null)?.trim() || undefined
 
-    // Validate metadata
     const validation = turnSchema.safeParse({
       conversationId,
       speakerProfileId,
