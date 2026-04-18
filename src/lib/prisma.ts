@@ -1,21 +1,30 @@
-import { PrismaPg } from "@prisma/adapter-pg"
 import { PrismaClient } from '@prisma/client'
 
-const databaseUrl = process.env.DATABASE_URL
-
 const prismaClientSingleton = () => {
-  if (!databaseUrl) {
+  const url = process.env.DATABASE_URL
+
+  if (!url) {
     throw new Error("DATABASE_URL is not set")
   }
 
-  if (databaseUrl.startsWith("prisma://") || databaseUrl.startsWith("prisma+postgres://")) {
+  // Prisma Accelerate URLs (prisma+postgres:// or prisma://)
+  if (url.startsWith("prisma://") || url.startsWith("prisma+postgres://")) {
     return new PrismaClient({
-      accelerateUrl: databaseUrl,
+      datasources: {
+        db: {
+          url: url,
+        },
+      },
     })
   }
 
+  // Standard PostgreSQL URL
   return new PrismaClient({
-    adapter: new PrismaPg(databaseUrl),
+    datasources: {
+      db: {
+        url: url,
+      },
+    },
   })
 }
 

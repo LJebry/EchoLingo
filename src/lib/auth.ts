@@ -20,7 +20,7 @@ export const isGoogleAuthConfigured = Boolean(
 export const { handlers, auth, signIn, signOut } = NextAuth({
   adapter: PrismaAdapter(prisma),
   secret: process.env.AUTH_SECRET,
-  trustHost: process.env.AUTH_TRUST_HOST === "true" || process.env.NODE_ENV !== "production",
+  trustHost: true, // Strictly trust host on Vercel
   providers: isGoogleAuthConfigured
     ? [
         GoogleProvider({
@@ -40,4 +40,5 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
   pages: {
     signIn: '/login',
   },
+  debug: process.env.NODE_ENV === "development",
 })
