@@ -2,19 +2,12 @@ import { PrismaClient } from '@prisma/client'
 import { withAccelerate } from '@prisma/extension-accelerate'
 
 const prismaClientSingleton = () => {
-  const url = process.env.DATABASE_URL
+  const url = process.env.DATABASE_URL || 'prisma://accelerate.prisma-data.net/?api_key=placeholder'
 
-  if (!url) {
-    // During build time on Vercel, this might be missing, 
-    // but we need a valid-looking string to prevent initialization crashes.
-    return new PrismaClient().$extends(withAccelerate())
-  }
-
-  // We pass the URL directly to the constructor as 'datasourceUrl'.
-  // We use 'as any' because Prisma 7's generated types sometimes omit this 
-  // when the schema datasource is defined via config file.
+  // In Prisma 7, Accelerate connections MUST be passed via the 'accelerateUrl' property.
+  // Direct connections would use the 'adapter' property.
   return new PrismaClient({
-    datasourceUrl: url
+    accelerateUrl: url,
   } as any).$extends(withAccelerate())
 }
 
