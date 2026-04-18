@@ -1,6 +1,6 @@
 "use client"
 
-import { useMemo, useState } from "react"
+import { useEffect, useMemo, useState } from "react"
 import Link from "next/link"
 import {
   ArrowRightLeft,
@@ -11,6 +11,7 @@ import {
   Mic,
   Send,
   Volume2,
+  Settings2,
 } from "lucide-react"
 import AudioRecorder from "@/components/AudioRecorder"
 import { cn } from "@/components/ui/Button"
@@ -30,6 +31,12 @@ type SpeakerConfig = {
   waveSecondary: string
   align: "left" | "right"
   upsideDown?: boolean
+}
+
+type SpeakerProfile = {
+  id: string
+  displayName: string
+  elevenLabsVoiceId?: string | null
 }
 
 type ConversationTurn = {
@@ -132,6 +139,9 @@ function SpeakerPanel({
   isRecording,
   isSubmitting,
   onActivate,
+  availableProfiles,
+  selectedProfileId,
+  onProfileChange,
 }: {
   speaker: SpeakerConfig
   content: PanelCopy
@@ -139,6 +149,9 @@ function SpeakerPanel({
   isRecording: boolean
   isSubmitting: boolean
   onActivate: () => void
+  availableProfiles: SpeakerProfile[]
+  selectedProfileId: string
+  onProfileChange: (id: string) => void
 }) {
   const wrapperClassName = speaker.upsideDown
     ? "flex h-full flex-col justify-between rotate-180 lg:rotate-0"
@@ -154,23 +167,46 @@ function SpeakerPanel({
       className={cn(
         "relative flex-1 rounded-[2rem] border px-5 pb-10 pt-6 shadow-[0_24px_60px_rgba(0,0,0,0.32)] lg:min-h-[32rem] lg:px-6 lg:pb-8",
         speaker.borderColor,
-        speaker.panelClassName
+        speaker.panelClassName,
+        isActive && "ring-2 ring-primary/20"
       )}
     >
       <div className={wrapperClassName}>
         <div className={cn("flex items-center justify-between", speaker.align === "right" && "flex-row-reverse")}>
-          <button
-            type="button"
-            onClick={onActivate}
-            className={cn(
-              "flex h-11 w-11 items-center justify-center rounded-full bg-[#101936] text-[#d8def6] transition-colors",
-              isActive && "ring-2 ring-offset-2 ring-offset-transparent",
-            )}
-            style={isActive ? { boxShadow: `0 0 0 2px ${speaker.accentColor}` } : undefined}
-            aria-label={`Use ${speaker.name}`}
-          >
-            <Keyboard size={18} />
-          </button>
+          <div className="flex items-center gap-2">
+            <button
+              type="button"
+              onClick={onActivate}
+              className={cn(
+                "flex h-11 w-11 items-center justify-center rounded-full bg-[#101936] text-[#d8def6] transition-colors",
+                isActive && "ring-2 ring-offset-2 ring-offset-transparent",
+              )}
+              style={isActive ? { boxShadow: `0 0 0 2px ${speaker.accentColor}` } : undefined}
+              aria-label={`Use ${speaker.name}`}
+            >
+              <Keyboard size={18} />
+            </button>
+            
+            <div className="relative group">
+              <select
+                value={selectedProfileId}
+                onChange={(e) => onProfileChange(e.target.value)}
+                className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10"
+                aria-label="Select Voice Profile"
+              >
+                <option value="default">Default AI Voice</option>
+                {availableProfiles.map((p) => (
+                  <option key={p.id} value={p.id}>{p.displayName}</option>
+                ))}
+              </select>
+              <div className="flex h-11 items-center gap-2 rounded-full bg-[#101936] pl-3 pr-4 text-xs font-semibold text-[#8ea0c9] border border-white/5 group-hover:bg-[#162242]">
+                <Settings2 size={14} className="text-[#c8aefc]" />
+                <span className="max-w-[80px] truncate">
+                  {availableProfiles.find(p => p.id === selectedProfileId)?.displayName || "AI Voice"}
+                </span>
+              </div>
+            </div>
+          </div>
 
           <div className={cn("flex items-center gap-3", speaker.align === "right" && "flex-row-reverse")}>
             <div className="flex h-12 w-12 items-center justify-center rounded-2xl text-lg" style={{ backgroundColor: `${speaker.accentColor}24` }}>
@@ -263,6 +299,26 @@ export function ConversationPage() {
   const [error, setError] = useState("")
   const [notice, setNotice] = useState("")
   const [persistenceState, setPersistenceState] = useState<"unknown" | "saved" | "guest">("unknown")
+  const [availableProfiles, setAvailableProfiles] = useState<SpeakerProfile[]>([])
+  const [selectedProfiles, setSelectedProfiles] = useState<Record<SpeakerKey, string>>({
+    person1: "default",
+    person2: "default",
+  })
+
+  useEffect(() => {
+    async function fetchProfiles() {
+      try {
+        const response = await fetch("/api/speaker-profiles")
+        if (response.ok) {
+          const data = await response.json()
+          setAvailableProfiles(data)
+        }
+      } catch (err) {
+        console.error("Failed to fetch speaker profiles", err)
+      }
+    }
+    fetchProfiles()
+  }, [])
 
   const activeSpeaker = useMemo(
     () => speakers.find((speaker) => speaker.key === activeSpeakerKey) || speakers[0],
@@ -330,6 +386,13 @@ export function ConversationPage() {
       const formData = new FormData()
       formData.append("sourceLang", activeSpeaker.sourceLanguage)
       formData.append("targetLang", activeSpeaker.targetLanguage)
+
+      // Send the ElevenLabs Voice ID if a profile is selected
+      const selectedId = selectedProfiles[activeSpeakerKey]
+      const profile = availableProfiles.find(p => p.id === selectedId)
+      if (profile?.elevenLabsVoiceId) {
+        formData.append("voiceId", profile.elevenLabsVoiceId)
+      }
 
       if (audioBlob) {
         formData.append("audio", audioBlob, "turn.webm")
@@ -408,6 +471,9 @@ export function ConversationPage() {
                 isRecording={isRecording}
                 isSubmitting={isSubmitting}
                 onActivate={() => setActiveSpeakerKey(speakers[0].key)}
+                availableProfiles={availableProfiles}
+                selectedProfileId={selectedProfiles[speakers[0].key]}
+                onProfileChange={(id) => setSelectedProfiles(prev => ({ ...prev, [speakers[0].key]: id }))}
               />
             </div>
 
@@ -451,6 +517,9 @@ export function ConversationPage() {
                 isRecording={isRecording}
                 isSubmitting={isSubmitting}
                 onActivate={() => setActiveSpeakerKey(speakers[1].key)}
+                availableProfiles={availableProfiles}
+                selectedProfileId={selectedProfiles[speakers[1].key]}
+                onProfileChange={(id) => setSelectedProfiles(prev => ({ ...prev, [speakers[1].key]: id }))}
               />
             </div>
           </div>
@@ -466,7 +535,7 @@ export function ConversationPage() {
                 value={draftText}
                 onChange={(event) => setDraftText(event.target.value)}
                 placeholder={`Type what ${activeSpeaker.name.toLowerCase()} wants to say...`}
-                className="min-h-[84px] flex-1 resize-none rounded-[1.4rem] border border-[#d0bcff]/10 bg-[#091127] px-4 py-3 text-sm text-[#eef1ff] outline-none placeholder:text-[#69789e] sm:min-h-[90px]"
+                className="min-h-[84px] flex-1 resize-none rounded-[1.4rem] border border-[#d0bcff]/10 bg-[#091127] px-4 py-3 text-sm text-[#eef1ff] outline-none placeholder:text-[#6f7fa8] sm:min-h-[90px]"
               />
               <button
                 type="button"
