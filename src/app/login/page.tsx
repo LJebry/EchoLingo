@@ -77,12 +77,7 @@ export default async function LoginPage({ searchParams }: LoginPageProps) {
               </p>
             </div>
 
-            <div className="mt-7 space-y-3">
-              <FauxInput icon={<Mail className="h-4 w-4" />} label="Email address" />
-              <FauxInput icon={<Lock className="h-4 w-4" />} label="Password" />
-            </div>
-
-            <div className="mt-6">
+            <div className="mt-7 space-y-6">
               {isGoogleAuthConfigured ? (
                 <GoogleSignInButton className="w-full" redirectTo={redirectTo} />
               ) : (
@@ -96,16 +91,13 @@ export default async function LoginPage({ searchParams }: LoginPageProps) {
               )}
             </div>
 
-            <p className="mt-4 text-center text-xs uppercase tracking-[0.2em] text-[#6f7da1]">
-              Or connect with Google
-            </p>
-
-            <div className="mt-6 flex items-center justify-between text-xs text-[#8b9aba]">
-              <Link href="/" className="hover:text-[#d6caff]">
-                Forgot password?
-              </Link>
-              <span>Google sign-in only</span>
+            <div className="mt-8 flex items-center justify-center text-xs text-[#8b9aba]">
+              <span className="flex items-center gap-1.5 rounded-full bg-white/5 px-3 py-1.5 border border-white/5">
+                <Lock size={12} className="text-[#c8aefc]" />
+                Secure Google Authentication Only
+              </span>
             </div>
+
           </section>
         </div>
       </div>
