@@ -2,10 +2,13 @@ import { PrismaClient } from '@prisma/client'
 import { withAccelerate } from '@prisma/extension-accelerate'
 
 const prismaClientSingleton = () => {
-  const url = process.env.DATABASE_URL || 'prisma://accelerate.prisma-data.net/?api_key=placeholder'
+  const url = process.env.DATABASE_URL
+
+  if (!url) {
+    throw new Error("RUNTIME ERROR: DATABASE_URL is not defined in the environment. Check Vercel settings.")
+  }
 
   // In Prisma 7, Accelerate connections MUST be passed via the 'accelerateUrl' property.
-  // Direct connections would use the 'adapter' property.
   return new PrismaClient({
     accelerateUrl: url,
   } as any).$extends(withAccelerate())
