@@ -45,4 +45,4 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
   },
   // Enable debug logs in Vercel to catch "Server Error" details
   debug: true, 
-})
+}) // Deployment trigger v1.0.1
