@@ -11,6 +11,7 @@ import {
   ChevronDown
 } from "lucide-react"
 import { cn } from "@/lib/utils"
+import { ThemeIconToggle } from "@/components/theme/ThemeIconToggle"
 
 export function UserProfile() {
   const { data: session, status } = useSession()
@@ -34,19 +35,24 @@ export function UserProfile() {
 
   if (!session) {
     return (
-      <Link
-        href="/login"
-        className="inline-flex h-10 items-center justify-center rounded-full border border-white/10 bg-[#162242] px-5 text-sm font-medium text-[#eef1ff] transition-all hover:bg-[#1f2b47] active:scale-95"
-      >
-        Log In
-      </Link>
+      <div className="flex items-center gap-2">
+        <ThemeIconToggle />
+        <Link
+          href="/login"
+          className="inline-flex h-10 items-center justify-center rounded-full border border-white/10 bg-[#162242] px-5 text-sm font-medium text-[#eef1ff] transition-all hover:bg-[#1f2b47] active:scale-95"
+        >
+          Log In
+        </Link>
+      </div>
     )
   }
 
   const user = session.user
 
   return (
-    <div className="relative" ref={dropdownRef}>
+    <div className="flex items-center gap-2">
+      <ThemeIconToggle />
+      <div className="relative" ref={dropdownRef}>
       <button
         onClick={() => setIsOpen(!isOpen)}
         className="flex items-center gap-2 rounded-full border border-white/10 bg-[#131d39] p-1 pr-3 transition-all hover:bg-[#1f2b47]"
@@ -102,6 +108,7 @@ export function UserProfile() {
           </div>
         </div>
       )}
+      </div>
     </div>
   )
 }

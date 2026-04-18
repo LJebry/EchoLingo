@@ -4,6 +4,7 @@ import Image from "next/image"
 import { MobileHeader } from "@/components/layout/MobileHeader"
 import { Button } from "@/components/ui/Button"
 import { LogOut, Shield, User } from "lucide-react"
+import { ThemeToggleCard } from "@/components/theme/ThemeToggleCard"
 
 export default async function SettingsPage() {
   const session = await auth()
@@ -30,6 +31,8 @@ export default async function SettingsPage() {
       </div>
 
       <div className="space-y-4">
+        <ThemeToggleCard />
+
         <div className="p-4 rounded-2xl bg-[#131b2e] border border-[#b9c7df]/5 space-y-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
