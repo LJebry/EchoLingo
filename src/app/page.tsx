@@ -15,6 +15,7 @@ import {
   Settings2,
 } from "lucide-react"
 import { UserProfile } from "@/components/layout/UserProfile"
+import { cn } from "@/lib/utils"
 
 const MAX_CHARS = 5000
 const EMPTY_TRANSLATION = "Your translated text will appear here."
