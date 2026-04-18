@@ -21,7 +21,7 @@ export default async function HistoryPage() {
     redirect(`/login?redirectTo=${encodeURIComponent("/history")}`)
   }
 
-  const conversations = await getUserConversations(session.user.id)
+  const conversations = await getUserConversations(session.user.id) as any
 
   return (
     <div className="space-y-6 px-4 pb-28 pt-5">
