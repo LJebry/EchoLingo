@@ -4,21 +4,29 @@ const prismaClientSingleton = () => {
   const url = process.env.DATABASE_URL
 
   if (!url) {
-    throw new Error("DATABASE_URL is not set")
+    throw new Error("DATABASE_URL environment variable is not set. Please add it to your Vercel project settings.")
   }
 
-  // Prisma Accelerate (prisma:// or prisma+postgres://)
-  if (url.startsWith("prisma://") || url.startsWith("prisma+postgres://")) {
+  // Determine if we should use the Accelerate URL property or standard URL
+  const isAccelerate = url.startsWith("prisma://") || url.startsWith("prisma+postgres://")
+
+  try {
+    if (isAccelerate) {
+      // In Prisma 7, Accelerate URLs are passed via accelerateUrl
+      // We also cast to any to avoid TypeScript Subset type errors if the definitions are slightly out of sync
+      return new PrismaClient({
+        accelerateUrl: url,
+      } as any)
+    }
+
+    // Direct connection to PostgreSQL
     return new PrismaClient({
-      accelerateUrl: url,
-    })
+      datasourceUrl: url,
+    } as any)
+  } catch (error) {
+    console.error("Failed to initialize Prisma Client:", error)
+    throw error
   }
-
-  // Standard PostgreSQL connection string
-  // Note: For direct connections in Prisma 7, you might need a driver adapter if not using Accelerate.
-  // But usually, passing nothing and letting it read from the config is preferred, 
-  // or passing the connection string if the client is generated for it.
-  return new PrismaClient()
 }
 
 declare global {

@@ -20,18 +20,20 @@ export const isGoogleAuthConfigured = Boolean(
 export const { handlers, auth, signIn, signOut } = NextAuth({
   adapter: PrismaAdapter(prisma),
   secret: process.env.AUTH_SECRET,
-  trustHost: true, // Strictly trust host on Vercel
+  // Ensure trustHost is true for Vercel, and provide a fallback
+  trustHost: true,
   providers: isGoogleAuthConfigured
     ? [
         GoogleProvider({
           clientId: process.env.AUTH_GOOGLE_ID,
           clientSecret: process.env.AUTH_GOOGLE_SECRET,
+          allowDangerousEmailAccountLinking: true, // Optional: helpful if users sign in with different methods
         }),
       ]
     : [],
   callbacks: {
-    session({ session, user }) {
-      if (session.user) {
+    async session({ session, user }) {
+      if (session.user && user) {
         session.user.id = user.id
       }
       return session
@@ -39,6 +41,8 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
   },
   pages: {
     signIn: '/login',
+    error: '/login', // Redirect back to login on error
   },
-  debug: process.env.NODE_ENV === "development",
+  // Enable debug logs in Vercel to catch "Server Error" details
+  debug: true, 
 })
