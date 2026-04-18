@@ -1,5 +1,6 @@
 import "./globals.css";
 import { AppShell } from "@/components/layout/AppShell";
+import { SessionProvider } from "next-auth/react";
 
 export const metadata = {
   title: "EchoLingo",
@@ -20,7 +21,9 @@ export default function RootLayout({
         />
       </head>
       <body className="font-sans bg-[#040915] text-on-surface antialiased">
-        <AppShell>{children}</AppShell>
+        <SessionProvider>
+          <AppShell>{children}</AppShell>
+        </SessionProvider>
       </body>
     </html>
   );

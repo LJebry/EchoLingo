@@ -15,6 +15,7 @@ import {
   Volume2,
   Settings2,
 } from "lucide-react"
+import { UserProfile } from "@/components/layout/UserProfile"
 
 const MAX_CHARS = 5000
 const EMPTY_TRANSLATION = "Your translated text will appear here."
@@ -309,12 +310,7 @@ export default function Home() {
               </div>
             </div>
 
-            <Link
-              href="/login"
-              className="inline-flex items-center rounded-full border border-white/10 bg-[#162242] px-4 py-2 text-sm font-medium text-[#eef1ff]"
-            >
-              Log In
-            </Link>
+            <UserProfile />
           </div>
         </header>
 

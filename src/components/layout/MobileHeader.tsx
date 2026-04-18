@@ -1,5 +1,5 @@
-import Link from "next/link"
-import { Globe, User } from "lucide-react"
+import { Globe } from "lucide-react"
+import { UserProfile } from "./UserProfile"
 
 export function MobileHeader({
   title,
@@ -16,14 +16,7 @@ export function MobileHeader({
           <span className="text-sm font-semibold tracking-tight">EchoLingo</span>
         </div>
 
-        {showProfile ? (
-          <Link
-            href="/settings"
-            className="flex h-10 w-10 items-center justify-center rounded-full border border-white/8 bg-[#131d39] text-[#d0bcff]"
-          >
-            <User size={18} />
-          </Link>
-        ) : null}
+        {showProfile ? <UserProfile /> : null}
       </div>
 
       <div className="space-y-1">

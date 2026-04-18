@@ -15,6 +15,7 @@ import {
 } from "lucide-react"
 import AudioRecorder from "@/components/AudioRecorder"
 import { cn } from "@/components/ui/Button"
+import { UserProfile } from "@/components/layout/UserProfile"
 
 type SpeakerKey = "person1" | "person2"
 
@@ -455,9 +456,12 @@ export function ConversationPage() {
             <h1 className="text-sm font-semibold tracking-tight">EchoLingo</h1>
           </div>
 
-          <div className="flex items-center gap-2 rounded-full border border-[#c8aefc]/15 bg-[#12203f]/80 px-3 py-2 text-xs text-[#d8def6]">
-            <ArrowRightLeft size={14} className="text-[#c8aefc]" />
-            {persistenceState === "saved" ? "Synced" : "Live"}
+          <div className="flex items-center gap-3">
+            <div className="flex items-center gap-2 rounded-full border border-[#c8aefc]/15 bg-[#12203f]/80 px-3 py-2 text-xs text-[#d8def6]">
+              <ArrowRightLeft size={14} className="text-[#c8aefc]" />
+              {persistenceState === "saved" ? "Synced" : "Live"}
+            </div>
+            <UserProfile />
           </div>
         </div>
 
