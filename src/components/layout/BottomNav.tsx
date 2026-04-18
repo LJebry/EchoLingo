@@ -29,8 +29,9 @@ export function BottomNav() {
               key={item.href}
               href={item.href}
               className={cn(
-                "flex flex-col items-center justify-center gap-1 rounded-[1.25rem] px-2 py-2.5 text-[#8ea0c9] transition-all active:scale-95",
-                isActive && "bg-[#202c52] text-[#d9cbff]"
+                "flex flex-col items-center justify-center gap-1 rounded-[1.25rem] px-2 py-2.5 text-[#8ea0c9] transition-all duration-200 active:scale-95",
+                "hover:bg-[rgba(164,92,255,0.14)] hover:text-[#e2d2ff] hover:shadow-[0_0_0_1px_rgba(164,92,255,0.22),0_0_24px_rgba(164,92,255,0.14)]",
+                isActive && "bg-[#202c52] text-[#d9cbff] shadow-[0_0_0_1px_rgba(164,92,255,0.18)]"
               )}
             >
               <span
