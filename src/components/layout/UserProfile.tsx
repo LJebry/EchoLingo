@@ -15,6 +15,7 @@ import { cn } from "@/lib/utils"
 export function UserProfile() {
   const { data: session, status } = useSession()
   const [isOpen, setIsOpen] = useState(false)
+  const [imgError, setImgError] = useState(false)
   const dropdownRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
@@ -50,9 +51,15 @@ export function UserProfile() {
         onClick={() => setIsOpen(!isOpen)}
         className="flex items-center gap-2 rounded-full border border-white/10 bg-[#131d39] p-1 pr-3 transition-all hover:bg-[#1f2b47]"
       >
-        <div className="flex h-8 w-8 items-center justify-center overflow-hidden rounded-full bg-primary/20 text-primary">
-          {user?.image ? (
-            <img src={user.image} alt={user.name || "User"} className="h-full w-full object-cover" />
+        <div className="flex h-8 w-8 items-center justify-center overflow-hidden rounded-full bg-[#201c47] text-[#c7afff] shadow-inner">
+          {user?.image && !imgError ? (
+            <img 
+              src={user.image} 
+              alt={user.name || "User"} 
+              className="h-full w-full object-cover"
+              onError={() => setImgError(true)}
+              referrerPolicy="no-referrer"
+            />
           ) : (
             <User size={16} />
           )}
