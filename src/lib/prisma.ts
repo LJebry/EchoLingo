@@ -7,25 +7,18 @@ const prismaClientSingleton = () => {
     throw new Error("DATABASE_URL is not set")
   }
 
-  // Prisma Accelerate URLs (prisma+postgres:// or prisma://)
+  // Prisma Accelerate (prisma:// or prisma+postgres://)
   if (url.startsWith("prisma://") || url.startsWith("prisma+postgres://")) {
     return new PrismaClient({
-      datasources: {
-        db: {
-          url: url,
-        },
-      },
+      accelerateUrl: url,
     })
   }
 
-  // Standard PostgreSQL URL
-  return new PrismaClient({
-    datasources: {
-      db: {
-        url: url,
-      },
-    },
-  })
+  // Standard PostgreSQL connection string
+  // Note: For direct connections in Prisma 7, you might need a driver adapter if not using Accelerate.
+  // But usually, passing nothing and letting it read from the config is preferred, 
+  // or passing the connection string if the client is generated for it.
+  return new PrismaClient()
 }
 
 declare global {
