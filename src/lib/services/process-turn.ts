@@ -38,8 +38,33 @@ export async function processTurn({
   let audioUrl: string | null = null
   let audioError: string | null = null
 
+  // --- SECURITY LAYER: Voice Ownership Validation ---
+  let validatedVoiceId: string | undefined = undefined
+
+  if (voiceId) {
+    if (userId) {
+      // Verify the voice belongs to this specific user in our DB
+      const profile = await prisma.speakerProfile.findFirst({
+        where: {
+          userId,
+          elevenLabsVoiceId: voiceId,
+        },
+      })
+      
+      if (profile) {
+        validatedVoiceId = voiceId
+      } else {
+        console.warn(`Unauthorized voice use attempt by user ${userId} for voice ${voiceId}`)
+        // Fallback to default (validatedVoiceId stays undefined)
+      }
+    } else {
+      // Guest users are NEVER allowed to use custom voice IDs
+      console.warn(`Guest user attempted to use custom voice ${voiceId}`)
+    }
+  }
+
   try {
-    audioUrl = await synthesizeSpeech(translatedText, voiceId)
+    audioUrl = await synthesizeSpeech(translatedText, validatedVoiceId)
   } catch (error) {
     audioError =
       error instanceof Error ? error.message : "Speech synthesis is unavailable right now."
