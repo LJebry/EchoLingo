@@ -11,7 +11,6 @@ import {
   Loader2,
   Mic,
   Send,
-  Share2,
   Volume2,
 } from "lucide-react"
 
@@ -100,20 +99,6 @@ export default function Home() {
     await navigator.clipboard.writeText(translatedText)
     setCopied(true)
     window.setTimeout(() => setCopied(false), 1200)
-  }
-
-  const shareTranslation = async () => {
-    if (!translatedText || translatedText === EMPTY_TRANSLATION) return
-
-    if (navigator.share) {
-      await navigator.share({
-        title: "EchoLingo Translation",
-        text: translatedText,
-      })
-      return
-    }
-
-    await navigator.clipboard.writeText(translatedText)
   }
 
   const pasteIntoInput = async () => {
@@ -393,15 +378,6 @@ export default function Home() {
                   aria-label="Copy translated text"
                 >
                   {copied ? <Check size={16} /> : <Copy size={16} />}
-                </button>
-
-                <button
-                  type="button"
-                  onClick={shareTranslation}
-                  className="flex h-10 w-10 items-center justify-center rounded-full bg-[#202b4d] text-[#d7def7]"
-                  aria-label="Share translated text"
-                >
-                  <Share2 size={16} />
                 </button>
               </div>
             </div>
