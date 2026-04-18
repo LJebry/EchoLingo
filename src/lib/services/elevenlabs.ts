@@ -1,4 +1,4 @@
-import elevenlabs from "@/lib/elevenlabs"
+import { elevenlabs } from "@/lib/elevenlabs"
 import { Readable } from "node:stream"
 
 const DEFAULT_TTS_MODEL = "eleven_multilingual_v2"
@@ -118,27 +118,42 @@ export const synthesizeSpeech = async (text: string, voiceId?: string): Promise<
 }
 
 /**
- * Instant Voice Cloning
+ * Instant Voice Cloning using Direct REST API
  */
 export const cloneVoice = async (audioBlob: Blob, name: string): Promise<string> => {
-  if (!process.env.ELEVENLABS_API_KEY) {
-    throw new Error("ElevenLabs API key is not configured.")
+  const apiKey = process.env.ELEVENLABS_API_KEY;
+  if (!apiKey) {
+    throw new Error("ElevenLabs API key is not configured.");
   }
 
   try {
-    const buffer = Buffer.from(await audioBlob.arrayBuffer());
-    const stream = Readable.from(buffer);
+    const formData = new FormData();
+    formData.append("name", name);
+    formData.append("description", "Custom voice profile created for EchoLingo.");
+    
+    // Convert Blob to File for the multipart request
+    const file = new File([audioBlob], "sample.webm", { type: "audio/webm" });
+    formData.append("files", file);
 
-    const voice = await elevenlabs.voices.add({
-      name,
-      files: [stream],
-      description: `Custom voice profile created for EchoLingo.`,
+    const response = await fetch("https://api.elevenlabs.io/v1/voices/add", {
+      method: "POST",
+      headers: {
+        "xi-api-key": apiKey,
+      },
+      body: formData,
     });
 
-    return voice.voice_id;
+    const data = await response.json();
+
+    if (!response.ok) {
+      console.error("ElevenLabs API Error:", data);
+      throw new Error(data.detail?.message || "Failed to clone voice via ElevenLabs API");
+    }
+
+    return data.voice_id;
   } catch (error) {
     console.error("ElevenLabs Cloning Error:", error);
-    throw new Error(getElevenLabsErrorMessage(error));
+    throw error;
   }
 }
 
