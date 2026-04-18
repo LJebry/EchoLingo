@@ -4,7 +4,6 @@ import { useState, useRef, useEffect } from "react"
 import { useSession, signOut } from "next-auth/react"
 import Link from "next/link"
 import { 
-  User, 
   LogOut, 
   LayoutDashboard, 
   Settings,
@@ -51,7 +50,7 @@ export function UserProfile() {
         onClick={() => setIsOpen(!isOpen)}
         className="flex items-center gap-2 rounded-full border border-white/10 bg-[#131d39] p-1 pr-3 transition-all hover:bg-[#1f2b47]"
       >
-        <div className="flex h-8 w-8 items-center justify-center overflow-hidden rounded-full bg-[#201c47] text-[#c7afff] shadow-inner">
+        <div className="flex h-8 w-8 items-center justify-center overflow-hidden rounded-full bg-[linear-gradient(180deg,#2c3f70_0%,#1b2447_100%)] text-[#c7afff] shadow-inner">
           {user?.image && !imgError ? (
             <img 
               src={user.image} 
@@ -61,7 +60,7 @@ export function UserProfile() {
               referrerPolicy="no-referrer"
             />
           ) : (
-            <User size={16} />
+            <span className="text-sm leading-none">🧑</span>
           )}
         </div>
         <ChevronDown size={14} className={cn("text-[#7e8cb1] transition-transform", isOpen && "rotate-180")} />
