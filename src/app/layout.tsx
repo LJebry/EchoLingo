@@ -17,7 +17,11 @@ export default function RootLayout({
       <head>
         <link
           rel="stylesheet"
-          href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=block"
+          href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap"
+        />
+        <link
+          href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;700;800&display=swap"
+          rel="stylesheet"
         />
       </head>
       <body className="font-sans bg-[#040915] text-on-surface antialiased">

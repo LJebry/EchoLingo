@@ -91,7 +91,7 @@ export default function NewVoicePage() {
            Universal Multilingual Voice
         </div>
         <p className="mt-6 max-w-[20rem] text-[#92a2c5] leading-relaxed">
-          Your custom voice profile <b>"{displayName}"</b> is now active. It will be used to speak your translations in <b>any language</b> with your natural tone.
+          Your custom voice profile <b>&quot;{displayName}&quot;</b> is now active. It will be used to speak your translations in <b>any language</b> with your natural tone.
         </p>
         <button
           onClick={() => router.push("/voices")}
