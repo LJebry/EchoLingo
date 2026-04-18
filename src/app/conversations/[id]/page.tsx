@@ -17,7 +17,7 @@ export default async function ConversationDetailPage({ params }: { params: { id:
   const session = await auth()
   if (!session?.user?.id) redirect(`/login?redirectTo=${encodeURIComponent(`/conversations/${params.id}`)}`)
 
-  const conversation = await getConversationWithTurns(params.id, session.user.id)
+  const conversation = await getConversationWithTurns(params.id, session.user.id) as any
   if (!conversation) redirect("/history")
 
   return (
