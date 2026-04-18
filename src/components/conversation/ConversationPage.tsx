@@ -222,7 +222,14 @@ function SpeakerPanel({
 
         <div className={cn("mt-10 rounded-[1.75rem] border p-5 lg:flex-1", speaker.cardClassName, textAlignClassName)}>
           <p className="text-sm uppercase tracking-[0.2em] text-[#7f91be]">{content.heading}</p>
-          <p className="mt-3 min-h-[5.5rem] text-[1.55rem] leading-tight text-[#eef1ff] lg:min-h-[11rem] lg:text-[1.85rem]">{content.body}</p>
+          <p className={cn(
+            "mt-3 min-h-[5.5rem] leading-tight lg:min-h-[11rem]",
+            content.statusVariant === "waiting"
+              ? "text-base text-[#6f7fa8] leading-relaxed"
+              : "text-[1.55rem] text-[#eef1ff] lg:text-[1.85rem]"
+          )}>
+            {content.body}
+          </p>
           <div className={cn("mt-6 flex items-end gap-2", justifyClassName)}>
             <div
               className={cn(

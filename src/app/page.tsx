@@ -404,7 +404,12 @@ export default function Home() {
               Translation
             </p>
             <div className="mt-3 flex-1">
-              <p className="min-h-[8rem] text-[1.65rem] leading-tight text-[#eef1ff] lg:min-h-[22rem]">
+              <p className={cn(
+                "min-h-[8rem] leading-tight lg:min-h-[22rem]",
+                translatedText === EMPTY_TRANSLATION 
+                  ? "text-base text-[#6f7fa8] leading-relaxed" 
+                  : "text-[1.65rem] text-[#eef1ff]"
+              )}>
                 {translatedText}
               </p>
             </div>
