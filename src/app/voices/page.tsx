@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react"
 import { useRouter } from "next/navigation"
 import Link from "next/link"
-import { Mic2, Plus, Trash2, Loader2, Info } from "lucide-react"
+import { Mic2, Plus, Trash2, Loader2, Info, Check } from "lucide-react"
 import { MobileHeader } from "@/components/layout/MobileHeader"
 
 type SpeakerProfileItem = {
