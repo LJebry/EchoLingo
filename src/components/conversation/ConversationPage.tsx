@@ -147,7 +147,7 @@ function getPanelCopy(turns: ConversationTurn[], speaker: SpeakerConfig): PanelC
 
   return {
     heading: "Ready",
-    body: `Tap ${speaker.name.toLowerCase()}'s mic or type a line to start.`,
+    body: speaker.key === "person1" ? "Tap the mic or type a line to start." : "The translated reply appears here.",
     status: "Waiting",
     audioUrl: null,
     statusVariant: "waiting",
@@ -184,8 +184,8 @@ function SpeakerPanel({
   onMicToggle: () => void
 }) {
   const wrapperClassName = speaker.upsideDown
-    ? "flex h-full min-h-0 flex-col justify-between rotate-180 lg:rotate-0"
-    : "flex h-full min-h-0 flex-col justify-between"
+    ? "flex h-full min-h-0 w-full flex-col rotate-180 lg:rotate-0"
+    : "flex h-full min-h-0 w-full flex-col"
   const textAlignClassName = speaker.align === "right" ? "text-right" : "text-left"
   const justifyClassName = speaker.align === "right" ? "justify-end" : "justify-start"
   const controlsRowClassName = speaker.align === "right" ? "justify-end" : "justify-start"
@@ -311,7 +311,7 @@ function SpeakerPanel({
   return (
     <section
       className={cn(
-        "relative flex min-h-0 flex-1 overflow-hidden rounded-[2rem] border px-3 pb-3 pt-3 shadow-[0_24px_60px_rgba(0,0,0,0.32)] sm:px-5 sm:pb-4 sm:pt-4 lg:min-h-[32rem] lg:px-6 lg:pt-6",
+        "relative flex h-full min-h-0 w-full flex-1 overflow-hidden rounded-[2rem] border px-3 pb-3 pt-3 shadow-[0_24px_60px_rgba(0,0,0,0.32)] sm:px-5 sm:pb-4 sm:pt-4 lg:px-6 lg:pt-6",
         speaker.borderColor,
         speaker.panelClassName,
         isActive && "ring-2 ring-primary/20"
@@ -389,15 +389,15 @@ function SpeakerPanel({
 
         <div
           className={cn(
-            "mt-3 flex min-h-0 flex-1 flex-col justify-center rounded-[1.75rem] border p-3 sm:mt-4 sm:p-5",
+            "mt-3 flex min-h-0 flex-1 flex-col rounded-[1.75rem] border p-3 sm:mt-4 sm:p-5",
             speaker.cardClassName,
             textAlignClassName
           )}
         >
-          <div className="mx-auto flex w-full max-w-[30rem] min-h-0 flex-col">
-            <p className="text-[11px] uppercase tracking-[0.2em] text-[#7f91be] sm:text-sm">{content.heading}</p>
-            <div className="mt-2.5 h-[3.6rem] overflow-y-auto pr-1 sm:mt-3 sm:h-[5.8rem] lg:h-[10rem]">
-              <div className="min-h-full">
+          <div className="mx-auto flex h-full min-h-0 w-full flex-1 flex-col">
+            <p className="shrink-0 text-[11px] uppercase tracking-[0.2em] text-[#7f91be] sm:text-sm">{content.heading}</p>
+            <div className="mt-2.5 min-h-0 flex-1 overflow-y-auto pr-1">
+              <div className="min-h-full w-full">
                 <p className={cn(
                   "whitespace-pre-wrap break-words leading-tight",
                   content.statusVariant === "waiting"
@@ -408,7 +408,7 @@ function SpeakerPanel({
                 </p>
               </div>
             </div>
-            <div className={cn("mt-3 flex items-end gap-1.5 sm:mt-4 sm:gap-2", justifyClassName)}>
+            <div className={cn("mt-3 flex items-end gap-1.5 shrink-0 sm:mt-4 sm:gap-2", justifyClassName)}>
               {[speaker.wavePrimary, speaker.waveSecondary, speaker.wavePrimary, speaker.waveSecondary, speaker.wavePrimary].map(
                 (barColor, index) => (
                   <div
@@ -425,7 +425,7 @@ function SpeakerPanel({
           </div>
         </div>
 
-        <div className="mt-3 grid grid-cols-3 items-end gap-2 sm:mt-4 sm:gap-3">
+        <div className="mt-3 grid grid-cols-3 items-end gap-2 shrink-0 sm:mt-4 sm:gap-3">
           {footerItems.map((item) => (
             <div key={item.key} className={item.alignClassName}>
               {item.node}
@@ -456,6 +456,17 @@ export function ConversationPage() {
     initialSpeakerLanguages
   )
   const pendingSpeakerKeyRef = useRef<SpeakerKey | null>(null)
+  const textareaRef = useRef<HTMLTextAreaElement>(null)
+
+  // Auto-resize textarea as user types
+  useEffect(() => {
+    const textarea = textareaRef.current
+    if (textarea) {
+      textarea.style.height = "inherit" // Reset height to recalculate
+      const scrollHeight = textarea.scrollHeight
+      textarea.style.height = `${Math.max(48, Math.min(200, scrollHeight))}px`
+    }
+  }, [draftText])
 
   useEffect(() => {
     async function fetchProfiles() {
@@ -681,8 +692,8 @@ export function ConversationPage() {
         }
 
         return (
-          <main className="min-h-[100svh] bg-[#020b23] text-white">
-            <div className="relative min-h-[100svh] overflow-y-auto bg-[radial-gradient(circle_at_top,rgba(124,92,255,0.22),transparent_28%),linear-gradient(180deg,#09142f_0%,#050c1f_48%,#09142f_100%)]">
+          <main className="flex flex-col min-h-[100svh] bg-[#020b23] text-white">
+            <div className="relative flex flex-col flex-1 min-h-0 overflow-y-auto bg-[radial-gradient(circle_at_top,rgba(124,92,255,0.22),transparent_28%),linear-gradient(180deg,#09142f_0%,#050c1f_48%,#09142f_100%)]">
               <div className="flex shrink-0 items-center justify-between px-4 pt-4 md:px-6 lg:px-8 lg:pt-8">
                 <div className="flex items-center gap-2 text-[#c8aefc]">
                   <Globe size={18} />
@@ -698,10 +709,10 @@ export function ConversationPage() {
                 </div>
               </div>
 
-              <div className="relative flex flex-col px-4 pb-[6.75rem] pt-3 md:px-6 lg:px-8 lg:pb-28 lg:pt-6">
-                <div className="relative min-h-0 flex-1">
-                  <div className="grid grid-cols-1 gap-4 lg:h-[calc(100svh-18rem)] lg:grid-cols-2 lg:items-stretch lg:gap-6">
-                    <div className="order-1 lg:order-2 lg:col-start-2 lg:flex lg:flex-col">
+              <div className="relative flex flex-col flex-1 min-h-0 px-4 pt-3 md:px-6 lg:px-8 lg:pt-6">
+                <div className="flex-1 min-h-0 h-full w-full">
+                  <div className="grid h-full min-h-0 gap-4 grid-rows-[minmax(0,1fr)_minmax(0,1fr)] lg:grid-cols-2 lg:grid-rows-1 lg:items-stretch lg:gap-6">
+                    <div className="order-1 lg:order-2 lg:col-start-2 flex flex-col min-h-0">
                       <SpeakerPanel
                         speaker={speakers[0]}
                         content={panelCopy[speakers[0].key]}
@@ -721,7 +732,7 @@ export function ConversationPage() {
                       />
                     </div>
 
-                    <div className="order-2 lg:order-1 lg:col-start-1 lg:flex lg:flex-col">
+                    <div className="order-2 lg:order-1 lg:col-start-1 flex flex-col min-h-0">
                       <SpeakerPanel
                         speaker={speakers[1]}
                         content={panelCopy[speakers[1].key]}
@@ -743,7 +754,7 @@ export function ConversationPage() {
                   </div>
                 </div>
 
-                <div className="mt-4 rounded-[1.6rem] border border-[#b9c7df]/10 bg-[#0d1734]/88 p-3 shadow-[0_20px_40px_rgba(0,0,0,0.24)] lg:mx-auto lg:mt-6 lg:w-full lg:max-w-4xl lg:p-5">
+                <div className="shrink-0 mt-4 mb-[calc(6.75rem+env(safe-area-inset-bottom))] lg:mb-28 w-full rounded-[1.6rem] border border-[#b9c7df]/10 bg-[#0d1734]/88 p-4 shadow-[0_20px_40px_rgba(0,0,0,0.24)] lg:mx-auto lg:mt-6 lg:max-w-4xl lg:p-5">
                   <div className="flex w-full items-center justify-between gap-3 text-[10px] uppercase tracking-[0.18em] text-[#8ea0c9] sm:text-xs">
                     <span>{activeSpeaker.name}</span>
                     <span className="text-right">
@@ -753,10 +764,11 @@ export function ConversationPage() {
 
                   <div className="mt-3 flex w-full items-center gap-3">
                     <textarea
+                      ref={textareaRef}
                       value={draftText}
                       onChange={(event) => setDraftText(event.target.value)}
                       placeholder={`Type what ${activeSpeaker.name.toLowerCase()} wants to say...`}
-                      className="h-[96px] flex-1 resize-none overflow-y-auto rounded-[1.25rem] border border-[#d0bcff]/10 bg-[#091127] px-4 py-3 text-sm text-[#eef1ff] outline-none placeholder:text-[#6f7fa8] sm:h-[108px]"
+                      className="h-[48px] flex-1 resize-none overflow-y-auto rounded-[1.25rem] border border-[#d0bcff]/10 bg-[#091127] px-4 py-4 text-sm text-[#eef1ff] outline-none placeholder:text-[#6f7fa8] transition-all"
                     />
                     <button
                       type="button"
@@ -764,7 +776,7 @@ export function ConversationPage() {
                         void submitTurn({ transcriptText: draftText, speakerKey: activeSpeakerKey })
                       }}
                       disabled={isSubmitting || !draftText.trim()}
-                      className="flex h-[96px] w-12 shrink-0 items-center justify-center self-center rounded-[1.25rem] bg-[#1d2b55] text-[#d0bcff] disabled:opacity-40 sm:h-[108px] sm:w-14"
+                      className="flex h-[48px] w-12 shrink-0 items-center justify-center self-end rounded-[1.25rem] bg-[#1d2b55] text-[#d0bcff] disabled:opacity-40 sm:h-[54px] sm:w-14"
                       aria-label="Send typed turn"
                     >
                       <Send size={20} />
@@ -774,26 +786,25 @@ export function ConversationPage() {
                   <div className="mt-3 flex w-full items-center justify-between gap-3 text-sm">
                     <div className="flex items-center gap-2 text-[#9fb0d4]">
                       {isSubmitting ? (
-                        <Loader2 size={15} className="animate-spin" />
+                        <Loader2 size={13} className="animate-spin" />
                       ) : (
-                        <Mic size={15} />
+                        <Mic size={13} />
                       )}
-                      <span>
+                      <span className="text-[10px] uppercase tracking-wider opacity-60 truncate">
                         {recorderIsRecording
-                          ? `${speakers.find((speaker) => speaker.key === recordingSpeakerKey)?.name || "Speaker"} is recording...`
-                          : "Use either speaker mic for speech or type a message here."}
+                          ? "Listening..."
+                          : "Type or use speaker mics"}
                       </span>
                     </div>
 
                     {conversationId && (
-                      <Link href="/history" className="text-[#d0bcff]">
-                        View history
+                      <Link href="/history" className="text-[10px] font-bold uppercase tracking-widest text-[#d0bcff] hover:underline whitespace-nowrap">
+                        History
                       </Link>
                     )}
                   </div>
 
-                  {error && <p className="mt-3 text-sm text-red-300">{error}</p>}
-                  {!error && notice && <p className="mt-3 text-sm text-amber-200">{notice}</p>}
+                  {error && <p className="mt-2 text-center text-[11px] font-medium text-red-300">{error}</p>}
                 </div>
               </div>
             </div>
