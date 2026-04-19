@@ -312,12 +312,12 @@ export default function Home() {
           </div>
         </header>
 
-        <section className="mx-auto mt-5 grid grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)] items-center gap-2 lg:mt-6 lg:max-w-3xl">
-          <div className="min-w-0 rounded-full border border-outline-ghost/10 bg-surface-low px-2 py-2 shadow-[0_18px_35px_rgba(0,0,0,0.12)]">
+        <section className="mx-auto mt-5 grid w-full grid-cols-[minmax(0,1fr)_2.75rem_minmax(0,1fr)] items-center gap-1.5 sm:gap-2 lg:mt-6 lg:max-w-3xl">
+          <div className="min-w-0 overflow-hidden rounded-full border border-outline-ghost/10 bg-surface-low px-1.5 py-2 shadow-[0_18px_35px_rgba(0,0,0,0.12)] sm:px-2">
             <div className="relative">
               <select
                 ref={sourceSelectRef}
-                className="max-w-[110px] sm:max-w-none min-w-0 w-full appearance-none rounded-full bg-surface-high px-3 py-3 pr-11 text-sm font-medium text-on-surface outline-none sm:px-4 sm:pr-12"
+                className="min-w-0 w-full appearance-none truncate rounded-full bg-surface-high px-3 py-3 pr-9 text-sm font-medium text-on-surface outline-none sm:px-4 sm:pr-12"
                 value={sourceLanguage}
                 onChange={(event) => setSourceLanguage(event.target.value)}
                 aria-label="Source language"
@@ -331,7 +331,7 @@ export default function Home() {
               <button
                 type="button"
                 onClick={() => openLanguagePicker(sourceSelectRef)}
-                className="absolute right-1.5 top-1/2 flex h-8 w-8 -translate-y-1/2 items-center justify-center rounded-full text-support transition-colors hover:bg-pulse/10 hover:text-pulse"
+                className="absolute right-1 top-1/2 flex h-8 w-8 -translate-y-1/2 items-center justify-center rounded-full text-support transition-colors hover:bg-pulse/10 hover:text-pulse sm:right-1.5"
                 aria-label="Open source language options"
               >
                 <ChevronDown size={16} />
@@ -348,11 +348,11 @@ export default function Home() {
             <ArrowRightLeft size={18} />
           </button>
 
-          <div className="min-w-0 rounded-full border border-outline-ghost/10 bg-surface-low px-2 py-2 shadow-[0_18px_35px_rgba(0,0,0,0.12)]">
+          <div className="min-w-0 overflow-hidden rounded-full border border-outline-ghost/10 bg-surface-low px-1.5 py-2 shadow-[0_18px_35px_rgba(0,0,0,0.12)] sm:px-2">
             <div className="relative">
               <select
                 ref={targetSelectRef}
-                className="min-w-0 w-full appearance-none rounded-full bg-surface-high px-4 py-3 pr-12 text-sm font-medium text-on-surface outline-none"
+                className="min-w-0 w-full appearance-none truncate rounded-full bg-surface-high px-3 py-3 pr-9 text-sm font-medium text-on-surface outline-none sm:px-4 sm:pr-12"
                 value={targetLanguage}
                 onChange={(event) => setTargetLanguage(event.target.value)}
                 aria-label="Target language"
@@ -366,7 +366,7 @@ export default function Home() {
               <button
                 type="button"
                 onClick={() => openLanguagePicker(targetSelectRef)}
-                className="absolute right-1.5 top-1/2 flex h-8 w-8 -translate-y-1/2 items-center justify-center rounded-full text-support transition-colors hover:bg-pulse/10 hover:text-pulse"
+                className="absolute right-1 top-1/2 flex h-8 w-8 -translate-y-1/2 items-center justify-center rounded-full text-support transition-colors hover:bg-pulse/10 hover:text-pulse sm:right-1.5"
                 aria-label="Open target language options"
               >
                 <ChevronDown size={16} />
