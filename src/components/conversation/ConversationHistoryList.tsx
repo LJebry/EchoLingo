@@ -89,7 +89,7 @@ export function ConversationHistoryList({ conversations }: { conversations: Conv
                   void deleteConversation(conversation)
                 }}
                 disabled={isDeleting}
-                className="flex h-10 w-10 items-center justify-center rounded-xl border border-red-300/10 bg-red-950/20 text-red-200 transition-colors hover:bg-red-900/30 disabled:cursor-wait disabled:opacity-60"
+                className="flex h-10 w-10 items-center justify-center rounded-xl border border-black/10 bg-black text-white transition-colors hover:bg-red-600 hover:text-white disabled:cursor-wait disabled:opacity-60 dark:border-white/10 dark:bg-white dark:text-black dark:hover:bg-red-500 dark:hover:text-white"
                 aria-label={`Delete ${conversation.title}`}
               >
                 {isDeleting ? <Loader2 size={16} className="animate-spin" /> : <Trash2 size={16} />}

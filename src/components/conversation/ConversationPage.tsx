@@ -199,18 +199,14 @@ function SpeakerPanel({
 
   const statusPill = (
     <div
-      className="inline-flex max-w-[8.25rem] items-center gap-1.5 rounded-full px-2.5 py-1.5 text-[11px] text-[#d7def7] shadow-[0_8px_22px_rgba(0,0,0,0.18)] sm:max-w-[8.75rem] sm:gap-2 sm:px-3 sm:py-2 sm:text-xs"
-      style={{
-        backgroundColor: speaker.key === "person1" ? "#202d54" : "#173343",
-        color: speaker.key === "person1" ? "#d7def7" : "#d6fff0",
-      }}
+      className="inline-flex max-w-[8.25rem] items-center gap-1.5 rounded-full bg-surface-high px-2.5 py-1.5 text-[11px] text-on-surface shadow-[0_8px_22px_rgba(0,0,0,0.14)] sm:max-w-[8.75rem] sm:gap-2 sm:px-3 sm:py-2 sm:text-xs"
     >
       {content.statusVariant === "saved" ? (
         <Check size={13} />
       ) : content.statusVariant === "audio" ? (
-        <Volume2 size={13} style={{ color: speaker.accentColor }} />
+        <Volume2 size={13} />
       ) : (
-        <Mic size={13} style={{ color: speaker.accentColor }} />
+        <Mic size={13} />
       )}
       <span className="truncate">{content.status}</span>
     </div>
@@ -222,14 +218,11 @@ function SpeakerPanel({
       onClick={onMicToggle}
       disabled={!isRecorderSupported || isSubmitting}
       className={cn(
-        "relative flex h-12 w-12 shrink-0 items-center justify-center rounded-full text-[#2e0b5a] shadow-[0_12px_30px_rgba(164,92,255,0.45)] transition-transform disabled:opacity-50 sm:h-14 sm:w-14 lg:h-16 lg:w-16",
-        isRecording
-          ? "bg-[linear-gradient(180deg,#f0d5ff_0%,#be7cff_100%)] scale-105"
-          : "bg-[linear-gradient(180deg,#d8b6ff_0%,#a45cff_100%)]"
+        "relative flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-pulse text-on-pulse shadow-[0_0_30px_rgba(var(--color-pulse),0.3)] transition-transform disabled:opacity-50 sm:h-14 sm:w-14 lg:h-16 lg:w-16",
+        isRecording && "scale-105 shadow-[0_0_34px_rgba(var(--color-pulse),0.48)]"
       )}
       aria-label={isRecording ? `Stop recording ${speaker.name}` : `Start recording ${speaker.name}`}
     >
-      <div className="absolute inset-0 rounded-full bg-[radial-gradient(circle,rgba(181,137,255,0.28)_0%,rgba(181,137,255,0.08)_48%,transparent_72%)]" />
       <div className="relative z-10">
         {isSubmitting && isActive ? (
           <Loader2 size={18} className="animate-spin sm:h-5 sm:w-5 lg:h-6 lg:w-6" strokeWidth={2.6} />
@@ -250,7 +243,7 @@ function SpeakerPanel({
               type="button"
               onClick={() => playAudio(content.audioUrl)}
               disabled={!content.audioUrl}
-              className="inline-flex h-10 w-10 items-center justify-center rounded-full bg-[#101936] text-[#d7def7] shadow-[0_8px_22px_rgba(0,0,0,0.22)] transition-colors disabled:cursor-default disabled:opacity-50 sm:h-11 sm:w-11"
+              className="inline-flex h-10 w-10 items-center justify-center rounded-full bg-surface-high text-on-surface shadow-[0_8px_22px_rgba(0,0,0,0.14)] transition-colors disabled:cursor-default disabled:opacity-50 sm:h-11 sm:w-11"
               aria-label={`Play translated audio for ${speaker.name}`}
             >
               {isSubmitting && isActive ? (
@@ -258,7 +251,7 @@ function SpeakerPanel({
               ) : content.statusVariant === "saved" ? (
                 <Check size={16} />
               ) : (
-                <Volume2 size={16} style={{ color: speaker.accentColor }} />
+                <Volume2 size={16} />
               )}
             </button>
           ),
@@ -293,7 +286,7 @@ function SpeakerPanel({
               type="button"
               onClick={() => playAudio(content.audioUrl)}
               disabled={!content.audioUrl}
-              className="inline-flex h-10 w-10 items-center justify-center rounded-full bg-[#101936] text-[#d7def7] shadow-[0_8px_22px_rgba(0,0,0,0.22)] transition-colors disabled:cursor-default disabled:opacity-50 sm:h-11 sm:w-11"
+              className="inline-flex h-10 w-10 items-center justify-center rounded-full bg-surface-high text-on-surface shadow-[0_8px_22px_rgba(0,0,0,0.14)] transition-colors disabled:cursor-default disabled:opacity-50 sm:h-11 sm:w-11"
               aria-label={`Play translated audio for ${speaker.name}`}
             >
               {isSubmitting && isActive ? (
@@ -301,7 +294,7 @@ function SpeakerPanel({
               ) : content.statusVariant === "saved" ? (
                 <Check size={16} />
               ) : (
-                <Volume2 size={16} style={{ color: speaker.accentColor }} />
+                <Volume2 size={16} />
               )}
             </button>
           ),
@@ -773,7 +766,7 @@ export function ConversationPage() {
                         void submitTurn({ transcriptText: draftText, speakerKey: activeSpeakerKey })
                       }}
                       disabled={isSubmitting || !draftText.trim()}
-                      className="flex h-[48px] w-12 shrink-0 items-center justify-center self-end rounded-[1.25rem] bg-surface-high text-pulse disabled:opacity-40 sm:h-[54px] sm:w-14"
+                      className="flex h-[48px] w-12 shrink-0 items-center justify-center self-end rounded-[1.25rem] bg-pulse text-on-pulse disabled:opacity-40 sm:h-[54px] sm:w-14"
                       aria-label="Send typed turn"
                     >
                       <Send size={20} />

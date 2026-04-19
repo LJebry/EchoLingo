@@ -71,16 +71,16 @@ export default function VoicesPage() {
       </p>
 
       <Link href="/voices/new" className="block group">
-        <section className="rounded-[1.9rem] bg-[linear-gradient(135deg,rgba(var(--color-pulse),0.78)_0%,rgba(var(--color-pulse),0.62)_45%,rgba(var(--color-accent),0.68)_100%)] p-6 text-on-pulse shadow-[0_18px_35px_rgba(123,92,255,0.24)] transition-all hover:scale-[1.01] active:scale-[0.99]">
+        <section className="rounded-[1.9rem] bg-pulse p-6 text-on-pulse shadow-[0_18px_35px_rgba(var(--color-pulse),0.24)] transition-all hover:scale-[1.01] active:scale-[0.99]">
           <div className="flex items-start justify-between gap-4">
             <div className="space-y-2">
               <p className="text-2xl font-bold leading-tight tracking-tight">Train Universal Voice</p>
-              <p className="max-w-[15rem] text-sm font-medium leading-relaxed opacity-80">
+              <p className="max-w-[15rem] text-sm font-medium leading-relaxed text-on-pulse/90">
                 Create a personal acoustic clone using a guided multilingual sample.
               </p>
             </div>
 
-            <div className="flex h-14 w-14 items-center justify-center rounded-full bg-on-pulse/20 text-on-pulse shadow-inner">
+            <div className="flex h-14 w-14 items-center justify-center rounded-full bg-on-pulse/15 text-on-pulse shadow-inner">
               <Plus size={28} strokeWidth={3} />
             </div>
           </div>
