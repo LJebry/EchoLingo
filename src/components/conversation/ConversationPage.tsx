@@ -699,9 +699,9 @@ export function ConversationPage() {
               </div>
 
               <div className="relative flex flex-col px-4 pb-[6.75rem] pt-3 md:px-6 lg:px-8 lg:pb-28 lg:pt-6">
-                <div className="relative h-[calc(100svh-13rem)] shrink-0 lg:h-[calc(100svh-15rem)]">
-                  <div className="grid h-full min-h-0 grid-rows-2 gap-3 lg:grid-cols-2 lg:grid-rows-1 lg:items-stretch lg:gap-6">
-                    <div className="order-1 lg:order-2 lg:col-start-2 lg:self-stretch">
+                <div className="relative min-h-0 flex-1">
+                  <div className="grid grid-cols-1 gap-4 lg:h-[calc(100svh-18rem)] lg:grid-cols-2 lg:items-stretch lg:gap-6">
+                    <div className="order-1 lg:order-2 lg:col-start-2 lg:flex lg:flex-col">
                       <SpeakerPanel
                         speaker={speakers[0]}
                         content={panelCopy[speakers[0].key]}
@@ -721,7 +721,7 @@ export function ConversationPage() {
                       />
                     </div>
 
-                    <div className="order-2 lg:order-1 lg:col-start-1 lg:self-stretch">
+                    <div className="order-2 lg:order-1 lg:col-start-1 lg:flex lg:flex-col">
                       <SpeakerPanel
                         speaker={speakers[1]}
                         content={panelCopy[speakers[1].key]}
@@ -744,14 +744,14 @@ export function ConversationPage() {
                 </div>
 
                 <div className="mt-4 rounded-[1.6rem] border border-[#b9c7df]/10 bg-[#0d1734]/88 p-3 shadow-[0_20px_40px_rgba(0,0,0,0.24)] lg:mx-auto lg:mt-6 lg:w-full lg:max-w-4xl lg:p-5">
-                  <div className="mx-auto flex w-full max-w-[29rem] items-center justify-between gap-3 text-[10px] uppercase tracking-[0.18em] text-[#8ea0c9] sm:max-w-[32rem] sm:text-xs lg:max-w-none">
+                  <div className="flex w-full items-center justify-between gap-3 text-[10px] uppercase tracking-[0.18em] text-[#8ea0c9] sm:text-xs">
                     <span>{activeSpeaker.name}</span>
                     <span className="text-right">
                       {activeSpeaker.sourceLanguage} to {activeSpeaker.targetLanguage}
                     </span>
                   </div>
 
-                  <div className="mx-auto mt-3 flex w-full max-w-[29rem] items-center gap-3 sm:max-w-[32rem] lg:max-w-none">
+                  <div className="mt-3 flex w-full items-center gap-3">
                     <textarea
                       value={draftText}
                       onChange={(event) => setDraftText(event.target.value)}
@@ -771,7 +771,7 @@ export function ConversationPage() {
                     </button>
                   </div>
 
-                  <div className="mx-auto mt-3 flex w-full max-w-[29rem] items-center justify-between gap-3 text-sm sm:max-w-[32rem] lg:max-w-none">
+                  <div className="mt-3 flex w-full items-center justify-between gap-3 text-sm">
                     <div className="flex items-center gap-2 text-[#9fb0d4]">
                       {isSubmitting ? (
                         <Loader2 size={15} className="animate-spin" />
