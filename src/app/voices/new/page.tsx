@@ -194,21 +194,21 @@ export default function NewVoicePage() {
 
   if (step === 3) {
     return (
-      <div className="flex min-h-screen flex-col items-center justify-center px-4 pb-20 pt-10 text-center bg-[#020b23]">
-        <div className="mb-6 flex h-24 w-24 items-center justify-center rounded-full bg-[#d0bcff]/20 text-[#d0bcff]">
+      <div className="flex min-h-screen flex-col items-center justify-center bg-transparent px-4 pb-20 pt-10 text-center text-on-surface">
+        <div className="mb-6 flex h-24 w-24 items-center justify-center rounded-full bg-pulse/20 text-pulse">
           <Check size={48} strokeWidth={3} />
         </div>
-        <h1 className="text-3xl font-bold text-[#eef1ff]">Voice Ready!</h1>
-        <div className="mt-4 flex items-center gap-2 rounded-full bg-primary/10 px-4 py-1.5 text-xs font-bold uppercase tracking-wider text-primary">
+        <h1 className="text-3xl font-bold text-on-surface">Voice Ready!</h1>
+        <div className="mt-4 flex items-center gap-2 rounded-full bg-pulse/10 px-4 py-1.5 text-xs font-bold uppercase tracking-wider text-pulse">
            <Globe2 size={14} />
            Universal Multilingual Voice
         </div>
-        <p className="mt-6 max-w-[20rem] text-[#92a2c5] leading-relaxed">
+        <p className="mt-6 max-w-[20rem] text-support leading-relaxed">
           Your custom voice profile <b>&quot;{displayName}&quot;</b> is now active. It will be used to speak your translations in <b>any language</b> with your natural tone.
         </p>
         <button
           onClick={() => router.push("/voices")}
-          className="mt-10 flex w-full max-w-xs items-center justify-center gap-2 rounded-full bg-[linear-gradient(180deg,#d8b6ff_0%,#a45cff_100%)] py-4 font-bold text-[#2e0b5a] shadow-lg hover:opacity-90 transition-opacity"
+          className="mt-10 flex w-full max-w-xs items-center justify-center gap-2 rounded-full bg-pulse py-4 font-bold text-on-pulse shadow-lg hover:opacity-90 transition-opacity"
         >
           View All Voices
           <ChevronRight size={20} />
@@ -220,11 +220,11 @@ export default function NewVoicePage() {
   const progress = Math.min((recordingSeconds / TARGET_SECONDS) * 100, 100)
 
   return (
-    <div className="flex min-h-screen flex-col bg-[#020b23] px-4 pb-28 pt-8 text-white">
+    <div className="flex min-h-screen flex-col bg-transparent px-4 pb-28 pt-8 text-on-surface">
       <header className="mb-8 flex items-center justify-between">
         <button 
           onClick={() => step > 1 ? setStep(1) : router.back()}
-          className="flex h-10 w-10 items-center justify-center rounded-full bg-[#162242] text-[#c8aefc] hover:bg-[#1f2b47] transition-colors"
+          className="flex h-10 w-10 items-center justify-center rounded-full bg-surface-high text-pulse hover:bg-surface-highest transition-colors"
         >
           <ArrowLeft size={20} />
         </button>
@@ -236,36 +236,36 @@ export default function NewVoicePage() {
         <div className="flex flex-1 flex-col space-y-8 animate-fade-up">
           <div className="space-y-3">
             <h2 className="text-4xl font-bold leading-tight tracking-tight">Create your universal voice</h2>
-            <p className="text-base text-[#92a2c5]">This profile will be used to generate translations in any language using your unique vocal DNA.</p>
+            <p className="text-base text-support">This profile will be used to generate translations in any language using your unique vocal DNA.</p>
           </div>
 
           <div className="space-y-6">
             <div className="space-y-2">
-              <label className="text-xs font-bold uppercase tracking-widest text-[#7e8cb1] ml-1">Profile Name</label>
+              <label className="text-xs font-bold uppercase tracking-widest text-support ml-1">Profile Name</label>
               <input
                 type="text"
                 value={displayName}
                 onChange={(e) => setDisplayName(e.target.value)}
                 placeholder="e.g. My Personal Voice"
-                className="w-full rounded-2xl border border-white/10 bg-[#0d1734] px-6 py-5 text-lg outline-none focus:ring-2 ring-primary/30 transition-all placeholder:text-white/20"
+                className="w-full rounded-2xl border border-outline-ghost/10 bg-surface-low px-6 py-5 text-lg text-on-surface outline-none focus:ring-2 ring-pulse/30 transition-all placeholder:text-support/60"
               />
             </div>
 
             <div className="space-y-2">
-              <label className="text-xs font-bold uppercase tracking-widest text-[#7e8cb1] ml-1">Your Primary Language</label>
+              <label className="text-xs font-bold uppercase tracking-widest text-support ml-1">Your Primary Language</label>
               <div className="relative">
                 <select
                   value={sourceLanguage}
                   onChange={(e) => setSourceLanguage(e.target.value)}
-                  className="w-full appearance-none rounded-2xl border border-white/10 bg-[#0d1734] px-6 py-5 text-lg outline-none focus:ring-2 ring-primary/30 transition-all"
+                  className="w-full appearance-none rounded-2xl border border-outline-ghost/10 bg-surface-low px-6 py-5 text-lg text-on-surface outline-none focus:ring-2 ring-pulse/30 transition-all"
                 >
                   {languages.map(l => <option key={l} value={l}>{l}</option>)}
                 </select>
-                <div className="pointer-events-none absolute inset-y-0 right-6 flex items-center text-primary">
+                <div className="pointer-events-none absolute inset-y-0 right-6 flex items-center text-pulse">
                   <ChevronRight className="rotate-90" size={20} />
                 </div>
               </div>
-              <p className="mt-2 text-xs text-[#7e8cb1] leading-relaxed px-1">
+              <p className="mt-2 text-xs text-support leading-relaxed px-1">
                 We&apos;ll use this language to analyze your voice during the training guided session.
               </p>
             </div>
@@ -275,7 +275,7 @@ export default function NewVoicePage() {
             {error && <p className="mb-4 text-center text-sm font-medium text-red-400">{error}</p>}
             <button
               onClick={handleFinishStep1}
-              className="group flex w-full items-center justify-center gap-2 rounded-full bg-[linear-gradient(180deg,#d8b6ff_0%,#a45cff_100%)] py-5 font-bold text-[#2e0b5a] shadow-[0_12px_30px_rgba(164,92,255,0.3)] hover:scale-[1.02] active:scale-[0.98] transition-all"
+              className="group flex w-full items-center justify-center gap-2 rounded-full bg-pulse py-5 font-bold text-on-pulse shadow-[0_12px_30px_rgba(var(--color-pulse),0.28)] hover:scale-[1.02] active:scale-[0.98] transition-all"
             >
               Start Recording
               <ChevronRight className="group-hover:translate-x-1 transition-transform" size={20} />
@@ -286,24 +286,24 @@ export default function NewVoicePage() {
         <div className="flex flex-1 flex-col space-y-8 animate-fade-up">
           <div className="space-y-3">
             <h2 className="text-3xl font-bold leading-tight tracking-tight">Capture your voice</h2>
-            <p className="text-base text-[#92a2c5]">
+            <p className="text-base text-support">
               {isRecording 
                 ? `Keep reading the ${sourceLanguage} phrases as they change...` 
                 : `Read the ${sourceLanguage} phrases naturally. A longer sample (20s) ensures maximum accuracy.`}
             </p>
           </div>
 
-          <div className="relative overflow-hidden rounded-[2.5rem] border border-[#d0bcff]/20 bg-[linear-gradient(180deg,rgba(27,38,73,0.96),rgba(14,22,46,0.92))] p-10 shadow-2xl min-h-[16rem] flex flex-col justify-center">
+          <div className="relative overflow-hidden rounded-[2.5rem] border border-pulse/20 bg-[linear-gradient(180deg,rgba(var(--color-surface-high),0.98),rgba(var(--color-surface-low),0.94))] p-10 shadow-2xl min-h-[16rem] flex flex-col justify-center">
              <div className="absolute top-0 right-0 p-6 opacity-10">
                 <Sparkles size={120} />
              </div>
              
              <div className="relative z-10 flex flex-col items-center">
-               <div className="mb-6 flex h-14 w-14 items-center justify-center rounded-full bg-white/5 text-primary">
+               <div className="mb-6 flex h-14 w-14 items-center justify-center rounded-full bg-surface-high text-pulse">
                   <Music size={28} />
                </div>
                
-               <p className="text-center text-xl font-semibold leading-relaxed tracking-tight text-[#eef1ff] min-h-[5rem] flex items-center justify-center animate-fade-in">
+               <p className="text-center text-xl font-semibold leading-relaxed tracking-tight text-on-surface min-h-[5rem] flex items-center justify-center animate-fade-in">
                  &quot;{trainingPhrases[currentPhraseIndex] || trainingPhrases[0]}&quot;
                </p>
                
@@ -313,7 +313,7 @@ export default function NewVoicePage() {
                       key={i} 
                       className={cn(
                         "w-1.5 rounded-full transition-all duration-300",
-                        i % 2 === 0 ? "bg-primary" : "bg-accent",
+                        i % 2 === 0 ? "bg-pulse" : "bg-accent",
                         isRecording ? "animate-wave-bar" : "scale-y-[0.2] opacity-10"
                       )}
                       style={{ 
@@ -331,19 +331,19 @@ export default function NewVoicePage() {
               <div className="flex justify-between items-end px-1">
                 <p className={cn(
                   "text-[10px] font-black uppercase tracking-[0.2em]",
-                  isRecording ? "text-primary" : "text-[#7e8cb1]"
+                  isRecording ? "text-pulse" : "text-support"
                 )}>
                   {isRecording ? "Recording DNA..." : recordedBlob ? "Sample Ready" : "Target: 20 Seconds"}
                 </p>
-                <p className="text-[10px] font-black font-mono text-[#7e8cb1]">
+                <p className="text-[10px] font-black font-mono text-support">
                   {recordingSeconds}s / {TARGET_SECONDS}s
                 </p>
               </div>
-              <div className="h-2 w-full rounded-full bg-white/5 overflow-hidden">
+              <div className="h-2 w-full rounded-full bg-surface-high overflow-hidden">
                  <div 
                    className={cn(
                      "h-full transition-all duration-500",
-                     recordingSeconds >= TARGET_SECONDS ? "bg-[#8bd6b4]" : "bg-primary"
+                     recordingSeconds >= TARGET_SECONDS ? "bg-accent" : "bg-pulse"
                    )} 
                    style={{ width: `${progress}%` }}
                  />
@@ -358,7 +358,7 @@ export default function NewVoicePage() {
                 <div className="relative h-24 w-24">
                   <div className={cn(
                     "absolute inset-0 rounded-full transition-all duration-700",
-                    isRecording ? "bg-red-500/20 scale-[1.8] blur-3xl opacity-100" : "bg-primary/20 scale-110 blur-2xl opacity-0"
+                    isRecording ? "bg-red-500/20 scale-[1.8] blur-3xl opacity-100" : "bg-pulse/20 scale-110 blur-2xl opacity-0"
                   )} />
                   <button
                     onClick={() => {
@@ -373,14 +373,14 @@ export default function NewVoicePage() {
                       isRecording 
                         ? "bg-red-500 scale-110 shadow-red-500/40" 
                         : recordedBlob 
-                          ? "bg-[#162242] text-[#8bd6b4] border border-[#8bd6b4]/30" 
-                          : "bg-[linear-gradient(180deg,#d8b6ff_0%,#a45cff_100%)] text-[#2e0b5a]"
+                          ? "bg-surface-high text-accent border border-accent/30"
+                          : "bg-pulse text-on-pulse"
                     )}
                   >
                     {isRecording ? (
                       <div className="flex items-center justify-center">
-                        <span className="absolute h-full w-full rounded-full animate-ping bg-white/20" />
-                        <Mic size={32} className="text-white" />
+                        <span className="absolute h-full w-full rounded-full animate-ping bg-on-pulse/20" />
+                        <Mic size={32} className="text-on-pulse" />
                       </div>
                     ) : recordedBlob ? (
                       <div className="flex flex-col items-center">
@@ -406,7 +406,7 @@ export default function NewVoicePage() {
               <button
                 onClick={handleSubmit}
                 disabled={!recordedBlob || isSubmitting || isRecording}
-                className="group relative flex w-full items-center justify-center gap-3 overflow-hidden rounded-full bg-[linear-gradient(180deg,#d8b6ff_0%,#a45cff_100%)] py-5 font-bold text-[#2e0b5a] shadow-[0_15px_40px_rgba(164,92,255,0.3)] disabled:opacity-30 disabled:grayscale disabled:shadow-none transition-all hover:scale-[1.02]"
+                className="group relative flex w-full items-center justify-center gap-3 overflow-hidden rounded-full bg-pulse py-5 font-bold text-on-pulse shadow-[0_15px_40px_rgba(var(--color-pulse),0.3)] disabled:opacity-30 disabled:grayscale disabled:shadow-none transition-all hover:scale-[1.02]"
               >
                 {isSubmitting ? (
                   <>
@@ -422,7 +422,7 @@ export default function NewVoicePage() {
               </button>
               
               {!recordedBlob && !isRecording && (
-                <p className="text-center text-[10px] text-[#7e8cb1] uppercase tracking-widest animate-pulse">
+                <p className="text-center text-[10px] text-support uppercase tracking-widest animate-pulse">
                   Tap mic to start training
                 </p>
               )}

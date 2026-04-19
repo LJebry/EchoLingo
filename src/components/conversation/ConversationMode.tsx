@@ -81,7 +81,7 @@ export default function ConversationMode({
         <div className="relative w-32 h-32 md:w-40 md:h-40">
           <div className={`absolute inset-0 rounded-full bg-primary/20 blur-2xl transition-opacity duration-300 ${isRecording ? 'opacity-100 scale-125' : 'opacity-0'}`} />
           
-          <div className="relative w-full h-full rounded-full bg-[#120f2d] border-4 border-outline-variant/20 overflow-hidden flex flex-col shadow-[0_0_50px_rgba(0,0,0,0.5)]">
+          <div className="relative flex h-full w-full flex-col overflow-hidden rounded-full border-4 border-outline-variant/20 bg-surface-low shadow-[0_0_50px_rgba(0,0,0,0.28)]">
             {/* Top Half Button (triggers Top Person / Primary) */}
             <button
               onMouseDown={() => handleStart("primary")}

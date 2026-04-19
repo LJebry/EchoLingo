@@ -34,7 +34,7 @@ export function BrandLogo({
       {showText ? (
         <span
           className={cn(
-            "font-display text-sm font-semibold tracking-tight text-[#c8aefc]",
+            "font-display text-sm font-semibold tracking-tight text-pulse",
             textClassName
           )}
         >

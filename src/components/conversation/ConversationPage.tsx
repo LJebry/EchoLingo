@@ -78,12 +78,12 @@ const speakerVisuals: SpeakerVisualConfig[] = [
     key: "person2",
     name: "Person 2",
     accentColor: "#8bd6b4",
-    borderColor: "border-[#8bd6b4]/10",
+    borderColor: "border-accent/10",
     panelClassName:
-      "bg-[linear-gradient(180deg,rgba(13,24,45,0.92),rgba(20,40,53,0.96))]",
-    cardClassName: "border-[#8bd6b4]/10 bg-[#0d1c2c]/80",
-    wavePrimary: "bg-[#8bd6b4]",
-    waveSecondary: "bg-[#d0bcff]",
+      "bg-[linear-gradient(180deg,rgba(var(--color-surface-high),0.92),rgba(var(--color-surface-low),0.96))]",
+    cardClassName: "border-accent/10 bg-surface/80",
+    wavePrimary: "bg-accent",
+    waveSecondary: "bg-pulse",
     align: "right",
     upsideDown: true,
   },
@@ -91,12 +91,12 @@ const speakerVisuals: SpeakerVisualConfig[] = [
     key: "person1",
     name: "Person 1",
     accentColor: "#d0bcff",
-    borderColor: "border-[#d0bcff]/10",
+    borderColor: "border-pulse/10",
     panelClassName:
-      "bg-[linear-gradient(180deg,rgba(27,38,73,0.96),rgba(14,22,46,0.92))]",
-    cardClassName: "border-[#d0bcff]/10 bg-[#0e1731]/80",
-    wavePrimary: "bg-[#79b3ff]",
-    waveSecondary: "bg-[#d0bcff]",
+      "bg-[linear-gradient(180deg,rgba(var(--color-surface-high),0.96),rgba(var(--color-surface-low),0.92))]",
+    cardClassName: "border-pulse/10 bg-surface/80",
+    wavePrimary: "bg-pulse",
+    waveSecondary: "bg-accent",
     align: "left",
   },
 ]
@@ -311,7 +311,7 @@ function SpeakerPanel({
   return (
     <section
       className={cn(
-        "relative flex h-full min-h-0 w-full flex-1 overflow-hidden rounded-[2rem] border px-3 pb-3 pt-3 shadow-[0_24px_60px_rgba(0,0,0,0.32)] sm:px-5 sm:pb-4 sm:pt-4 lg:px-6 lg:pt-6",
+        "relative flex h-full min-h-0 w-full flex-1 overflow-hidden rounded-[2rem] border px-3 pb-3 pt-3 shadow-[0_24px_60px_rgba(0,0,0,0.18)] sm:px-5 sm:pb-4 sm:pt-4 lg:px-6 lg:pt-6",
         speaker.borderColor,
         speaker.panelClassName,
         isActive && "ring-2 ring-primary/20"
@@ -336,8 +336,8 @@ function SpeakerPanel({
               👤
             </div>
             <div className={cn("min-w-0", textAlignClassName)}>
-              <p className="text-[0.95rem] font-semibold text-[#eef1ff] sm:text-sm">{speaker.name}</p>
-              <p className="text-[10px] uppercase tracking-[0.18em] text-[#8ea0c9] sm:text-xs">
+              <p className="text-[0.95rem] font-semibold text-on-surface sm:text-sm">{speaker.name}</p>
+              <p className="text-[10px] uppercase tracking-[0.18em] text-support sm:text-xs">
                 {speaker.sourceLanguage} to {speaker.targetLanguage}
               </p>
             </div>
@@ -359,8 +359,8 @@ function SpeakerPanel({
                 </option>
               ))}
             </select>
-            <div className="flex h-9 items-center gap-1.5 rounded-full border border-white/5 bg-[#101936] pl-3 pr-3.5 text-[11px] font-semibold text-[#8ea0c9] group-hover:bg-[#162242] sm:h-10 sm:gap-2 sm:pr-4 sm:text-xs">
-              <ArrowRightLeft size={13} className="text-[#c8aefc] sm:h-[14px] sm:w-[14px]" />
+            <div className="flex h-9 items-center gap-1.5 rounded-full border border-outline-ghost/10 bg-surface-high pl-3 pr-3.5 text-[11px] font-semibold text-support group-hover:bg-surface-highest sm:h-10 sm:gap-2 sm:pr-4 sm:text-xs">
+              <ArrowRightLeft size={13} className="text-pulse sm:h-[14px] sm:w-[14px]" />
               <span className="max-w-[92px] truncate sm:max-w-[104px]">{speaker.sourceLanguage}</span>
             </div>
           </div>
@@ -380,8 +380,8 @@ function SpeakerPanel({
                 </option>
               ))}
             </select>
-            <div className="flex h-9 items-center gap-1.5 rounded-full border border-white/5 bg-[#101936] pl-3 pr-3.5 text-[11px] font-semibold text-[#8ea0c9] group-hover:bg-[#162242] sm:h-10 sm:gap-2 sm:pr-4 sm:text-xs">
-              <Settings2 size={13} className="text-[#c8aefc] sm:h-[14px] sm:w-[14px]" />
+            <div className="flex h-9 items-center gap-1.5 rounded-full border border-outline-ghost/10 bg-surface-high pl-3 pr-3.5 text-[11px] font-semibold text-support group-hover:bg-surface-highest sm:h-10 sm:gap-2 sm:pr-4 sm:text-xs">
+              <Settings2 size={13} className="text-pulse sm:h-[14px] sm:w-[14px]" />
               <span className="max-w-[92px] truncate sm:max-w-[104px]">{selectedProfileName}</span>
             </div>
           </div>
@@ -395,14 +395,14 @@ function SpeakerPanel({
           )}
         >
           <div className="mx-auto flex h-full min-h-0 w-full flex-1 flex-col">
-            <p className="shrink-0 text-[11px] uppercase tracking-[0.2em] text-[#7f91be] sm:text-sm">{content.heading}</p>
+            <p className="shrink-0 text-[11px] uppercase tracking-[0.2em] text-support sm:text-sm">{content.heading}</p>
             <div className="mt-2.5 min-h-0 flex-1 overflow-y-auto pr-1">
               <div className="min-h-full w-full">
                 <p className={cn(
                   "whitespace-pre-wrap break-words leading-tight",
                   content.statusVariant === "waiting"
-                    ? "text-base text-[#6f7fa8] leading-relaxed"
-                    : "text-[0.95rem] text-[#eef1ff] sm:text-[1.15rem] lg:text-[1.65rem]"
+                    ? "text-base text-support leading-relaxed"
+                    : "text-[0.95rem] text-on-surface sm:text-[1.15rem] lg:text-[1.65rem]"
                 )}>
                   {content.body}
                 </p>
@@ -692,14 +692,14 @@ export function ConversationPage() {
         }
 
         return (
-          <main className="flex flex-col min-h-[100svh] bg-[#020b23] text-white">
-            <div className="relative flex flex-col flex-1 min-h-0 overflow-y-auto bg-[radial-gradient(circle_at_top,rgba(124,92,255,0.22),transparent_28%),linear-gradient(180deg,#09142f_0%,#050c1f_48%,#09142f_100%)]">
+          <main className="flex flex-col min-h-[100svh] bg-transparent text-on-surface">
+            <div className="relative flex flex-col flex-1 min-h-0 overflow-y-auto bg-transparent">
               <div className="flex shrink-0 items-center justify-between px-4 pt-4 md:px-6 lg:px-8 lg:pt-8">
                 <BrandLogo />
 
                 <div className="flex items-center gap-3">
-                  <div className="flex items-center gap-2 rounded-full border border-[#c8aefc]/15 bg-[#12203f]/80 px-3 py-2 text-xs text-[#d8def6]">
-                    <ArrowRightLeft size={14} className="text-[#c8aefc]" />
+                  <div className="flex items-center gap-2 rounded-full border border-outline-ghost/10 bg-surface-high/80 px-3 py-2 text-xs text-on-surface">
+                    <ArrowRightLeft size={14} className="text-pulse" />
                     {persistenceState === "saved" ? "Synced" : "Live"}
                   </div>
                   <UserProfile />
@@ -751,8 +751,8 @@ export function ConversationPage() {
                   </div>
                 </div>
 
-                <div className="shrink-0 mt-4 mb-[calc(6.75rem+env(safe-area-inset-bottom))] lg:mb-28 w-full rounded-[1.6rem] border border-[#b9c7df]/10 bg-[#0d1734]/88 p-4 shadow-[0_20px_40px_rgba(0,0,0,0.24)] lg:mx-auto lg:mt-6 lg:max-w-4xl lg:p-5">
-                  <div className="flex w-full items-center justify-between gap-3 text-[10px] uppercase tracking-[0.18em] text-[#8ea0c9] sm:text-xs">
+                <div className="shrink-0 mt-4 mb-[calc(6.75rem+env(safe-area-inset-bottom))] lg:mb-28 w-full rounded-[1.6rem] border border-outline-ghost/10 bg-surface-low/90 p-4 shadow-[0_20px_40px_rgba(0,0,0,0.16)] lg:mx-auto lg:mt-6 lg:max-w-4xl lg:p-5">
+                  <div className="flex w-full items-center justify-between gap-3 text-[10px] uppercase tracking-[0.18em] text-support sm:text-xs">
                     <span>{activeSpeaker.name}</span>
                     <span className="text-right">
                       {activeSpeaker.sourceLanguage} to {activeSpeaker.targetLanguage}
@@ -765,7 +765,7 @@ export function ConversationPage() {
                       value={draftText}
                       onChange={(event) => setDraftText(event.target.value)}
                       placeholder={`Type what ${activeSpeaker.name.toLowerCase()} wants to say...`}
-                      className="h-[48px] flex-1 resize-none overflow-y-auto rounded-[1.25rem] border border-[#d0bcff]/10 bg-[#091127] px-4 py-4 text-sm text-[#eef1ff] outline-none placeholder:text-[#6f7fa8] transition-all"
+                      className="h-[48px] flex-1 resize-none overflow-y-auto rounded-[1.25rem] border border-outline-ghost/10 bg-surface px-4 py-4 text-sm text-on-surface outline-none placeholder:text-support transition-all"
                     />
                     <button
                       type="button"
@@ -773,7 +773,7 @@ export function ConversationPage() {
                         void submitTurn({ transcriptText: draftText, speakerKey: activeSpeakerKey })
                       }}
                       disabled={isSubmitting || !draftText.trim()}
-                      className="flex h-[48px] w-12 shrink-0 items-center justify-center self-end rounded-[1.25rem] bg-[#1d2b55] text-[#d0bcff] disabled:opacity-40 sm:h-[54px] sm:w-14"
+                      className="flex h-[48px] w-12 shrink-0 items-center justify-center self-end rounded-[1.25rem] bg-surface-high text-pulse disabled:opacity-40 sm:h-[54px] sm:w-14"
                       aria-label="Send typed turn"
                     >
                       <Send size={20} />
@@ -781,7 +781,7 @@ export function ConversationPage() {
                   </div>
 
                   <div className="mt-3 flex w-full items-center justify-between gap-3 text-sm">
-                    <div className="flex items-center gap-2 text-[#9fb0d4]">
+                    <div className="flex items-center gap-2 text-support">
                       {isSubmitting ? (
                         <Loader2 size={13} className="animate-spin" />
                       ) : (
@@ -795,13 +795,13 @@ export function ConversationPage() {
                     </div>
 
                     {conversationId && (
-                      <Link href="/history" className="text-[10px] font-bold uppercase tracking-widest text-[#d0bcff] hover:underline whitespace-nowrap">
+                      <Link href="/history" className="text-[10px] font-bold uppercase tracking-widest text-pulse hover:underline whitespace-nowrap">
                         History
                       </Link>
                     )}
                   </div>
 
-                  {error && <p className="mt-2 text-center text-[11px] font-medium text-red-300">{error}</p>}
+                  {error && <p className="mt-2 text-center text-[11px] font-medium text-red-400">{error}</p>}
                 </div>
               </div>
             </div>

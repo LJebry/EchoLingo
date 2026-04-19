@@ -282,7 +282,7 @@ export default function Home() {
   }
 
   return (
-    <main className="min-h-full bg-[radial-gradient(circle_at_top,rgba(124,92,255,0.22),transparent_28%),linear-gradient(180deg,#09142f_0%,#050c1f_48%,#09142f_100%)] text-white">
+    <main className="min-h-full bg-transparent text-on-surface">
       <div className="flex min-h-full flex-col px-4 pb-[6.75rem] pt-5 md:px-6 lg:px-8 lg:pb-28 lg:pt-8">
         <header className="flex items-center justify-between gap-3 pt-[max(0rem,env(safe-area-inset-top))]">
           <BrandLogo />
@@ -300,8 +300,8 @@ export default function Home() {
                   <option key={p.id} value={p.id}>{p.displayName}</option>
                 ))}
               </select>
-              <div className="flex h-9 items-center gap-2 rounded-full bg-[#162242]/50 pl-3 pr-4 text-xs font-semibold text-[#8ea0c9] border border-white/10 group-hover:bg-[#1f2b47]/80 transition-colors backdrop-blur-sm">
-                <Settings2 size={14} className="text-[#c8aefc]" />
+              <div className="flex h-9 items-center gap-2 rounded-full border border-outline-ghost/10 bg-surface-high/80 pl-3 pr-4 text-xs font-semibold text-support transition-colors backdrop-blur-sm group-hover:bg-surface-highest">
+                <Settings2 size={14} className="text-pulse" />
                 <span className="max-w-[100px] truncate">
                   {availableProfiles.find(p => p.id === selectedProfileId)?.displayName || "Select Voice"}
                 </span>
@@ -313,17 +313,17 @@ export default function Home() {
         </header>
 
         <section className="mx-auto mt-5 grid grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)] items-center gap-2 lg:mt-6 lg:max-w-3xl">
-          <div className="min-w-0 rounded-full border border-white/8 bg-[#151f3c] px-2 py-2 shadow-[0_18px_35px_rgba(0,0,0,0.22)]">
+          <div className="min-w-0 rounded-full border border-outline-ghost/10 bg-surface-low px-2 py-2 shadow-[0_18px_35px_rgba(0,0,0,0.12)]">
             <div className="relative">
               <select
                 ref={sourceSelectRef}
-                className="max-w-[110px] sm:max-w-none min-w-0 w-full appearance-none rounded-full bg-[#202b4d] px-3 py-3 pr-11 text-sm font-medium text-[#eef1ff] outline-none sm:px-4 sm:pr-12"
+                className="max-w-[110px] sm:max-w-none min-w-0 w-full appearance-none rounded-full bg-surface-high px-3 py-3 pr-11 text-sm font-medium text-on-surface outline-none sm:px-4 sm:pr-12"
                 value={sourceLanguage}
                 onChange={(event) => setSourceLanguage(event.target.value)}
                 aria-label="Source language"
               >
                 {languages.map((lang) => (
-                  <option key={`src-${lang}`} value={lang} className="bg-[#132041] text-white">
+                  <option key={`src-${lang}`} value={lang} className="bg-surface text-on-surface">
                     {lang}
                   </option>
                 ))}
@@ -331,7 +331,7 @@ export default function Home() {
               <button
                 type="button"
                 onClick={() => openLanguagePicker(sourceSelectRef)}
-                className="absolute right-1.5 top-1/2 flex h-8 w-8 -translate-y-1/2 items-center justify-center rounded-full text-[#8ea0c9] transition-colors hover:bg-white/5 hover:text-[#d9cbff]"
+                className="absolute right-1.5 top-1/2 flex h-8 w-8 -translate-y-1/2 items-center justify-center rounded-full text-support transition-colors hover:bg-pulse/10 hover:text-pulse"
                 aria-label="Open source language options"
               >
                 <ChevronDown size={16} />
@@ -342,23 +342,23 @@ export default function Home() {
           <button
             type="button"
             onClick={swapLanguages}
-            className="flex h-11 w-11 items-center justify-center rounded-full bg-[#202b4d] text-[#c8aefc]"
+            className="flex h-11 w-11 items-center justify-center rounded-full bg-surface-high text-pulse"
             aria-label="Swap languages"
           >
             <ArrowRightLeft size={18} />
           </button>
 
-          <div className="min-w-0 rounded-full border border-white/8 bg-[#151f3c] px-2 py-2 shadow-[0_18px_35px_rgba(0,0,0,0.22)]">
+          <div className="min-w-0 rounded-full border border-outline-ghost/10 bg-surface-low px-2 py-2 shadow-[0_18px_35px_rgba(0,0,0,0.12)]">
             <div className="relative">
               <select
                 ref={targetSelectRef}
-                className="min-w-0 w-full appearance-none rounded-full bg-[#202b4d] px-4 py-3 pr-12 text-sm font-medium text-[#eef1ff] outline-none"
+                className="min-w-0 w-full appearance-none rounded-full bg-surface-high px-4 py-3 pr-12 text-sm font-medium text-on-surface outline-none"
                 value={targetLanguage}
                 onChange={(event) => setTargetLanguage(event.target.value)}
                 aria-label="Target language"
               >
                 {languages.map((lang) => (
-                  <option key={`tgt-${lang}`} value={lang} className="bg-[#132041] text-white">
+                  <option key={`tgt-${lang}`} value={lang} className="bg-surface text-on-surface">
                     {lang}
                   </option>
                 ))}
@@ -366,7 +366,7 @@ export default function Home() {
               <button
                 type="button"
                 onClick={() => openLanguagePicker(targetSelectRef)}
-                className="absolute right-1.5 top-1/2 flex h-8 w-8 -translate-y-1/2 items-center justify-center rounded-full text-[#8ea0c9] transition-colors hover:bg-white/5 hover:text-[#d9cbff]"
+                className="absolute right-1.5 top-1/2 flex h-8 w-8 -translate-y-1/2 items-center justify-center rounded-full text-support transition-colors hover:bg-pulse/10 hover:text-pulse"
                 aria-label="Open target language options"
               >
                 <ChevronDown size={16} />
@@ -376,8 +376,8 @@ export default function Home() {
         </section>
 
         <div className="mt-4 flex flex-1 flex-col gap-4 lg:min-h-0 lg:grid lg:grid-cols-2 lg:gap-6">
-          <section className="flex flex-col rounded-[1.9rem] border border-white/6 bg-[#121b33] p-4 shadow-[0_22px_45px_rgba(0,0,0,0.24)] lg:min-h-0 lg:p-6">
-            <p className="text-xs font-semibold uppercase tracking-[0.22em] text-[#7e8cb1]">
+          <section className="flex flex-col rounded-[1.9rem] border border-outline-ghost/10 bg-surface-low p-4 shadow-[0_22px_45px_rgba(0,0,0,0.14)] lg:min-h-0 lg:p-6">
+            <p className="text-xs font-semibold uppercase tracking-[0.22em] text-support">
               Original
             </p>
             <textarea
@@ -385,7 +385,7 @@ export default function Home() {
               value={text}
               onChange={(event) => setText(event.target.value.slice(0, MAX_CHARS))}
               placeholder="Enter text to translate..."
-              className="mt-3 min-h-[9rem] w-full resize-none bg-transparent text-base leading-relaxed text-[#eef1ff] outline-none placeholder:text-[#6f7fa8] lg:flex-1 lg:min-h-[22rem]"
+              className="mt-3 min-h-[9rem] w-full resize-none bg-transparent text-base leading-relaxed text-on-surface outline-none placeholder:text-support lg:flex-1 lg:min-h-[22rem]"
             />
 
             <div className="mt-4 flex items-center justify-between gap-3">
@@ -394,7 +394,7 @@ export default function Home() {
                   type="button"
                   onClick={playOriginal}
                   disabled={audioLoadingOriginal || !text.trim()}
-                  className="flex h-10 w-10 items-center justify-center rounded-full bg-[#202b4d] text-[#d7def7] disabled:opacity-40"
+                  className="flex h-10 w-10 items-center justify-center rounded-full bg-surface-high text-on-surface disabled:opacity-40"
                   aria-label="Play original audio"
                 >
                   {audioLoadingOriginal ? <Loader2 size={16} className="animate-spin" /> : <Volume2 size={16} />}
@@ -403,7 +403,7 @@ export default function Home() {
                 <button
                   type="button"
                   onClick={pasteIntoInput}
-                  className="flex h-10 w-10 items-center justify-center rounded-full bg-[#202b4d] text-[#d7def7]"
+                  className="flex h-10 w-10 items-center justify-center rounded-full bg-surface-high text-on-surface"
                   aria-label="Paste into translation input"
                 >
                   {pastePending ? <Loader2 size={16} className="animate-spin" /> : <Clipboard size={16} />}
@@ -415,7 +415,7 @@ export default function Home() {
                     setText("")
                     setError("")
                   }}
-                  className="flex h-10 w-10 items-center justify-center rounded-full bg-[#202b4d] text-[#9fb0d4]"
+                  className="flex h-10 w-10 items-center justify-center rounded-full bg-surface-high text-support"
                   aria-label="Clear input"
                 >
                   <span className="text-lg leading-none">×</span>
@@ -423,14 +423,14 @@ export default function Home() {
               </div>
 
               <div className="flex items-center gap-3">
-                <span className={`text-xs ${error ? "text-red-300" : "text-[#7e8cb1]"}`}>
+                <span className={`text-xs ${error ? "text-red-400" : "text-support"}`}>
                   {helperText}
                 </span>
                 <button
                   type="button"
                   onClick={translate}
                   disabled={!canTranslate}
-                  className="inline-flex h-11 w-11 items-center justify-center rounded-full bg-[linear-gradient(180deg,#d8b6ff_0%,#a45cff_100%)] text-[#2e0b5a] disabled:opacity-40"
+                  className="inline-flex h-11 w-11 items-center justify-center rounded-full bg-pulse text-on-pulse disabled:opacity-40"
                   aria-label="Translate text"
                 >
                   {loading ? <Loader2 size={18} className="animate-spin" /> : <Send size={18} />}
@@ -439,16 +439,16 @@ export default function Home() {
             </div>
           </section>
 
-          <section className="flex flex-col rounded-[1.9rem] border border-white/6 bg-[#121b33] p-4 shadow-[0_22px_45px_rgba(0,0,0,0.24)] lg:min-h-0 lg:p-6">
-            <p className="text-xs font-semibold uppercase tracking-[0.22em] text-[#7e8cb1]">
+          <section className="flex flex-col rounded-[1.9rem] border border-outline-ghost/10 bg-surface-low p-4 shadow-[0_22px_45px_rgba(0,0,0,0.14)] lg:min-h-0 lg:p-6">
+            <p className="text-xs font-semibold uppercase tracking-[0.22em] text-support">
               Translation
             </p>
             <div className="mt-3 flex-1">
               <p className={cn(
                 "min-h-[8rem] leading-tight lg:min-h-[22rem]",
                 translatedText === EMPTY_TRANSLATION 
-                  ? "text-base text-[#6f7fa8] leading-relaxed" 
-                  : "text-[1.65rem] text-[#eef1ff]"
+                  ? "text-base leading-relaxed text-support"
+                  : "text-[1.65rem] text-on-surface"
               )}>
                 {translatedText}
               </p>
@@ -459,7 +459,7 @@ export default function Home() {
                 type="button"
                 onClick={playTranslation}
                 disabled={audioLoading}
-                className="flex h-10 w-10 items-center justify-center rounded-full bg-[#202b4d] text-[#d7def7]"
+                className="flex h-10 w-10 items-center justify-center rounded-full bg-surface-high text-on-surface"
                 aria-label="Play translated audio"
               >
                 {audioLoading ? <Loader2 size={16} className="animate-spin" /> : <Volume2 size={16} />}
@@ -469,7 +469,7 @@ export default function Home() {
                 <button
                   type="button"
                   onClick={copyTranslation}
-                  className="flex h-10 w-10 items-center justify-center rounded-full bg-[#202b4d] text-[#d7def7]"
+                  className="flex h-10 w-10 items-center justify-center rounded-full bg-surface-high text-on-surface"
                   aria-label="Copy translated text"
                 >
                   {copied ? <Check size={16} /> : <Copy size={16} />}
@@ -483,7 +483,7 @@ export default function Home() {
           <button
             type="button"
             onClick={() => inputRef.current?.focus()}
-            className="flex h-16 w-16 items-center justify-center rounded-full bg-[linear-gradient(180deg,#d8b6ff_0%,#a45cff_100%)] text-[#2e0b5a] shadow-[0_16px_35px_rgba(164,92,255,0.4)]"
+            className="flex h-16 w-16 items-center justify-center rounded-full bg-pulse text-on-pulse shadow-[0_16px_35px_rgba(var(--color-pulse),0.3)]"
             aria-label="Focus translation input"
           >
             <Mic size={26} />

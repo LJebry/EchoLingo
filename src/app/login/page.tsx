@@ -30,8 +30,8 @@ function FauxInput({
   label: string
 }) {
   return (
-    <div className="flex items-center gap-3 rounded-full bg-[#121c38] px-4 py-3.5 text-sm text-[#7483a8]">
-      <span className="text-[#8696bd]">{icon}</span>
+    <div className="flex items-center gap-3 rounded-full bg-surface-high px-4 py-3.5 text-sm text-support">
+      <span className="text-support">{icon}</span>
       <span>{label}</span>
     </div>
   )
@@ -46,14 +46,14 @@ export default async function LoginPage({ searchParams }: LoginPageProps) {
   }
 
   return (
-    <main className="min-h-dvh bg-[radial-gradient(circle_at_top,rgba(124,92,255,0.18),transparent_28%),linear-gradient(180deg,#09142f_0%,#050c1f_48%,#09142f_100%)] text-white">
+    <main className="min-h-dvh bg-transparent text-on-surface">
       <div className="flex min-h-dvh flex-col px-4 pb-8 pt-5">
         <div className="flex items-center justify-between">
           <BrandLogo />
 
           <Link
             href="/"
-            className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-[#162242] px-3.5 py-2 text-sm text-[#eef1ff]"
+            className="inline-flex items-center gap-2 rounded-full border border-outline-ghost/10 bg-surface-high px-3.5 py-2 text-sm text-on-surface transition-colors hover:bg-surface-highest"
           >
             <ChevronLeft className="h-4 w-4" />
             Guest
@@ -61,16 +61,16 @@ export default async function LoginPage({ searchParams }: LoginPageProps) {
         </div>
 
         <div className="flex flex-1 items-center">
-          <section className="w-full rounded-[2rem] border border-white/8 bg-[#0f1832] px-6 pb-7 pt-8 shadow-[0_25px_50px_rgba(0,0,0,0.3)]">
-            <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-[#201c47] text-[#c7afff]">
+          <section className="w-full rounded-[2rem] border border-outline-ghost/10 bg-surface-low px-6 pb-7 pt-8 shadow-[0_25px_50px_rgba(0,0,0,0.16)]">
+            <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-pulse/15 text-pulse">
               <Globe className="h-6 w-6" />
             </div>
 
             <div className="mt-6 space-y-2 text-center">
-              <h1 className="text-[2rem] font-semibold tracking-tight text-[#eef1ff]">
+              <h1 className="text-[2rem] font-semibold tracking-tight text-on-surface">
                 Welcome back
               </h1>
-              <p className="mx-auto max-w-[16rem] text-sm leading-relaxed text-[#8b9aba]">
+              <p className="mx-auto max-w-[16rem] text-sm leading-relaxed text-support">
                 Log in to sync your voice profiles and translation history seamlessly.
               </p>
             </div>
@@ -89,9 +89,9 @@ export default async function LoginPage({ searchParams }: LoginPageProps) {
               )}
             </div>
 
-            <div className="mt-8 flex items-center justify-center text-xs text-[#8b9aba]">
-              <span className="flex items-center gap-1.5 rounded-full bg-white/5 px-3 py-1.5 border border-white/5">
-                <Lock size={12} className="text-[#c8aefc]" />
+            <div className="mt-8 flex items-center justify-center text-xs text-support">
+              <span className="flex items-center gap-1.5 rounded-full border border-outline-ghost/10 bg-surface-high px-3 py-1.5">
+                <Lock size={12} className="text-pulse" />
                 Secure Google Authentication Only
               </span>
             </div>

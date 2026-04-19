@@ -35,14 +35,14 @@ export default async function HistoryPage() {
 
       <div className="space-y-3">
         <div className="space-y-1 px-1">
-          <p className="text-[10px] font-bold uppercase tracking-[0.22em] text-[#7e8cb1]">Latest conversations</p>
-          <p className="text-sm text-[#b9c7df]/40">Your newest saved sessions appear first.</p>
+          <p className="text-[10px] font-bold uppercase tracking-[0.22em] text-support">Latest conversations</p>
+          <p className="text-sm text-support/70">Your newest saved sessions appear first.</p>
         </div>
 
         {conversations.length === 0 ? (
-          <div className="rounded-[2rem] border border-dashed border-[#b9c7df]/10 bg-[#131b2e] px-6 py-10 text-center">
-            <p className="text-lg font-semibold text-[#dae2fd]">No history yet</p>
-            <p className="mt-2 text-sm leading-relaxed text-[#b9c7df]/40">
+          <div className="rounded-[2rem] border border-dashed border-outline-ghost/10 bg-surface-low px-6 py-10 text-center">
+            <p className="text-lg font-semibold text-on-surface">No history yet</p>
+            <p className="mt-2 text-sm leading-relaxed text-support/70">
               Saved conversations will show up here after you complete a translation flow.
             </p>
             <Link href="/" className="mt-6 inline-block">

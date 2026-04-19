@@ -1,8 +1,7 @@
 "use client"
 
 import { useState } from 'react'
-import { Mic, Send, Volume2 } from 'lucide-react'
-import { Button } from '@/components/ui/Button'
+import { Mic, Volume2 } from 'lucide-react'
 
 export function TranslatorCard() {
   const [isRecording, setIsRecording] = useState(false)
@@ -33,25 +32,25 @@ export function TranslatorCard() {
 
   return (
     <div className="w-full space-y-6">
-      <div className="p-6 rounded-[2rem] bg-[#131b2e] border border-[#b9c7df]/5 shadow-2xl">
+      <div className="rounded-[2rem] border border-outline-ghost/10 bg-surface-low p-6 shadow-2xl">
         <div className="space-y-4">
           <div className="space-y-1">
-            <span className="text-xs font-bold uppercase tracking-widest text-[#b9c7df]/40">Source (English)</span>
-            <p className="text-lg text-[#dae2fd]">
+            <span className="text-xs font-bold uppercase tracking-widest text-support/70">Source (English)</span>
+            <p className="text-lg text-on-surface">
               {transcript || "Tap the mic to start speaking..."}
             </p>
           </div>
 
-          <div className="h-px bg-[#b9c7df]/5" />
+          <div className="h-px bg-outline-ghost/10" />
 
           <div className="space-y-1">
-            <span className="text-xs font-bold uppercase tracking-widest text-[#d0bcff]/60">Translation (Spanish)</span>
+            <span className="text-xs font-bold uppercase tracking-widest text-pulse/70">Translation (Spanish)</span>
             <div className="flex items-start justify-between gap-4">
-              <p className="text-2xl font-bold text-[#d0bcff] leading-tight">
+              <p className="text-2xl font-bold leading-tight text-pulse">
                 {translation || "..."}
               </p>
               {translation && (
-                <button className="mt-1 text-[#d0bcff] p-2 bg-[#d0bcff]/10 rounded-full">
+                <button className="mt-1 rounded-full bg-pulse/10 p-2 text-pulse">
                   <Volume2 size={20} />
                 </button>
               )}
@@ -67,13 +66,13 @@ export function TranslatorCard() {
           className={`w-20 h-20 rounded-full flex items-center justify-center transition-all ${
             isRecording 
               ? "bg-red-500 shadow-[0_0_30px_rgba(239,68,68,0.5)] scale-110" 
-              : "bg-gradient-to-br from-[#d0bcff] to-[#3c0091] shadow-[0_0_30px_rgba(208,188,255,0.3)]"
+              : "bg-pulse text-on-pulse shadow-[0_0_30px_rgba(var(--color-pulse),0.3)]"
           }`}
         >
           {isProcessing ? (
-            <div className="w-8 h-8 border-4 border-white/20 border-t-white rounded-full animate-spin" />
+            <div className="h-8 w-8 animate-spin rounded-full border-4 border-on-pulse/20 border-t-on-pulse" />
           ) : (
-            <Mic size={32} className="text-white" />
+            <Mic size={32} className="text-on-pulse" />
           )}
         </button>
       </div>

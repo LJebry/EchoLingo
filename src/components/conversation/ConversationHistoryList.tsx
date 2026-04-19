@@ -58,18 +58,18 @@ export function ConversationHistoryList({ conversations }: { conversations: Conv
         return (
           <div
             key={conversation.id}
-            className="group flex items-center justify-between gap-3 rounded-2xl border border-[#b9c7df]/5 bg-[#131b2e] p-4"
+            className="group flex items-center justify-between gap-3 rounded-2xl border border-outline-ghost/10 bg-surface-low p-4 transition-colors hover:bg-surface-high"
           >
             <Link
               href={`/conversations/${conversation.id}`}
               className="flex min-w-0 flex-1 items-center gap-4"
             >
-              <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-[#3c0091]/10 text-[#d0bcff] transition-colors group-hover:bg-[#3c0091]/20">
+              <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-pulse/10 text-pulse transition-colors group-hover:bg-pulse/20">
                 <MessageSquare size={20} />
               </div>
               <div className="min-w-0">
-                <h4 className="truncate font-bold text-[#dae2fd]">{conversation.title}</h4>
-                <p className="text-xs text-[#b9c7df]/40">
+                <h4 className="truncate font-bold text-on-surface">{conversation.title}</h4>
+                <p className="text-xs text-support/70">
                   {conversation.turns} turns • {new Date(conversation.updatedAt).toLocaleDateString()}
                 </p>
               </div>
@@ -78,7 +78,7 @@ export function ConversationHistoryList({ conversations }: { conversations: Conv
             <div className="flex shrink-0 items-center gap-2">
               <Link
                 href={`/conversations/${conversation.id}`}
-                className="hidden text-[#b9c7df]/20 transition-colors group-hover:text-[#d0bcff]/40 sm:block"
+                className="hidden text-support/40 transition-colors group-hover:text-pulse/60 sm:block"
                 aria-label={`Open ${conversation.title}`}
               >
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="m9 18 6-6-6-6"/></svg>
