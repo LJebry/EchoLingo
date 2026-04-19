@@ -34,3 +34,12 @@ export async function createConversation(userId: string, title: string) {
     }
   })
 }
+
+export async function deleteUserConversation(id: string, userId: string) {
+  return await prisma.conversation.deleteMany({
+    where: {
+      id,
+      ownerId: userId,
+    },
+  })
+}

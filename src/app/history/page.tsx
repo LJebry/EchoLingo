@@ -3,8 +3,8 @@ import { redirect } from "next/navigation"
 import { MobileHeader } from "@/components/layout/MobileHeader"
 import { getUserConversations } from "@/lib/services/conversations"
 import Link from "next/link"
-import { MessageSquare } from "lucide-react"
 import { Button } from "@/components/ui/Button"
+import { ConversationHistoryList } from "@/components/conversation/ConversationHistoryList"
 
 type ConversationListItem = {
   id: string
@@ -22,6 +22,12 @@ export default async function HistoryPage() {
   }
 
   const conversations = await getUserConversations(session.user.id) as any
+  const conversationItems = conversations.map((conv: ConversationListItem) => ({
+    id: conv.id,
+    title: conv.title,
+    updatedAt: conv.updatedAt.toISOString(),
+    turns: conv._count.turns,
+  }))
 
   return (
     <div className="space-y-6 px-4 pb-28 pt-5">
@@ -44,26 +50,7 @@ export default async function HistoryPage() {
             </Link>
           </div>
         ) : (
-          conversations.map((conv: ConversationListItem) => (
-            <Link key={conv.id} href={`/conversations/${conv.id}`}>
-              <div className="group flex items-center justify-between rounded-2xl border border-[#b9c7df]/5 bg-[#131b2e] p-4">
-                <div className="flex items-center gap-4">
-                  <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-[#3c0091]/10 text-[#d0bcff] transition-colors group-hover:bg-[#3c0091]/20">
-                    <MessageSquare size={20} />
-                  </div>
-                  <div>
-                    <h4 className="font-bold text-[#dae2fd]">{conv.title}</h4>
-                    <p className="text-xs text-[#b9c7df]/40">
-                      {conv._count.turns} turns • {new Date(conv.updatedAt).toLocaleDateString()}
-                    </p>
-                  </div>
-                </div>
-                <div className="text-[#b9c7df]/20 transition-colors group-hover:text-[#d0bcff]/40">
-                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="m9 18 6-6-6-6"/></svg>
-                </div>
-              </div>
-            </Link>
-          ))
+          <ConversationHistoryList conversations={conversationItems} />
         )}
       </div>
     </div>
