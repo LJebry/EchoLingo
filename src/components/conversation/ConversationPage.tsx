@@ -219,7 +219,7 @@ function SpeakerPanel({
       disabled={!isRecorderSupported || isSubmitting}
       className={cn(
         "relative flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-pulse text-on-pulse shadow-[0_0_30px_rgba(var(--color-pulse),0.3)] transition-transform disabled:opacity-50 sm:h-14 sm:w-14 lg:h-16 lg:w-16",
-        isRecording && "scale-105 shadow-[0_0_34px_rgba(var(--color-pulse),0.48)]"
+        isRecording && "bg-red-500 text-white scale-105 shadow-[0_0_34px_rgba(239,68,68,0.48)]"
       )}
       aria-label={isRecording ? `Stop recording ${speaker.name}` : `Start recording ${speaker.name}`}
     >
