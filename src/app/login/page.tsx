@@ -3,6 +3,7 @@ import type { ReactNode } from "react"
 import { redirect } from "next/navigation"
 import { ChevronLeft, Globe, Lock, Mail } from "lucide-react"
 import { GoogleSignInButton } from "@/components/auth/GoogleSignInButton"
+import { BrandLogo } from "@/components/layout/BrandLogo"
 import { auth, isGoogleAuthConfigured } from "@/lib/auth"
 
 interface LoginPageProps {
@@ -48,10 +49,7 @@ export default async function LoginPage({ searchParams }: LoginPageProps) {
     <main className="min-h-dvh bg-[radial-gradient(circle_at_top,rgba(124,92,255,0.18),transparent_28%),linear-gradient(180deg,#09142f_0%,#050c1f_48%,#09142f_100%)] text-white">
       <div className="flex min-h-dvh flex-col px-4 pb-8 pt-5">
         <div className="flex items-center justify-between">
-          <div className="flex items-center gap-2 text-[#c8aefc]">
-            <Globe size={18} />
-            <span className="text-sm font-semibold tracking-tight">EchoLingo</span>
-          </div>
+          <BrandLogo />
 
           <Link
             href="/"

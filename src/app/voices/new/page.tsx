@@ -1,21 +1,11 @@
 "use client"
 
-import { useState, useEffect, useRef } from "react"
+import { useState, useEffect, useMemo, useRef } from "react"
 import { useRouter } from "next/navigation"
 import Link from "next/link"
 import { ArrowLeft, Check, ChevronRight, Loader2, Mic, Music, Sparkles, Globe2, AlertCircle } from "lucide-react"
 import AudioRecorder from "@/components/AudioRecorder"
 import { cn } from "@/lib/utils"
-
-const TRAINING_PHRASES = [
-  "The quick brown fox jumps over the lazy dog.",
-  "EchoLingo helps me speak any language naturally and fluently.",
-  "I am recording my voice to create a personal digital profile.",
-  "Technology should bring people together through better communication.",
-  "Artificial intelligence can analyze the unique qualities of my voice.",
-  "I look forward to having natural conversations in many different languages.",
-  "Every person has a unique vocal identity that carries emotion and intent."
-]
 
 const languages = [
   "English",
@@ -27,6 +17,81 @@ const languages = [
   "Hindi",
   "Japanese",
 ]
+
+const TRAINING_PHRASES_BY_LANGUAGE: Record<string, string[]> = {
+  English: [
+    "The quick brown fox jumps over the lazy dog.",
+    "EchoLingo helps me speak any language naturally and fluently.",
+    "I am recording my voice to create a personal digital profile.",
+    "Technology should bring people together through better communication.",
+    "Artificial intelligence can analyze the unique qualities of my voice.",
+    "I look forward to having natural conversations in many different languages.",
+    "Every person has a unique vocal identity that carries emotion and intent.",
+  ],
+  Spanish: [
+    "El zorro marrón salta sobre el perro tranquilo.",
+    "EchoLingo me ayuda a hablar con naturalidad y confianza.",
+    "Estoy grabando mi voz para crear un perfil digital personal.",
+    "La tecnología debe acercar a las personas con mejor comunicación.",
+    "Mi voz tiene ritmo, emoción y una identidad única.",
+    "Quiero tener conversaciones naturales en muchos idiomas.",
+    "Cada palabra puede transmitir intención, calma y claridad.",
+  ],
+  French: [
+    "Le renard brun saute par-dessus le chien tranquille.",
+    "EchoLingo m'aide à parler naturellement avec confiance.",
+    "J'enregistre ma voix pour créer un profil numérique personnel.",
+    "La technologie devrait rapprocher les personnes par la communication.",
+    "Ma voix porte du rythme, de l'émotion et une identité unique.",
+    "Je veux avoir des conversations naturelles dans plusieurs langues.",
+    "Chaque phrase peut transmettre une intention calme et claire.",
+  ],
+  German: [
+    "Der braune Fuchs springt über den ruhigen Hund.",
+    "EchoLingo hilft mir, natürlich und sicher zu sprechen.",
+    "Ich nehme meine Stimme auf, um ein persönliches Profil zu erstellen.",
+    "Technologie sollte Menschen durch bessere Kommunikation verbinden.",
+    "Meine Stimme hat Rhythmus, Gefühl und eine eigene Identität.",
+    "Ich möchte natürliche Gespräche in vielen Sprachen führen.",
+    "Jeder Satz kann Absicht, Ruhe und Klarheit vermitteln.",
+  ],
+  Italian: [
+    "La volpe marrone salta sopra il cane tranquillo.",
+    "EchoLingo mi aiuta a parlare in modo naturale e sicuro.",
+    "Sto registrando la mia voce per creare un profilo personale.",
+    "La tecnologia dovrebbe unire le persone con una comunicazione migliore.",
+    "La mia voce ha ritmo, emozione e una identità unica.",
+    "Voglio avere conversazioni naturali in molte lingue.",
+    "Ogni frase può trasmettere intenzione, calma e chiarezza.",
+  ],
+  Portuguese: [
+    "A raposa marrom salta sobre o cachorro tranquilo.",
+    "O EchoLingo me ajuda a falar com naturalidade e confiança.",
+    "Estou gravando minha voz para criar um perfil digital pessoal.",
+    "A tecnologia deve aproximar as pessoas com melhor comunicação.",
+    "Minha voz tem ritmo, emoção e uma identidade única.",
+    "Quero ter conversas naturais em muitos idiomas.",
+    "Cada frase pode transmitir intenção, calma e clareza.",
+  ],
+  Hindi: [
+    "मेरी आवाज़ शांत, स्पष्ट और स्वाभाविक लगती है।",
+    "EchoLingo मुझे आत्मविश्वास के साथ बोलने में मदद करता है।",
+    "मैं अपनी आवाज़ का एक व्यक्तिगत डिजिटल प्रोफ़ाइल बना रहा हूँ।",
+    "तकनीक बेहतर संवाद के ज़रिए लोगों को जोड़ सकती है।",
+    "मेरी आवाज़ में लय, भावना और एक अलग पहचान है।",
+    "मैं कई भाषाओं में स्वाभाविक बातचीत करना चाहता हूँ।",
+    "हर वाक्य शांति, स्पष्टता और इरादे को दिखा सकता है।",
+  ],
+  Japanese: [
+    "私の声は自然で、はっきりしています。",
+    "EchoLingoは自信を持って話すために役立ちます。",
+    "私は自分の声の個人プロフィールを作っています。",
+    "テクノロジーはより良い会話で人々をつなげます。",
+    "私の声にはリズム、感情、そして個性があります。",
+    "私はいろいろな言語で自然に会話したいです。",
+    "一つ一つの言葉には意味と落ち着きがあります。",
+  ],
+}
 
 const TARGET_SECONDS = 20
 const MIN_SECONDS = 5
@@ -44,6 +109,10 @@ export default function NewVoicePage() {
   const [currentPhraseIndex, setCurrentPhraseIndex] = useState(0)
   
   const timerRef = useRef<NodeJS.Timeout | null>(null)
+  const trainingPhrases = useMemo(
+    () => TRAINING_PHRASES_BY_LANGUAGE[sourceLanguage] || TRAINING_PHRASES_BY_LANGUAGE.English,
+    [sourceLanguage]
+  )
 
   useEffect(() => {
     if (isRecording) {
@@ -60,12 +129,19 @@ export default function NewVoicePage() {
     }
   }, [isRecording])
 
+  useEffect(() => {
+    setCurrentPhraseIndex(0)
+    setRecordedBlob(null)
+    setRecordingSeconds(0)
+    setError("")
+  }, [sourceLanguage])
+
   // Cycle phrases while recording
   useEffect(() => {
     if (isRecording && recordingSeconds > 0 && recordingSeconds % 4 === 0) {
-      setCurrentPhraseIndex(prev => (prev + 1) % TRAINING_PHRASES.length)
+      setCurrentPhraseIndex(prev => (prev + 1) % trainingPhrases.length)
     }
-  }, [isRecording, recordingSeconds])
+  }, [isRecording, recordingSeconds, trainingPhrases.length])
 
   const handleFinishStep1 = () => {
     if (displayName.trim()) {
@@ -212,8 +288,8 @@ export default function NewVoicePage() {
             <h2 className="text-3xl font-bold leading-tight tracking-tight">Capture your voice</h2>
             <p className="text-base text-[#92a2c5]">
               {isRecording 
-                ? "Keep reading the phrases as they change..." 
-                : "Read the phrases naturally. A longer sample (20s) ensures maximum accuracy."}
+                ? `Keep reading the ${sourceLanguage} phrases as they change...` 
+                : `Read the ${sourceLanguage} phrases naturally. A longer sample (20s) ensures maximum accuracy.`}
             </p>
           </div>
 
@@ -228,7 +304,7 @@ export default function NewVoicePage() {
                </div>
                
                <p className="text-center text-xl font-semibold leading-relaxed tracking-tight text-[#eef1ff] min-h-[5rem] flex items-center justify-center animate-fade-in">
-                 &quot;{TRAINING_PHRASES[currentPhraseIndex]}&quot;
+                 &quot;{trainingPhrases[currentPhraseIndex] || trainingPhrases[0]}&quot;
                </p>
                
                <div className="mt-8 flex justify-center gap-2 h-8">

@@ -5,7 +5,6 @@ import Link from "next/link"
 import {
   ArrowRightLeft,
   Check,
-  Globe,
   Keyboard,
   Loader2,
   Mic,
@@ -16,6 +15,7 @@ import {
 import AudioRecorder from "@/components/AudioRecorder"
 import { cn } from "@/lib/utils"
 import { UserProfile } from "@/components/layout/UserProfile"
+import { BrandLogo } from "@/components/layout/BrandLogo"
 
 type SpeakerKey = "person1" | "person2"
 
@@ -695,10 +695,7 @@ export function ConversationPage() {
           <main className="flex flex-col min-h-[100svh] bg-[#020b23] text-white">
             <div className="relative flex flex-col flex-1 min-h-0 overflow-y-auto bg-[radial-gradient(circle_at_top,rgba(124,92,255,0.22),transparent_28%),linear-gradient(180deg,#09142f_0%,#050c1f_48%,#09142f_100%)]">
               <div className="flex shrink-0 items-center justify-between px-4 pt-4 md:px-6 lg:px-8 lg:pt-8">
-                <div className="flex items-center gap-2 text-[#c8aefc]">
-                  <Globe size={18} />
-                  <h1 className="text-sm font-semibold tracking-tight">EchoLingo</h1>
-                </div>
+                <BrandLogo />
 
                 <div className="flex items-center gap-3">
                   <div className="flex items-center gap-2 rounded-full border border-[#c8aefc]/15 bg-[#12203f]/80 px-3 py-2 text-xs text-[#d8def6]">

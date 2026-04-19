@@ -1,5 +1,5 @@
-import { Globe } from "lucide-react"
 import { UserProfile } from "./UserProfile"
+import { BrandLogo } from "./BrandLogo"
 
 export function MobileHeader({
   title,
@@ -11,10 +11,7 @@ export function MobileHeader({
   return (
     <header className="sticky top-0 z-40 -mx-4 space-y-5 border-b border-white/5 bg-[#09142f]/95 px-4 pb-4 pt-[max(1.25rem,env(safe-area-inset-top))] backdrop-blur-md">
       <div className="flex items-center justify-between">
-        <div className="flex items-center gap-2 text-[#c8aefc]">
-          <Globe size={18} />
-          <span className="text-sm font-semibold tracking-tight">EchoLingo</span>
-        </div>
+        <BrandLogo markClassName="h-7 w-7" />
 
         {showProfile ? <UserProfile /> : null}
       </div>

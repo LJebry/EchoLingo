@@ -8,7 +8,6 @@ import {
   ChevronDown,
   Clipboard,
   Copy,
-  Globe,
   Loader2,
   Mic,
   Send,
@@ -16,6 +15,7 @@ import {
   Settings2,
 } from "lucide-react"
 import { UserProfile } from "@/components/layout/UserProfile"
+import { BrandLogo } from "@/components/layout/BrandLogo"
 import { cn } from "@/lib/utils"
 
 const MAX_CHARS = 5000
@@ -285,10 +285,7 @@ export default function Home() {
     <main className="min-h-full bg-[radial-gradient(circle_at_top,rgba(124,92,255,0.22),transparent_28%),linear-gradient(180deg,#09142f_0%,#050c1f_48%,#09142f_100%)] text-white">
       <div className="flex min-h-full flex-col px-4 pb-[6.75rem] pt-5 md:px-6 lg:px-8 lg:pb-28 lg:pt-8">
         <header className="flex items-center justify-between gap-3 pt-[max(0rem,env(safe-area-inset-top))]">
-          <div className="flex items-center gap-2 text-[#c8aefc]">
-            <Globe size={18} />
-            <h1 className="text-sm font-semibold tracking-tight">EchoLingo</h1>
-          </div>
+          <BrandLogo />
 
           <div className="flex items-center gap-3">
             <div className="relative group">

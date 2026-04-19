@@ -1,0 +1,28 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-labelledby="title">
+  <title id="title">Echolingo mark</title>
+  <defs>
+    <linearGradient id="mark-a" x1="42" y1="42" x2="206" y2="218" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#9d62e7"/>
+      <stop offset=".58" stop-color="#5e2ca5"/>
+      <stop offset="1" stop-color="#3b177b"/>
+    </linearGradient>
+    <linearGradient id="mark-b" x1="42" y1="52" x2="142" y2="182" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#ffffff"/>
+      <stop offset=".58" stop-color="#f1e9ff"/>
+      <stop offset="1" stop-color="#caa8ff"/>
+    </linearGradient>
+    <filter id="shadow" x="-20%" y="-20%" width="140%" height="150%" color-interpolation-filters="sRGB">
+      <feDropShadow dx="0" dy="10" stdDeviation="8" flood-color="#2f126d" flood-opacity=".28"/>
+    </filter>
+  </defs>
+  <path fill="url(#mark-a)" d="M127.8 33.3c55.8 0 101 38.8 101 86.6s-45.2 86.5-101 86.5c-18.1 0-35.1-4.1-49.8-11.2l-40.4 14.4 12.2-36.5c-13.6-14.7-21.8-33.1-21.8-53.2 0-47.8 45.2-86.6 99.8-86.6z"/>
+  <path fill="url(#mark-b)" d="M126.8 50.4c-45.3 0-82 31.1-82 69.5 0 15.9 6.4 30.5 17.1 42.2l-7.2 21.6 23.8-8.5c13.1 7.2 29.8 11.2 48.3 11.2h4.3V50.5c-1.4 0-2.9-.1-4.3-.1z"/>
+  <path fill="#7d45d8" d="M72.8 85.4h58.3v10.8H67.8c1.3-3.8 3-7.4 5-10.8zm-8.7 29.5h67v10.8H64.2a54.1 54.1 0 0 1-.1-10.8zm4.3 29.5h62.7v10.8H74.5c-2.4-3.4-4.4-7-6.1-10.8z" opacity=".8"/>
+  <path fill="none" stroke="#7d45d8" stroke-linecap="round" stroke-width="10" d="M106.5 55.2c-17.1 15.6-26.6 37-26.6 64.4s9.5 49.3 26.6 64.9m21.7-129.3c-17.1 15.6-26.6 37-26.6 64.4s9.5 49.3 26.6 64.9" opacity=".82"/>
+  <g filter="url(#shadow)">
+    <path fill="#fff" d="M139.5 52.4h52.8c11.6 0 21 9.4 21 21v20.2c0 11.6-9.4 21-21 21h-19.9l-27.9 17.3 6.2-17.3h-11.2c-11.6 0-21-9.4-21-21V73.4c0-11.6 9.4-21 21-21z"/>
+    <path fill="#fff" d="M159.8 126.8h52.8c11.6 0 21 9.4 21 21V168c0 11.6-9.4 21-21 21h-19.9l-27.9 17.3 6.2-17.3h-11.2c-11.6 0-21-9.4-21-21v-20.2c0-11.6 9.4-21 21-21z"/>
+  </g>
+  <path fill="#7b3fd2" d="M166.8 67.7h12.1l20.8 36.4h-13.4l-3.3-6.4h-20.8l-3.2 6.4h-13l20.8-36.4zm12.1 21.5-6.2-12.1-6.3 12.1h12.5zm-4.1 50.6h12.4v11.4h24.5v11.8h-14.6c-1.4 6.2-4.2 11.7-8.5 16.2 5.2 3.4 11.5 5.7 18.7 6.9l-6.9 11.2a64.7 64.7 0 0 1-21.6-9.8 70.1 70.1 0 0 1-23.1 10.2l-6.3-10.7c7.9-1.4 14.4-4 19.6-7.6a48.5 48.5 0 0 1-8.1-13.4l10.7-3h-16.5v-11.8h19.7v-11.4zm-2.8 23.2a28.5 28.5 0 0 0 7.2 9.1 27.3 27.3 0 0 0 5.6-9.1H172z"/>
+  <path fill="none" stroke="#8f56df" stroke-linecap="round" stroke-width="8" d="M8 115h1m17-17c-3.4 7.4-5.1 14.7-5.1 22s1.7 14.6 5.1 22m25-54c-5.3 10.7-8 21.4-8 32s2.7 21.4 8 32m197-37h-1m-17-17c3.4 7.4 5.1 14.7 5.1 22s-1.7 14.6-5.1 22m-25-54c5.3 10.7 8 21.4 8 32s-2.7 21.4-8 32"/>
+</svg>

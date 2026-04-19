@@ -5,6 +5,10 @@ import { SessionProvider } from "next-auth/react";
 export const metadata = {
   title: "EchoLingo",
   description: "Live translation and voice cloning",
+  icons: {
+    icon: "/echolingo-mark.svg",
+    apple: "/echolingo-mark.svg",
+  },
 };
 
 export default function RootLayout({
