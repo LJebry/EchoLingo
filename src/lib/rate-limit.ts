@@ -34,10 +34,13 @@ export function checkRateLimit(key: string, limit: number, windowMs: number) {
 
   // Cleanup old entries periodically (simple way)
   if (cache.size > 1000) {
-    for (const [k, v] of cache.entries()) {
-      if (v.expires < now) cache.delete(k);
-      if (cache.size <= 1000) break;
-    }
+    let deletedCount = 0;
+    cache.forEach((v, k) => {
+      if (deletedCount < 100 && v.expires < now) {
+        cache.delete(k);
+        deletedCount++;
+      }
+    });
   }
 
   return { 

@@ -1,7 +1,9 @@
 import NextAuth, { type DefaultSession } from "next-auth"
 import { PrismaAdapter } from "@auth/prisma-adapter"
 import prismaBase from "@/lib/prisma-base"
-import { authConfig } from "./auth.config"
+import { authConfig, isGoogleAuthConfigured } from "./auth.config"
+
+export { isGoogleAuthConfigured }
 
 declare module "next-auth" {
   interface Session {
