@@ -1,34 +1,49 @@
-import { LRUCache } from 'lru-cache';
-
-// Max 1000 unique identifiers in memory, with a default 1-minute TTL
-const cache = new LRUCache<string, number>({
-  max: 1000,
-  ttl: 60 * 1000,
-});
-
 /**
- * Rate limiter using lru-cache for better memory management.
- * Note: In a serverless/edge environment, this is local to each instance.
+ * Minimal rate limiter using native Map to avoid external dependencies in Edge middleware.
  */
-export function checkRateLimit(key: string, limit: number, windowMs: number) {
-  const currentCount = cache.get(key) || 0;
 
-  if (currentCount >= limit) {
+// Simple in-memory cache for rate limiting
+const cache = new Map<string, { count: number, expires: number }>();
+
+export function checkRateLimit(key: string, limit: number, windowMs: number) {
+  const now = Date.now();
+  const cached = cache.get(key);
+
+  if (cached && cached.expires > now) {
+    if (cached.count >= limit) {
+      return { 
+        success: false, 
+        limit, 
+        remaining: 0, 
+        reset: cached.expires 
+      };
+    }
+    
+    cached.count += 1;
     return { 
-      success: false, 
+      success: true, 
       limit, 
-      remaining: 0, 
-      reset: Date.now() + windowMs // Rough estimate as lru-cache doesn't expose exact expiry
+      remaining: limit - cached.count, 
+      reset: cached.expires 
     };
   }
 
-  const nextCount = currentCount + 1;
-  cache.set(key, nextCount, { ttl: windowMs });
+  // Reset or initialize for this key
+  const expires = now + windowMs;
+  cache.set(key, { count: 1, expires });
+
+  // Cleanup old entries periodically (simple way)
+  if (cache.size > 1000) {
+    for (const [k, v] of cache.entries()) {
+      if (v.expires < now) cache.delete(k);
+      if (cache.size <= 1000) break;
+    }
+  }
 
   return { 
     success: true, 
     limit, 
-    remaining: limit - nextCount, 
-    reset: Date.now() + windowMs 
+    remaining: limit - 1, 
+    reset: expires 
   };
 }
