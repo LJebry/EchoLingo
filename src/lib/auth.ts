@@ -1,7 +1,7 @@
 import NextAuth, { type DefaultSession } from "next-auth"
 import GoogleProvider from "next-auth/providers/google"
 import { PrismaAdapter } from "@auth/prisma-adapter"
-import prisma from "@/lib/prisma"
+import prismaBase from "@/lib/prisma-base"
 
 declare module "next-auth" {
   interface Session {
@@ -18,7 +18,7 @@ export const isGoogleAuthConfigured = Boolean(
 )
 
 export const { handlers, auth, signIn, signOut } = NextAuth({
-  adapter: PrismaAdapter(prisma),
+  adapter: PrismaAdapter(prismaBase),
   secret: process.env.AUTH_SECRET,
   // Ensure trustHost is true for Vercel, and provide a fallback
   trustHost: true,

@@ -1,27 +1,27 @@
-import { PrismaClient } from '@prisma/client'
-import { withAccelerate } from '@prisma/extension-accelerate'
+import prismaBase from './prisma-base'
+import { getCurrentUser } from './session'
 
-const prismaClientSingleton = () => {
-  const url = process.env.DATABASE_URL
+/**
+ * Prisma Client extended with Row Level Security (RLS).
+ * It automatically sets the 'app.current_user_id' session variable 
+ * before every query based on the current authenticated user.
+ */
+const prisma = prismaBase.$extends({
+  query: {
+    $allModels: {
+      async $allOperations({ args, query }) {
+        const user = await getCurrentUser()
+        const userId = user?.id || ''
 
-  if (!url) {
-    throw new Error("RUNTIME ERROR: DATABASE_URL is not defined in the environment. Check Vercel settings.")
-  }
-
-  // In Prisma 7, Accelerate connections MUST be passed via the 'accelerateUrl' property.
-  return new PrismaClient({
-    accelerateUrl: url,
-  } as any).$extends(withAccelerate())
-}
-
-type PrismaClientExtended = ReturnType<typeof prismaClientSingleton>
-
-declare global {
-  var prisma: undefined | PrismaClientExtended
-}
-
-const prisma = globalThis.prisma ?? prismaClientSingleton()
+        // Wrap the query in a transaction to set the local session variable.
+        // SET LOCAL ensures the variable is only visible within this transaction.
+        return prismaBase.$transaction(async (tx) => {
+          await tx.$executeRawUnsafe(`SET LOCAL app.current_user_id = '${userId}'`)
+          return query(args)
+        })
+      },
+    },
+  },
+})
 
 export default prisma
-
-if (process.env.NODE_ENV !== 'production') globalThis.prisma = prisma
